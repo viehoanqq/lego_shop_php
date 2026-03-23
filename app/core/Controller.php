@@ -1,24 +1,26 @@
 <?php
 class Controller {
-    // Hàm nạp Model
     public function model($model) {
         require_once 'app/models/' . $model . '.php';
         return new $model();
     }
 
-    // Hàm nạp View và truyền dữ liệu
     public function view($view, $data = []) {
-    extract($data); 
-    
-    // 1. Tự động đắp cái đầu vào
-    require_once 'app/views/components/header.php';
+        extract($data); 
+        
+        // Tự động ghép Header
+        if (file_exists('app/views/components/header.php')) {
+            require_once 'app/views/components/header.php';
+        }
 
-    // 2. Đổ nội dung thân bài (home, product, v.v.) vào giữa
-    if (file_exists('app/views/' . $view . '.php')) {
-        require_once 'app/views/' . $view . '.php';
+        // Nạp nội dung thân bài
+        if (file_exists('app/views/' . $view . '.php')) {
+            require_once 'app/views/' . $view . '.php';
+        }
+
+        // Tự động ghép Footer
+        if (file_exists('app/views/components/footer.php')) {
+            require_once 'app/views/components/footer.php';
+        }
     }
-
-    // 3. Tự động đắp cái đuôi vào
-    require_once 'app/views/components/footer.php';
-}
 }

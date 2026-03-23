@@ -1,15 +1,15 @@
 <?php
 class HomeController extends Controller {
     public function index() {
-        // 1. Gọi Model sản phẩm
+        // Gọi Model
         $productModel = $this->model('ProductModel');
         
-        // 2. Lấy danh sách sản phẩm từ DB
+        // Lấy dữ liệu
         $products = $productModel->getAllProducts();
 
-        // 3. Truyền biến $products sang giao diện home.php
+        // Truyền dữ liệu sang View
         $this->view('user/home', [
-            'title' => 'Trang chủ Lego World',
+            'title' => 'Lego World Store - Trang chủ',
             'products' => $products
         ]);
     }
