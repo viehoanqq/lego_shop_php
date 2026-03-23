@@ -1,9 +1,10 @@
-﻿LEGO WORLD STORE - PHP MVC PROJECT
+﻿
+### LEGO WORLD STORE - PHP MVC PROJECT
 
 Chào mừng bạn đến với dự án Website bán đồ chơi Lego được xây dựng bằng PHP theo mô hình MVC (Model-View-Controller). Dự án tập trung vào trải nghiệm người dùng và quy trình quản lý kho hàng.
 
 ## Cấu trúc thư mục (Project Structure)
-
+```plaintext
 lego_shop_php/
 ├── app/                    # Thư mục chính chứa logic ứng dụng
 │   ├── core/               # Các file hệ thống cốt lõi (`App.php`, `Controller.php`, `Database.php`)
@@ -23,7 +24,7 @@ lego_shop_php/
 ├── .htaccess               # Rewrite tất cả yêu cầu về `index.php`
 ├── index.php               # Entry point (gọi `session_start()` và khởi `App`)
 └── lego_shop.sql           # SQL schema để import vào MySQL
-
+```
 ## Yêu cầu hệ thống (Prerequisites)
 
 - XAMPP (PHP 7.4 hoặc 8.x)
