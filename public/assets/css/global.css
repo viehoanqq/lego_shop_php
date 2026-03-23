@@ -1,0 +1,36 @@
+/* ==========================================
+   GLOBAL CSS (Reset & Fonts)
+========================================== */
+@font-face {
+  font-family: 'PoppinsVH';
+  src: url('../font/FzPoppins/FZ-Poppins-Regular.ttf') format('truetype');
+  font-weight: 400; /* Regular nên để 400 */
+}
+
+@font-face {
+  font-family: 'PoppinsVH';
+  src: url('../font/FzPoppins/FZ-Poppins-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+/* Reset CSS cơ bản - KHÔNG ép font-weight ở đây */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'PoppinsVH', Arial, sans-serif;
+}
+
+body {
+  font-weight: 400; /* Đặt độ dày mặc định ở body */
+  background-color: #f8f9fa; /* Màu nền xám nhạt cho toàn web (tùy chọn) */
+}
+
+a {
+  text-decoration: none;
+  /* Bỏ color: #fff ở đây, vì nếu để sẽ làm tất cả link trên web thành màu trắng, kể cả link nền trắng */
+}
+
+ul {
+  list-style: none;
+}

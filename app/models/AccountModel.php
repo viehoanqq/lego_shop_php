@@ -1,11 +1,13 @@
 <?php
 class AccountModel extends Database {
+    
+    // Xử lý Đăng ký
     public function registerFull($data) {
         $db = $this->getConnection();
         
-        // 1. Kiểm tra SDT hoặc Email đã tồn tại trong bảng accounts chưa
-        $phone = $db->real_escape_string($data['phone']);
-        $email = $db->real_escape_string($data['email']);
+        // 1. Kiểm tra SDT hoặc Email đã tồn tại chưa
+        $phone = $db->real_escape_string(trim($data['phone']));
+        $email = $db->real_escape_string(trim($data['email']));
         
         $check = $db->query("SELECT id FROM accounts WHERE phone = '$phone' OR email = '$email'");
         if ($check->num_rows > 0) {
@@ -22,17 +24,17 @@ class AccountModel extends Database {
             $account_id = $db->insert_id;
 
             // 3. Chèn vào bảng users
-            $fullname = $db->real_escape_string($data['fullname']);
+            $fullname = $db->real_escape_string(trim($data['fullname']));
             $sqlUser = "INSERT INTO users (account_id, fullname) 
                         VALUES ('$account_id', '$fullname')";
             $db->query($sqlUser);
             $user_id = $db->insert_id;
 
             // 4. Chèn vào bảng user_addresses
-            $street = $db->real_escape_string($data['street']);
-            $ward = $db->real_escape_string($data['ward']);
-            $district = $db->real_escape_string($data['district']);
-            $city = $db->real_escape_string($data['city']);
+            $street = $db->real_escape_string(trim($data['street']));
+            $ward = $db->real_escape_string(trim($data['ward']));
+            $district = $db->real_escape_string(trim($data['district']));
+            $city = $db->real_escape_string(trim($data['city']));
             
             $sqlAddr = "INSERT INTO user_addresses (user_id, receiver_name, receiver_phone, street, ward, district, city, is_default) 
                         VALUES ('$user_id', '$fullname', '$phone', '$street', '$ward', '$district', '$city', 1)";
@@ -44,5 +46,27 @@ class AccountModel extends Database {
             $db->rollback();
             return "Lỗi hệ thống: " . $e->getMessage();
         }
+    }
+
+    // Xử lý Đăng nhập
+    public function login($username, $password) {
+        $db = $this->getConnection();
+        $username = $db->real_escape_string(trim($username));
+        
+        $sql = "SELECT a.*, u.fullname, u.id as user_id 
+                FROM accounts a 
+                LEFT JOIN users u ON a.id = u.account_id 
+                WHERE (a.phone = '$username' OR a.email = '$username') AND a.status = 'active'";
+                
+        $result = $db->query($sql);
+        
+        if ($result && $result->num_rows > 0) {
+            $account = $result->fetch_assoc();
+            if (password_verify($password, $account['password'])) {
+                unset($account['password']);
+                return $account;
+            }
+        }
+        return false; 
     }
 }

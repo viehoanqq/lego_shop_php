@@ -4,28 +4,82 @@ $error = $data['error'] ?? null;
 ?>
 
 <style>
-    .register-wrapper { background-color: #f8f9fa; padding: 40px 0; min-height: 100vh; font-family: 'Inter', sans-serif; }
-    .register-card { max-width: 650px; margin: auto; background: #fff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); overflow: hidden; }
-    .register-header { background: #a4161a; color: white; padding: 25px; text-align: center; }
-    .register-header h2 { margin: 0; font-size: 24px; }
-    .register-body { padding: 35px; }
-    .form-section { border-bottom: 1px solid #eee; margin-bottom: 20px; padding-bottom: 10px; color: #a4161a; font-weight: bold; font-size: 13px; }
+    /* Đồng bộ Background với trang Login */
+    .register-wrapper { 
+        background: url('/lego_shop_php/public/assets/images/login-bgr.webp') no-repeat center center; 
+        background-size: cover; 
+        padding: 40px 0; 
+        min-height: 100vh; 
+        font-family: 'Inter', sans-serif; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Box trong suốt nhẹ giống Login */
+    .register-card { 
+        width: 100%;
+        max-width: 650px; 
+        background: rgba(255, 255, 255, 0.96); 
+        border-radius: 12px; 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+        overflow: hidden; 
+    }
+    
+    .register-header { text-align: center; padding: 25px 20px 10px; }
+    .register-header img { width: 120px; margin-bottom: 10px; }
+    .register-header h2 { margin: 0; font-size: 24px; color: #a4161a; font-weight: 700; }
+    .register-body { padding: 25px 35px 35px; }
+    
+    .form-section { border-bottom: 1px solid #ddd; margin-bottom: 20px; padding-bottom: 5px; color: #a4161a; font-weight: bold; font-size: 13px; }
     .form-row { display: flex; gap: 15px; }
-    .form-group { flex: 1; margin-bottom: 18px; }
-    label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #444; }
-    input, select { width: 100%; padding: 11px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-    input.invalid, select.invalid { border-color: #e03131; background-color: #fff5f5; }
+    .form-group { flex: 1; margin-bottom: 15px; }
+    
+    /* KHÓA VÙNG CSS: Thêm .register-body phía trước để không ảnh hưởng Header */
+    .register-body label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #444; }
+    
+    .register-body input[type="text"], 
+    .register-body input[type="email"], 
+    .register-body input[type="password"], 
+    .register-body select { 
+        width: 100%; padding: 11px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; transition: 0.3s;
+    }
+    
+    .register-body input:focus, 
+    .register-body select:focus { 
+        border-color: #a4161a; outline: none; box-shadow: 0 0 0 3px rgba(164, 22, 26, 0.1); 
+    }
+    
+    .register-body input.invalid, 
+    .register-body select.invalid { 
+        border-color: #e03131; background-color: #fff5f5; 
+    }
+    
     .error-msg { color: #e03131; font-size: 11px; margin-top: 5px; display: block; height: 12px; }
-    .alert-danger { background: #fff5f5; color: #c92a2a; padding: 12px; border-left: 5px solid #ff6b6b; margin-bottom: 20px; border-radius: 4px; font-size: 14px; }
-    .btn-submit { width: 100%; background: #a4161a; color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; }
+    .alert-danger { background: #fff5f5; color: #c92a2a; padding: 12px; border-left: 5px solid #ff6b6b; margin-bottom: 20px; border-radius: 4px; font-size: 14px; text-align: center; font-weight: 500;}
+    
+    .terms-group { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #444; margin-top: 10px; margin-bottom: 20px; }
+    .terms-group input { width: auto; cursor: pointer; }
+    .terms-group a { color: #a4161a; font-weight: bold; text-decoration: none; }
+    
+    .btn-submit { width: 100%; background: #a4161a; color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s;}
+    .btn-submit:hover { background: #801215; }
+    
+    .auth-links { text-align: center; margin-top: 20px; font-size: 14px; color: #666; }
+    .auth-links a { color: #a4161a; text-decoration: none; font-weight: bold; transition: 0.2s; }
+    .auth-links a:hover { text-decoration: underline; }
 </style>
 
 <div class="register-wrapper">
     <div class="register-card">
-        <div class="register-header"><h2>ĐĂNG KÝ THÀNH VIÊN</h2></div>
+        <div class="register-header">
+            <img src="/lego_shop_php/public/assets/images/logo.png" alt="LEGO World">
+            <h2>ĐĂNG KÝ THÀNH VIÊN</h2>
+        </div>
+        
         <div class="register-body">
             <?php if ($error): ?>
-                <div class="alert-danger">⚠️ <?= $error ?></div>
+                <div class="alert-danger"><?= $error ?></div>
             <?php endif; ?>
 
             <form id="registerForm" action="/lego_shop_php/account/actionRegister" method="POST" novalidate>
@@ -93,8 +147,18 @@ $error = $data['error'] ?? null;
                         <span class="error-msg" id="street-error"></span>
                     </div>
                 </div>
+
+                <div class="terms-group">
+                    <input type="checkbox" id="terms" name="terms" required <?= isset($old['terms']) ? 'checked' : '' ?>>
+                    <label for="terms">Tôi đã đọc và đồng ý với <a href="#">Điều khoản dịch vụ</a> *</label>
+                </div>
+
                 <button type="submit" class="btn-submit">ĐĂNG KÝ NGAY</button>
             </form>
+
+            <div class="auth-links">
+                Đã có tài khoản? <a href="/lego_shop_php/account/login">Quay lại trang Đăng nhập</a>
+            </div>
         </div>
     </div>
 </div>
@@ -119,6 +183,12 @@ $error = $data['error'] ?? null;
         const val = el.value.trim();
         let ok = true;
 
+        if (val === "") {
+            err.innerText = "Không được để trống!";
+            el.classList.add('invalid');
+            return false; 
+        }
+
         if (rules[id]) {
             if (!rules[id].reg.test(val)) {
                 err.innerText = rules[id].msg; el.classList.add('invalid'); ok = false;
@@ -130,8 +200,14 @@ $error = $data['error'] ?? null;
         if (id === 'confirm_password' || id === 'password') {
             const p = document.getElementById('password').value;
             const c = document.getElementById('confirm_password').value;
-            if (c !== p) { document.getElementById('confirm-error').innerText = "Không khớp."; ok = false; }
-            else { document.getElementById('confirm-error').innerText = ""; }
+            if (c !== "" && c !== p) { 
+                document.getElementById('confirm-error').innerText = "Không khớp."; 
+                document.getElementById('confirm_password').classList.add('invalid');
+                ok = false; 
+            } else if (c !== "") { 
+                document.getElementById('confirm-error').innerText = ""; 
+                document.getElementById('confirm_password').classList.remove('invalid');
+            }
         }
         return ok;
     }
@@ -157,14 +233,23 @@ $error = $data['error'] ?? null;
         validate('district');
     }
 
+    // Chặn gửi form nếu còn ô trống hoặc lỗi
     document.getElementById('registerForm').addEventListener('submit', function(e) {
         let valid = true;
         ['fullname', 'phone', 'email', 'password', 'confirm_password', 'city', 'district', 'ward', 'street'].forEach(id => {
             if (!validate(id)) valid = false;
         });
+        
+        const terms = document.getElementById('terms');
+        if (!terms.checked) {
+            alert("Bạn phải đồng ý với Điều khoản dịch vụ để tiếp tục!");
+            valid = false;
+        }
+
         if (!valid) { e.preventDefault(); }
     });
 
+    // Tự động khôi phục Dropdown khi load lại do lỗi
     window.onload = function() {
         if ("<?= $old['city'] ?? '' ?>") {
             updateDistrict(); document.getElementById("district").value = "<?= $old['district'] ?? '' ?>";

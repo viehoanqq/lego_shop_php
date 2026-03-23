@@ -29,7 +29,7 @@
       </div>
 
       <div class="search-bar">
-        <input type="text" placeholder="Nhập từ khóa để tìm kiếm (ví dụ: lắp ráp, mô hình, ba lô,...)">
+        <input class="search-input" type="text" placeholder="Nhập từ khóa để tìm kiếm (ví dụ: lắp ráp, mô hình, ba lô,...)">
         <a href="/lego_shop_php/product/search"><button><i class="fa-solid fa-magnifying-glass"></i></button></a>
         <button type="button" class="advanced-search-trigger" id="openAdvancedSearch" title="Tìm kiếm nâng cao">
           <i class="fa-solid fa-sliders"></i>
