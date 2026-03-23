@@ -1,10 +1,14 @@
+-- ==========================================
+-- 1. CỤM TÀI KHOẢN & NGƯỜI DÙNG
+-- ==========================================
 
 CREATE TABLE accounts (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    phone VARCHAR(20) UNIQUE NOT NULL, -- Đã thêm để khớp với chức năng Login/Register PHP
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'customer') DEFAULT 'customer',
-    status ENUM('active', 'locked') DEFAULT 'active', -- Phục vụ yêu cầu: Khoá tài khoản
+    status ENUM('active', 'locked') DEFAULT 'active', 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -12,7 +16,6 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     account_id INT NOT NULL,
     fullname VARCHAR(100) NOT NULL,
-    phone VARCHAR(20) NOT NULL,
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
 );
 
@@ -36,8 +39,10 @@ CREATE TABLE user_addresses (
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    description TEXT, -- Đã bổ sung theo phát hiện của bạn
-    image_url VARCHAR(255) -- Thêm ảnh danh mục (VD: Logo Star Wars, Ninjago) để web đẹp hơn
+    description TEXT, 
+    image_url VARCHAR(255),
+    status VARCHAR(20) DEFAULT 'active', -- Đã thêm để khớp code Header PHP
+    ordering INT DEFAULT 0               -- Đã thêm để sắp xếp Menu
 );
 
 CREATE TABLE products (
@@ -47,12 +52,12 @@ CREATE TABLE products (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     unit VARCHAR(50) DEFAULT 'Hộp', 
-    import_price INT DEFAULT 0, -- Giá vốn BÌNH QUÂN hiện tại
-    profit_margin FLOAT DEFAULT 0, -- % Lợi nhuận hiện tại
-    selling_price INT DEFAULT 0, -- Giá bán hiện tại
+    import_price INT DEFAULT 0, 
+    profit_margin FLOAT DEFAULT 0, 
+    selling_price INT DEFAULT 0, 
     stock_quantity INT DEFAULT 0, 
-    min_stock_level INT DEFAULT 5, -- Mức cảnh báo sắp hết hàng
-    status TINYINT DEFAULT 1, -- 1: Đang bán, 0: Ẩn (Không xóa cứng nếu đã nhập hàng)
+    min_stock_level INT DEFAULT 5, 
+    status TINYINT DEFAULT 1, 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
@@ -83,10 +88,9 @@ CREATE TABLE import_receipt_details (
     receipt_id INT NOT NULL,
     product_id INT NOT NULL,
     quantity INT NOT NULL,
-    price INT NOT NULL, -- Giá nhập của TỪNG HỘP trong lô này
-    -- 2 CỘT MỚI: Chìa khóa để lấy trọn điểm câu "tra cứu giá vốn, giá bán THEO LÔ HÀNG"
-    calculated_average_price INT DEFAULT 0, -- Chốt cứng giá vốn bình quân ngay sau khi lô này nhập xong
-    calculated_selling_price INT DEFAULT 0, -- Chốt cứng giá bán ngay sau khi lô này nhập xong
+    price INT NOT NULL, 
+    calculated_average_price INT DEFAULT 0, 
+    calculated_selling_price INT DEFAULT 0, 
     FOREIGN KEY (receipt_id) REFERENCES import_receipts(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
@@ -123,7 +127,7 @@ CREATE TABLE orders (
     shipping_fullname VARCHAR(100) NOT NULL,
     shipping_phone VARCHAR(20) NOT NULL,
     shipping_street VARCHAR(255) NOT NULL,
-    shipping_ward VARCHAR(100) NOT NULL, -- Tách riêng để order/filter theo yêu cầu thầy
+    shipping_ward VARCHAR(100) NOT NULL, 
     shipping_district VARCHAR(100) NOT NULL,
     shipping_city VARCHAR(100) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -135,7 +139,7 @@ CREATE TABLE order_details (
     order_id INT NOT NULL,
     product_id INT NOT NULL,
     quantity INT NOT NULL,
-    price INT NOT NULL, -- Giá chốt tại thời điểm khách bấm mua
+    price INT NOT NULL, 
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id)
 );

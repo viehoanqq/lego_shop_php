@@ -59,8 +59,7 @@ $success = $data['success'] ?? null;
                 </div>
 
                 <div style="text-align: right; margin-bottom: 20px; font-size: 13px;">
-                    <a href="#" style="color: #666; text-decoration: none;">Quên mật khẩu?</a>
-                </div>
+                    <a href="/lego_shop_php/account/forgot" style="color: #666; text-decoration: none;">Quên mật khẩu?</a>    </div>
 
                 <button type="submit" class="btn-submit">ĐĂNG NHẬP</button>
             </form>

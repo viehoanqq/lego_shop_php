@@ -69,4 +69,27 @@ class AccountModel extends Database {
         }
         return false; 
     }
+
+    // Kiểm tra tài khoản tồn tại (dùng cho quên mật khẩu)  
+    public function checkAccountExists($username) {
+        $db = $this->getConnection();
+        $username = $db->real_escape_string(trim($username));
+        
+        $sql = "SELECT id FROM accounts WHERE (phone = '$username' OR email = '$username') AND status = 'active'";
+        $result = $db->query($sql);
+        
+        if ($result && $result->num_rows > 0) {
+            return $result->fetch_assoc(); // Trả về mảng chứa id tài khoản
+        }
+        return false;
+    }
+
+    // Cập nhật mật khẩu mới
+    public function updatePassword($account_id, $new_password) {
+        $db = $this->getConnection();
+        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+        
+        $sql = "UPDATE accounts SET password = '$hashed_password' WHERE id = '$account_id'";
+        return $db->query($sql);
+    }
 }

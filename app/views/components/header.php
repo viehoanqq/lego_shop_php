@@ -106,14 +106,37 @@
     </div>
 
     <nav class="nav-bar">
-      <ul>
-        <li><a href="/lego_shop_php/home">TRANG CHỦ</a></li>
-        <li><a href="/lego_shop_php/product">SẢN PHẨM</a></li>
-        <li><a href="/lego_shop_php/new">HÀNG MỚI</a></li>
-        <li><a href="/lego_shop_php/sale">KHUYẾN MÃI</a></li>
-        <li><a href="/lego_shop_php/theme">CHỦ ĐỀ</a></li>
-        <li><a href="/lego_shop_php/news">TIN TỨC</a></li>
-      </ul>
+      <ul class="header-menu-ul" style="display: flex; gap: 30px; justify-content: center; padding: 15px 0; background-color: #a4161a;">
+    <li><a href="/lego_shop_php/home" style="color: white; font-weight: 700;">TRANG CHỦ</a></li>
+    <li><a href="/lego_shop_php/product" style="color: white; font-weight: 700;">SẢN PHẨM</a></li>
+    
+    <?php if(!empty($header_categories)): ?>
+        <li style="position: relative;" class="dropdown-chu-de">
+            <a href="#" style="color: white; font-weight: 700;">CHỦ ĐỀ <i class="fa-solid fa-chevron-down" style="font-size: 12px;"></i></a>
+            
+            <ul class="dropdown-menu" style="position: absolute; top: 100%; left: 0; background: white; width: 200px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 10px 0;">
+                <?php foreach($header_categories as $cat): ?>
+                    <li>
+                        <a href="/lego_shop_php/product/category/<?= $cat['id'] ?>" style="color: #333; display: block; padding: 10px 15px; text-transform: none; font-weight: 500;">
+                            <?= htmlspecialchars($cat['name']) ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+    <?php endif; ?>
+
+</ul>
+
+<style>
+    .dropdown-chu-de:hover .dropdown-menu {
+        display: block !important;
+    }
+    .dropdown-menu li a:hover {
+        background-color: #f8f9fa;
+        color: #a4161a !important;
+    }
+</style>
     </nav>
   </header>
 

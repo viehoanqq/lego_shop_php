@@ -118,4 +118,73 @@ class AccountController extends Controller {
         header("Location: /lego_shop_php/home");
         exit();
     }
+
+    /* ================= QUÊN MẬT KHẨU (BƯỚC 1) ================= */
+    public function forgot() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        $error = $_SESSION['forgot_error'] ?? null;
+        unset($_SESSION['forgot_error']);
+
+        $this->view('user/forgot', ['title' => 'Quên mật khẩu', 'error' => $error]);
+    }
+
+    public function actionForgot() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $username = $_POST['username'];
+            
+            $model = $this->model('AccountModel');
+            $account = $model->checkAccountExists($username);
+
+            if ($account) {
+                // Có tài khoản -> Cấp quyền vào trang Đặt lại mật khẩu
+                $_SESSION['reset_account_id'] = $account['id'];
+                header("Location: /lego_shop_php/account/reset");
+            } else {
+                $_SESSION['forgot_error'] = "Không tìm thấy tài khoản với Email/SĐT này!";
+                header("Location: /lego_shop_php/account/forgot");
+            }
+            exit();
+        }
+    }
+
+    /* ================= ĐẶT LẠI MẬT KHẨU (BƯỚC 2) ================= */
+    public function reset() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        
+        // Chặn không cho truy cập thẳng nếu chưa qua bước nhập Email (Bảo mật)
+        if (!isset($_SESSION['reset_account_id'])) {
+            header("Location: /lego_shop_php/account/login");
+            exit();
+        }
+
+        $error = $_SESSION['reset_error'] ?? null;
+        unset($_SESSION['reset_error']);
+
+        $this->view('user/reset', ['title' => 'Đặt lại mật khẩu', 'error' => $error]);
+    }
+
+    public function actionReset() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $password = $_POST['password'];
+            $confirm_password = $_POST['confirm_password'];
+            $account_id = $_SESSION['reset_account_id'];
+
+            if ($password !== $confirm_password) {
+                $_SESSION['reset_error'] = "Mật khẩu xác nhận không khớp!";
+                header("Location: /lego_shop_php/account/reset");
+                exit();
+            }
+
+            $model = $this->model('AccountModel');
+            $model->updatePassword($account_id, $password);
+
+            // Đổi xong thì xóa Session reset đi và báo thành công ở trang Login
+            unset($_SESSION['reset_account_id']);
+            $_SESSION['success_msg'] = "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.";
+            header("Location: /lego_shop_php/account/login");
+            exit();
+        }
+    }
 }
