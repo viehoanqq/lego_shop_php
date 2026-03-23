@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Khai báo thư mục gốc ảo để .htaccess không bị lạc đường
+RewriteBase /lego_shop_php/
+
+# Bỏ qua nếu là file (hình ảnh, css) hoặc thư mục có thật
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Đẩy mọi request về index.php
+RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
