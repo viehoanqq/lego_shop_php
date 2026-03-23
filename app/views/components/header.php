@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/global.css">
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/components/header.css">
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/components/footer.css">
+    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/components/productCard.css">
     <script src="/lego_shop_php/public/assets/js/main.js" defer></script>
 </head>
 <body>
@@ -30,7 +31,7 @@
 
       <div class="search-bar">
         <input class="search-input" type="text" placeholder="Nhập từ khóa để tìm kiếm (ví dụ: lắp ráp, mô hình, ba lô,...)">
-        <a href="/lego_shop_php/product/search"><button><i class="fa-solid fa-magnifying-glass"></i></button></a>
+        <a href="/lego_shop_php/product/search"><button class="normal-btn"><i class="fa-solid fa-magnifying-glass"></i></button></a>
         <button type="button" class="advanced-search-trigger" id="openAdvancedSearch" title="Tìm kiếm nâng cao">
           <i class="fa-solid fa-sliders"></i>
         </button>
