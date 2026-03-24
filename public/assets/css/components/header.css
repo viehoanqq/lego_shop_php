@@ -254,3 +254,220 @@ footer {
   display: flex;
   justify-content: space-between;
 }
+/* ==========================================
+   BREADCRUMB (Thanh điều hướng)
+   ========================================== */
+.breadcrumb-wrapper {
+    background-color: #fff;
+    border-top: 1px solid #eaeaea;
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom: 30px;
+    padding: 15px 0;
+}
+
+.breadcrumb-wrapper .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.breadcrumb a {
+    color: #a4161a;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.breadcrumb a:hover { color: #d00000; }
+.breadcrumb .separator { color: #ccc; }
+.breadcrumb .active { color: #333; font-weight: 600; }
+
+/* ==========================================
+   SIDEBAR FILTER (Cột lọc bên trái)
+   ========================================== */
+.sidebar-filter {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03); /* Bóng đổ rất mờ giống ảnh */
+    border: 1px solid #f0f0f0;
+}
+
+.filter-group {
+    margin-bottom: 30px;
+}
+
+.filter-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Tiêu đề danh mục có gạch đít đỏ */
+.filter-title {
+    color: #a4161a;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 2px solid #a4161a;
+    padding-bottom: 10px;
+}
+
+.filter-list li {
+    margin-bottom: 12px;
+}
+
+.filter-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: #444;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.filter-label:hover {
+    color: #a4161a;
+}
+
+/* Custom cái Radio Button cho hiện đại */
+.filter-label input[type="radio"] {
+    margin-right: 12px;
+    width: 16px;
+    height: 16px;
+    accent-color: #a4161a; /* Đổi màu nút tick thành màu đỏ của LEGO */
+    cursor: pointer;
+}
+
+.filter-label .count {
+    color: #888;
+    margin-left: 6px;
+    font-size: 13px;
+    font-weight: 400;
+}
+/* Sidebar Group */
+.sidebar-filter {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.filter-group {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #f5f5f5;
+    padding-bottom: 15px;
+}
+
+.filter-group:last-of-type {
+    border-bottom: none;
+}
+
+.filter-title {
+    color: #a4161a;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #a4161a;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.filter-list {
+    list-style: none;
+    padding: 0;
+}
+
+.filter-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #444;
+}
+
+.filter-label input[type="radio"] {
+    accent-color: #a4161a;
+    width: 16px;
+    height: 16px;
+}
+
+.filter-subtitle {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 15px 0 8px;
+    color: #666;
+}
+
+/* Ô nhập giá tay */
+.price-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-input-group input {
+    width: 80px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+.price-input-group input:focus {
+    border-color: #a4161a;
+}
+
+/* Nút bấm ở cuối */
+.filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-apply-filter {
+    background-color: #a4161a;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+}
+
+.btn-apply-filter:hover {
+    background-color: #801215;
+}
+
+.btn-clear-filter {
+    display: block;
+    text-align: center;
+    background-color: white;
+    color: #a4161a;
+    border: 1px solid #a4161a;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-clear-filter:hover {
+    background-color: #fff5f5;
+}

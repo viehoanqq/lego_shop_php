@@ -61,7 +61,7 @@ $error = $data['error'] ?? null;
     .terms-group { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #444; margin-top: 10px; margin-bottom: 20px; }
     .terms-group input { width: auto; cursor: pointer; }
     .terms-group a { color: #a4161a; font-weight: bold; text-decoration: none; }
-    
+    .terms-group .terms {position: relative ; bottom: 3px;}
     .btn-submit { width: 100%; background: #a4161a; color: white; border: none; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s;}
     .btn-submit:hover { background: #801215; }
     
@@ -149,7 +149,7 @@ $error = $data['error'] ?? null;
                 </div>
 
                 <div class="terms-group">
-                    <input type="checkbox" id="terms" name="terms" required <?= isset($old['terms']) ? 'checked' : '' ?>>
+                    <input type="checkbox" class= "terms" id="terms" name="terms" required <?= isset($old['terms']) ? 'checked' : '' ?>>
                     <label for="terms">Tôi đã đọc và đồng ý với <a href="#">Điều khoản dịch vụ</a> *</label>
                 </div>
 
