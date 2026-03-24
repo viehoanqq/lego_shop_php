@@ -128,7 +128,7 @@
                 <i class="fa-solid fa-user"></i> <span id="name">Đăng nhập</span>
             </a>
             
-<a href="javascript:void(0);" id="cart-link" onclick="showToast('Bạn cần đăng nhập để xem giỏ hàng!', 'error'); setTimeout(() => window.location.href='/lego_shop_php/account/login', 1500);">              <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+<a href="javascript:void(0);" id="cart-link" onclick="showToast('Bạn cần đăng nhập để xem giỏ hàng!', 'error'); setTimeout(() => window.location.href='/lego_shop_php/account/login', 1000);">              <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
             </a>
         <?php endif; ?>
       </div>

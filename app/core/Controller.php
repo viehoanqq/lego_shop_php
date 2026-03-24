@@ -10,35 +10,69 @@ class Controller {
 
     // Nạp View
     public function view($view, $data = []) {
-        // Giải nén mảng data thành các biến riêng lẻ (rất tốt, giữ nguyên)
+        // Giải nén mảng data thành các biến riêng lẻ
         extract($data); 
         
         // ==========================================
-        // 1. ĐỔ DỮ LIỆU ĐỘNG LÊN HEADER TẠI ĐÂY
+        // 1. XỬ LÝ GIAO DIỆN ADMIN
         // ==========================================
-        require_once __DIR__ . '/../models/CategoryModel.php';
-        $categoryModel = new CategoryModel();
+        if (strpos($view, 'admin/') !== false) {
+            
+            // TRƯỜNG HỢP ĐẶC BIỆT: Trang Login Admin (Không load Sidebar/Header)
+            if ($view === 'admin/login') {
+                if (file_exists(__DIR__ . '/../views/admin/login.php')) {
+                    require_once __DIR__ . '/../views/admin/login.php';
+                    return; // Kết thúc luôn, không chạy xuống dưới
+                }
+            }
+
+            // CÁC TRANG ADMIN CÒN LẠI: Tự động ghép bộ khung Sidebar + Header
+            if (file_exists(__DIR__ . '/../views/' . $view . '.php')) {
+                // Nạp Sidebar (Dùng chung thư mục components với user như bạn muốn)
+                if (file_exists(__DIR__ . '/../views/components/admin_sidebar.php')) {
+                    require_once __DIR__ . '/../views/components/sidebar.php';
+                }
+
+                echo '<div class="main-content">';
+                    // Nạp Admin Header
+                    if (file_exists(__DIR__ . '/../views/components/admin_header.php')) {
+                        require_once __DIR__ . '/../views/components/admin_header.php';
+                    }
+
+                    echo '<section class="content">';
+                        // Nạp nội dung chính của trang (dashboard, products,...)
+                        require_once __DIR__ . '/../views/' . $view . '.php';
+                    echo '</section>';
+                echo '</div>';
+
+            } else {
+                die("Lỗi: Không tìm thấy giao diện Admin tại " . $view);
+            }
+        } 
         
-        // Biến này sẽ tự động chạy sang file header.php
-        $header_categories = $categoryModel->getAllCategories();
-
         // ==========================================
-        // 2. GHÉP GIAO DIỆN (Dùng __DIR__ để chống lỗi)
+        // 2. XỬ LÝ GIAO DIỆN NGƯỜI DÙNG (USER)
         // ==========================================
-        
-        // Tự động ghép Header
-        if (file_exists(__DIR__ . '/../views/components/header.php')) {
-            require_once __DIR__ . '/../views/components/header.php';
-        }
+        else {
+            // Đổ dữ liệu động lên Header cho User
+            require_once __DIR__ . '/../models/CategoryModel.php';
+            $categoryModel = new CategoryModel();
+            $header_categories = $categoryModel->getAllCategories();
 
-        // Nạp nội dung thân bài (home, login, register...)
-        if (file_exists(__DIR__ . '/../views/' . $view . '.php')) {
-            require_once __DIR__ . '/../views/' . $view . '.php';
-        }
+            // Ghép bộ khung User: Header -> Content -> Footer
+            if (file_exists(__DIR__ . '/../views/components/header.php')) {
+                require_once __DIR__ . '/../views/components/header.php';
+            }
 
-        // Tự động ghép Footer
-        if (file_exists(__DIR__ . '/../views/components/footer.php')) {
-            require_once __DIR__ . '/../views/components/footer.php';
+            if (file_exists(__DIR__ . '/../views/' . $view . '.php')) {
+                require_once __DIR__ . '/../views/' . $view . '.php';
+            } else {
+                die("Lỗi: Không tìm thấy giao diện User tại " . $view);
+            }
+
+            if (file_exists(__DIR__ . '/../views/components/footer.php')) {
+                require_once __DIR__ . '/../views/components/footer.php';
+            }
         }
     }
 }

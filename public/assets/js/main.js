@@ -177,10 +177,6 @@ function addToCart(productId) {
         showToast("Vui lòng đăng nhập để sử dụng giỏ hàng!", "error");
         
         // Đợi 1.5 giây rồi chuyển về trang Login
-        setTimeout(() => {
-            window.location.href = "/lego_shop_php/account/login";
-        }, 1500); 
-        
         return; // Dừng hàm lại
     }
 
