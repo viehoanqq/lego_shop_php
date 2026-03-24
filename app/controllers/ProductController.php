@@ -54,4 +54,55 @@ class ProductController extends Controller {
             'category_name' => $product['category_name']
         ]);
     }
+    // ==================================================
+    // HÀM XỬ LÝ TRANG KẾT QUẢ TÌM KIẾM (Khi bấm Enter)
+    // ==================================================
+    public function search() {
+        // 1. Lấy từ khóa từ thanh địa chỉ (URL)
+        $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+
+        // 2. Nếu người dùng không nhập gì mà bấm Enter thì đẩy về trang gốc
+        if (empty($keyword)) {
+            header("Location: /lego_shop_php/product");
+            exit;
+        }
+
+        // 3. Load Models
+        $prodModel = $this->model('ProductModel');
+        $catModel = $this->model('CategoryModel');
+
+        // 4. Lấy dữ liệu từ Database
+        $products = $prodModel->searchProducts($keyword);
+        $categories = $catModel->getCategoriesWithCount();
+
+        // 5. Ném dữ liệu ra View (Dùng lại view user/product)
+        $this->view('user/product', [
+            'keyword' => $keyword, // Biến này rất quan trọng để View đổi Tiêu đề
+            'products' => $products,
+            'categories' => $categories,
+            'total_products' => count($products),
+            'title' => 'Kết quả tìm kiếm cho: ' . htmlspecialchars($keyword), // THÊM DÒNG NÀY ĐỂ SỬA BREADCRUMB
+        ]);
+    }
+    // API Xử lý Live Search (Vừa gõ vừa hiện)
+    public function liveSearch() {
+        // Khai báo trả về JSON
+        header('Content-Type: application/json');
+        
+        $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+        
+        // Nếu gõ ít hơn 2 ký tự thì trả về mảng rỗng cho nhẹ Server
+        if (strlen($keyword) < 2) {
+            echo json_encode([]);
+            return;
+        }
+
+        $prodModel = $this->model('ProductModel');
+        $products = $prodModel->searchProducts($keyword);
+        
+        // Cắt lấy 5 sản phẩm đầu tiên để dropdown không bị quá dài
+        $limit_products = array_slice($products, 0, 5);
+        
+        echo json_encode($limit_products);
+    }
 }

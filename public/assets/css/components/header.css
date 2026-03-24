@@ -471,3 +471,34 @@ footer {
 .btn-clear-filter:hover {
     background-color: #fff5f5;
 }
+/* CSS CHO LIVE SEARCH */
+    .search-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: calc(100% - 50px); /* Trừ đi nút nâng cao */
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        z-index: 9999;
+        max-height: 350px;
+        overflow-y: auto;
+        margin-top: 5px;
+    }
+    .suggest-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        border-bottom: 1px solid #f5f5f5;
+        text-decoration: none;
+        color: #333;
+        transition: 0.2s;
+    }
+    .suggest-item:last-child { border-bottom: none; }
+    .suggest-item:hover { background-color: #f8f9fa; }
+    .suggest-img { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; border: 1px solid #eee; margin-right: 15px; }
+    .suggest-info { display: flex; flex-direction: column; }
+    .suggest-name { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 5px; }
+    .suggest-item:hover .suggest-name { color: #a4161a; }
+    .suggest-price { font-size: 13px; font-weight: 700; color: #a4161a; }

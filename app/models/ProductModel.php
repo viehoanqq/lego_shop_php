@@ -79,4 +79,33 @@ class ProductModel extends Database {
         }
         return $reviews;
     }
+    // ==================================================
+    // HÀM TÌM KIẾM SẢN PHẨM (Cho cả Live Search và Search thường)
+    // ==================================================
+    public function searchProducts($keyword) {
+        $db = $this->getConnection();
+        
+        // Chống SQL Injection (Bảo mật)
+        $safe_keyword = $db->real_escape_string($keyword);
+        
+        // Truy vấn tìm theo Tên sản phẩm, Mã SKU hoặc Tên Danh mục
+        $sql = "SELECT p.*, c.name as category_name,
+                (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM products p 
+                LEFT JOIN categories c ON p.category_id = c.id 
+                WHERE (p.name LIKE '%$safe_keyword%' 
+                   OR p.sku LIKE '%$safe_keyword%' 
+                   OR c.name LIKE '%$safe_keyword%')
+                AND p.status = 1 
+                ORDER BY p.id DESC";
+                
+        $result = $db->query($sql);
+        $products = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $products[] = $row;
+            }
+        }
+        return $products;
+    }
 }

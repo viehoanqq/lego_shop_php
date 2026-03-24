@@ -29,12 +29,19 @@
         </a>
       </div>
 
-      <div class="search-bar">
-        <input class="search-input" type="text" placeholder="Nhập từ khóa để tìm kiếm (ví dụ: lắp ráp, mô hình, ba lô,...)">
-        <a href="/lego_shop_php/product/search"><button class="normal-btn"><i class="fa-solid fa-magnifying-glass"></i></button></a>
+      <div class="search-bar" style="position: relative; display: flex; align-items: center;">
+        
+        <form action="/lego_shop_php/product/search" method="GET" style="display: flex; flex: 1;">
+            <input class="search-input" name="keyword" type="text" id="liveSearchInput" autocomplete="off" placeholder="Nhập từ khóa (ví dụ: lắp ráp, mô hình...)">
+            <button type="submit" class="normal-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
         <button type="button" class="advanced-search-trigger" id="openAdvancedSearch" title="Tìm kiếm nâng cao">
           <i class="fa-solid fa-sliders"></i>
         </button>
+
+        <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
+        
       </div>
 
       <div class="advanced-search-overlay" id="advancedSearchOverlay">

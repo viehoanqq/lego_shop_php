@@ -13,7 +13,14 @@
                 
                 <div class="category-info">
                     <h1 style="color: #a4161a; font-size: 22px; font-weight: 700; margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
-                        <i class="fa-solid fa-box-open"></i> <?= isset($category_name) ? $category_name : 'Tất cả sản phẩm LEGO' ?>
+                        <i class="fa-solid fa-box-open"></i> 
+                        <?php 
+                            if (isset($keyword)) {
+                                echo 'Kết quả tìm kiếm cho: "' . htmlspecialchars($keyword) . '"';
+                            } else {
+                                echo isset($category_name) ? $category_name : 'Tất cả sản phẩm LEGO';
+                            }
+                        ?>
                     </h1>
                     <p style="color: #666; font-size: 14px; margin: 0;">
                         Hiển thị <strong><?= $total_products ?? 0 ?></strong> sản phẩm

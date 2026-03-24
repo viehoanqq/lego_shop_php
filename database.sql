@@ -168,3 +168,14 @@ CREATE TABLE product_reviews (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+CREATE TABLE product_details (
+    product_id INT PRIMARY KEY, -- Vừa là khóa chính, vừa là khóa ngoại
+    material VARCHAR(100) DEFAULT 'Nhựa ABS an toàn',
+    weight FLOAT DEFAULT 0, -- Tính bằng kg
+    dimensions VARCHAR(100),
+    age_range VARCHAR(20) DEFAULT '6+',
+    pieces INT DEFAULT 0,
+    release_year INT,
+    theme_story TEXT, -- Câu chuyện/Bối cảnh của bộ Lego
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
