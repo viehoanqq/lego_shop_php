@@ -12,30 +12,41 @@
             <div class="category-header-bar" style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #f0f0f0; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
                 
                 <div class="category-info">
-                    <h1 style="color: #a4161a; font-size: 22px; font-weight: 700; margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
-                        <i class="fa-solid fa-box-open"></i> 
-                        <?php 
-                            if (isset($keyword)) {
-                                echo 'Kết quả tìm kiếm cho: "' . htmlspecialchars($keyword) . '"';
-                            } else {
-                                echo isset($category_name) ? $category_name : 'Tất cả sản phẩm LEGO';
-                            }
-                        ?>
-                    </h1>
-                    <p style="color: #666; font-size: 14px; margin: 0;">
-                        Hiển thị <strong><?= $total_products ?? 0 ?></strong> sản phẩm
-                    </p>
-                </div>
+    <h1 style="color: #a4161a; font-size: 22px; font-weight: 700; margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-box-open"></i> 
+        <?php 
+            // Ưu tiên dùng $title được truyền từ Controller
+            echo isset($title) ? $title : 'Tất cả sản phẩm LEGO';
+        ?>
+    </h1>
+    <p style="color: #666; font-size: 14px; margin: 0;">
+        Hiển thị <strong><?= $total_products ?? 0 ?></strong> sản phẩm
+    </p>
+</div>
 
                 <div class="category-sort">
-                    <label style="font-weight: 600; color: #444; margin-right: 10px; font-size: 14px;"><i class="fa-solid fa-arrow-down-a-z"></i> Sắp xếp:</label>
-                    <select style="padding: 8px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer;">
-                        <option value="newest">Mới nhất</option>
-                        <option value="price_asc">Giá: Thấp đến cao</option>
-                        <option value="price_desc">Giá: Cao đến thấp</option>
-                        <option value="name_asc">Tên: A-Z</option>
-                    </select>
-                </div>
+    <label style="font-weight: 600; color: #444; margin-right: 10px; font-size: 14px;">
+        <i class="fa-solid fa-arrow-down-a-z"></i> Sắp xếp:
+    </label>
+    <select id="sortSelect" onchange="applySort(this.value)" style="padding: 8px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer;">
+        <option value="newest" <?= (isset($_GET['sort']) && $_GET['sort'] == 'newest') ? 'selected' : '' ?>>Mới nhất</option>
+        <option value="price_asc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'price_asc') ? 'selected' : '' ?>>Giá: Thấp đến cao</option>
+        <option value="price_desc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'price_desc') ? 'selected' : '' ?>>Giá: Cao đến thấp</option>
+        <option value="name_asc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'name_asc') ? 'selected' : '' ?>>Tên: A-Z</option>
+    </select>
+</div>
+
+<script>
+function applySort(sortValue) {
+    // Lấy tất cả tham số hiện tại trên URL (để giữ lại filter, page...)
+    let urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('sort', sortValue); // Ghi đè hoặc thêm mới tham số sort
+    urlParams.set('page', 1);        // Reset về trang 1 khi đổi cách sắp xếp
+    
+    // Chuyển hướng trang
+    window.location.search = urlParams.toString();
+}
+</script>
             </div>
 
             <div class="product-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;">

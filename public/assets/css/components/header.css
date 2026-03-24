@@ -93,7 +93,8 @@ header {
 }
 .search-bar  .normal-btn {
   position: relative;
-  top: 3px;
+  top: 0px !important;
+  padding: 0px 20px !important;
 }
 /* User Options */
 .user-options {

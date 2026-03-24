@@ -1,16 +1,9 @@
 <?php
 class HomeController extends Controller {
     public function index() {
-        // Gọi Model
-        $productModel = $this->model('ProductModel');
-        
-        // Lấy dữ liệu
-        $products = $productModel->getAllProducts();
-
-        // Truyền dữ liệu sang View
-        $this->view('user/home', [
-            'title' => 'Lego World Store - Trang chủ',
-            'products' => $products
-        ]);
-    }
+    $prodModel = $this->model('ProductModel');
+    // Lấy 8 sản phẩm mới nhất hiện trang chủ
+    $products = $prodModel->getFilteredProducts([], 0, 8); 
+    $this->view('user/home', ['title' => 'Trang chủ', 'products' => $products]);
+}
 }

@@ -139,12 +139,13 @@
             
             <ul class="dropdown-menu" style="position: absolute; top: 100%; left: 0; background: white; width: auto; min-width: 200px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 10px 0;">
                 <?php foreach($header_categories as $cat): ?>
-                    <li>
-                        <a href="/lego_shop_php/product/category/<?= $cat['id'] ?>" style="color: #333; display: block; padding: 10px 15px; text-transform: none; font-weight: 500;">
-                            <?= htmlspecialchars($cat['name']) ?>
-                        </a>
-                    </li>
-                <?php endforeach; ?>
+    <li>
+        <a href="/lego_shop_php/product/category/<?= $cat['id'] ?>" 
+           style="color: #333; display: block; padding: 10px 15px; text-transform: none; font-weight: 500;">
+            <?= htmlspecialchars($cat['name']) ?>
+        </a>
+    </li>
+<?php endforeach; ?>
             </ul>
         </li>
     <?php endif; ?>

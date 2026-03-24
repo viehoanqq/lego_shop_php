@@ -1,6 +1,11 @@
 <?php
 class CategoryModel extends Database {
-    
+    public function getCategoryById($id) {
+        $db = $this->getConnection();
+        $sql = "SELECT * FROM categories WHERE id = " . intval($id);
+        $result = $db->query($sql);
+        return ($result && $result->num_rows > 0) ? $result->fetch_assoc() : false;
+    }
     // Lấy tất cả danh mục đang hoạt động
     public function getAllCategories() {
         $db = $this->getConnection();
