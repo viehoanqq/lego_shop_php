@@ -1,45 +1,38 @@
-<aside class="side-bar">
-    <div class="logo">
-        <h2><a href="/lego_shop_php/admin/dashboard">LEGO STORE</a></h2>
+<header class="admin-header">
+    <div class="header-left">
+        <div class="page-title">
+            <h1><?= $title ?? 'Bảng điều khiển' ?></h1>
+            <span class="breadcrumb">Admin / <?= $title ?? 'Tổng quan' ?></span>
+        </div>
     </div>
-    <nav class="menu">
-        <ul class="system">
-            <?php 
-                $current_page = $_GET['url'] ?? ''; 
-            ?>
-            <li>
-                <a href="/lego_shop_php/admin/dashboard" class="<?= strpos($current_page, 'dashboard') !== false ? 'active' : '' ?>">
-                    <i class="fa-solid fa-house"></i>Tổng quan
-                </a>
-            </li>
-            <li>
-                <a href="/lego_shop_php/admin/messages" class="<?= strpos($current_page, 'messages') !== false ? 'active' : '' ?>">
-                    <i class="fa-solid fa-envelope"></i>Tin nhắn <span class="message">2</span>
-                </a>
-            </li>
-            <li>
-                <a href="/lego_shop_php/admin/products" class="<?= strpos($current_page, 'products') !== false ? 'active' : '' ?>">
-                    <i class="fa-solid fa-box"></i>Sản phẩm
-                </a>
-            </li>
-            <li>
-                <a href="/lego_shop_php/admin/categories" class="<?= strpos($current_page, 'categories') !== false ? 'active' : '' ?>">
-                    <i class="fa-solid fa-tags"></i>Danh mục
-                </a>
-            </li>
-            <li>
-                <a href="/lego_shop_php/admin/orders" class="<?= strpos($current_page, 'orders') !== false ? 'active' : '' ?>">
-                    <i class="fa-solid fa-receipt"></i>Đơn hàng
-                </a>
-            </li>
-            <li>
-                <a href="/lego_shop_php/admin/customers" class="<?= strpos($current_page, 'customers') !== false ? 'active' : '' ?>">
-                    <i class="fa-solid fa-users"></i>Khách hàng
-                </a>
-            </li>
-        </ul>
-        <ul class="support">
-            <li><a href="/lego_shop_php/admin/logout"><i class="fa-solid fa-right-from-bracket"></i>Đăng xuất</a></li>
-        </ul>
-    </nav>
-</aside>
+
+    <div class="header-right">
+        <div class="action-item">
+            <div class="icon-badge">
+                <i class="fa-solid fa-bell"></i>
+                <span class="badge">3</span>
+            </div>
+        </div>
+
+        <div class="action-item">
+            <div class="icon-badge">
+                <i class="fa-solid fa-message"></i>
+                <span class="badge blue">2</span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="admin-profile">
+            <div class="profile-info">
+                <p class="name"><?= $_SESSION['admin_name'] ?? 'Hoàng Nguyễn' ?></p>
+                <p class="role"><?= strtoupper($_SESSION['admin_role'] ?? 'Quản trị viên') ?></p>
+            </div>
+            <div class="profile-avatar">
+                <img src="/lego_shop_php/public/assets/images/avt.png" 
+                     onerror="this.src='https://ui-avatars.com/api/?name=<?= $_SESSION['admin_name'] ?? 'H' ?>&background=6366f1&color=fff&bold=true'" 
+                     alt="Avatar">
+            </div>
+        </div>
+    </div>
+</header>

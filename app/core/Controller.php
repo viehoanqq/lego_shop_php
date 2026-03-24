@@ -3,7 +3,6 @@ class Controller {
     
     // Nạp Model
     public function model($model) {
-        // __DIR__ là app/core, dùng '/../' để lùi ra app, rồi vào models
         require_once __DIR__ . '/../models/' . $model . '.php';
         return new $model();
     }
@@ -18,35 +17,21 @@ class Controller {
         // ==========================================
         if (strpos($view, 'admin/') !== false) {
             
-            // TRƯỜNG HỢP ĐẶC BIỆT: Trang Login Admin (Không load Sidebar/Header)
+            // TRƯỜNG HỢP ĐẶC BIỆT: Trang Login Admin (Không dùng layout chung)
             if ($view === 'admin/login') {
                 if (file_exists(__DIR__ . '/../views/admin/login.php')) {
                     require_once __DIR__ . '/../views/admin/login.php';
-                    return; // Kết thúc luôn, không chạy xuống dưới
+                    return; 
                 }
             }
 
-            // CÁC TRANG ADMIN CÒN LẠI: Tự động ghép bộ khung Sidebar + Header
-            if (file_exists(__DIR__ . '/../views/' . $view . '.php')) {
-                // Nạp Sidebar (Dùng chung thư mục components với user như bạn muốn)
-                if (file_exists(__DIR__ . '/../views/components/admin_sidebar.php')) {
-                    require_once __DIR__ . '/../views/components/sidebar.php';
-                }
-
-                echo '<div class="main-content">';
-                    // Nạp Admin Header
-                    if (file_exists(__DIR__ . '/../views/components/admin_header.php')) {
-                        require_once __DIR__ . '/../views/components/admin_header.php';
-                    }
-
-                    echo '<section class="content">';
-                        // Nạp nội dung chính của trang (dashboard, products,...)
-                        require_once __DIR__ . '/../views/' . $view . '.php';
-                    echo '</section>';
-                echo '</div>';
-
+            // CÁC TRANG ADMIN KHÁC (Dashboard, Products...): Dùng layout_admin.php
+            if (file_exists(__DIR__ . '/../views/admin/admin_layout.php')) {
+                // Biến này sẽ được dùng bên trong file layout_admin.php để nạp nội dung con
+                $view_content = $view; 
+                require_once __DIR__ . '/../views/admin/admin_layout.php';
             } else {
-                die("Lỗi: Không tìm thấy giao diện Admin tại " . $view);
+                die("Lỗi: Không tìm thấy file layout_admin.php tại views/admin/");
             }
         } 
         

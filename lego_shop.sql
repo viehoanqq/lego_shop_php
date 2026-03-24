@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th3 24, 2026 lúc 06:08 AM
+-- Thời gian đã tạo: Th3 24, 2026 lúc 03:29 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -42,6 +42,7 @@ CREATE TABLE `accounts` (
 --
 
 INSERT INTO `accounts` (`id`, `phone`, `email`, `password`, `role`, `status`, `created_at`) VALUES
+(1, 'admin', 'admin', '123456', 'admin', 'active', '2026-03-24 20:23:16'),
 (5, '0961589023', 'viethoang0101010@gmail.com', '$2y$10$piPSlwd3/PpeaaMhG4CwjuevsiaCvKEBzbbg7kWeZE2coii2VLsja', 'customer', 'active', '2026-03-23 21:44:10'),
 (6, '', '', '$2y$10$NO6D2pBke7kylpXztZ9I9.7NFOBgWqoNDGh7nWve9otjRmGELGgsW', 'customer', 'active', '2026-03-23 21:54:32'),
 (7, '0961589323', 'viethoang010s1010@gmail.com', '$2y$10$WF3..hq.Sxk6SfesEvxqgOhxODeeBp33xVI2zIUl0t8D9eeCEzG7m', 'customer', 'active', '2026-03-23 22:01:23');
@@ -106,6 +107,7 @@ INSERT INTO `categories` (`id`, `name`, `description`, `image_url`, `status`, `o
 CREATE TABLE `import_receipts` (
   `id` int(11) NOT NULL,
   `admin_id` int(11) NOT NULL,
+  `supplier_id` int(11) NOT NULL,
   `total_amount` int(11) DEFAULT 0,
   `status` enum('draft','completed') DEFAULT 'draft',
   `created_at` datetime DEFAULT current_timestamp()
@@ -299,6 +301,31 @@ INSERT INTO `product_reviews` (`id`, `product_id`, `user_id`, `rating`, `comment
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `suppliers`
+--
+
+CREATE TABLE `suppliers` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL COMMENT 'Tên công ty/nhà cung cấp',
+  `phone` varchar(20) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `status` enum('active','inactive') DEFAULT 'active',
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `suppliers`
+--
+
+INSERT INTO `suppliers` (`id`, `name`, `phone`, `email`, `address`, `status`, `created_at`) VALUES
+(1, 'LEGO Group Vietnam', '02812345678', 'contact@lego.vn', 'KCN Hiệp Phước, Nhà Bè, TP.HCM', 'active', '2026-03-24 21:06:45'),
+(2, 'Đồ Chơi Sáng Tạo ABC', '0908888999', 'info@abc_toys.com', '123 Lý Thường Kiệt, Quận 10, TP.HCM', 'active', '2026-03-24 21:06:45'),
+(3, 'Nhà Phân Phối MyKingdom', '19001208', 'support@mykingdom.com.vn', 'Quận 7, TP.HCM', 'active', '2026-03-24 21:06:45');
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `users`
 --
 
@@ -382,7 +409,8 @@ ALTER TABLE `categories`
 --
 ALTER TABLE `import_receipts`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `admin_id` (`admin_id`);
+  ADD KEY `admin_id` (`admin_id`),
+  ADD KEY `fk_import_supplier` (`supplier_id`);
 
 --
 -- Chỉ mục cho bảng `import_receipt_details`
@@ -442,6 +470,12 @@ ALTER TABLE `product_reviews`
   ADD PRIMARY KEY (`id`),
   ADD KEY `product_id` (`product_id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Chỉ mục cho bảng `suppliers`
+--
+ALTER TABLE `suppliers`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Chỉ mục cho bảng `users`
@@ -531,7 +565,13 @@ ALTER TABLE `product_images`
 -- AUTO_INCREMENT cho bảng `product_reviews`
 --
 ALTER TABLE `product_reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT cho bảng `suppliers`
+--
+ALTER TABLE `suppliers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT cho bảng `users`
@@ -566,6 +606,7 @@ ALTER TABLE `cart_items`
 -- Các ràng buộc cho bảng `import_receipts`
 --
 ALTER TABLE `import_receipts`
+  ADD CONSTRAINT `fk_import_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`),
   ADD CONSTRAINT `import_receipts_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `accounts` (`id`);
 
 --

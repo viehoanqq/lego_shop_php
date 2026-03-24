@@ -61,11 +61,15 @@ class AdminController extends Controller {
     
     // Hàm Dashboard tạm thời
     public function dashboard() {
-        if (!isset($_SESSION['admin_id'])) {
-            header("Location: /lego_shop_php/admin/login");
-            exit;
-        }
-        echo "<h1>Chào mừng Admin " . $_SESSION['admin_name'] . "</h1>";
-        echo "<a href='/lego_shop_php/admin/logout'>Đăng xuất</a>";
+    // Kiểm tra quyền admin
+    if (!isset($_SESSION['admin_id'])) {
+        header("Location: /lego_shop_php/admin/login");
+        exit;
     }
+
+    // Gọi view admin/dashboard
+    $this->view('admin/dashboard', [
+        'title' => 'Bảng điều khiển tổng quan'
+    ]);
+}
 }
