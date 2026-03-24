@@ -115,4 +115,24 @@ class ProductModel extends Database {
         if ($res) { while($row = $res->fetch_assoc()) { $data[] = $row; } }
         return $data;
     }
+    public function getRandomProducts($limit = 8) {
+        $db = $this->getConnection();
+        
+        $sql = "SELECT p.*, c.name as category_name,
+                (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM products p 
+                LEFT JOIN categories c ON p.category_id = c.id 
+                WHERE p.status = 1 
+                ORDER BY RAND() 
+                LIMIT " . intval($limit);
+                
+        $result = $db->query($sql);
+        $products = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $products[] = $row;
+            }
+        }
+        return $products;
+    }
 }

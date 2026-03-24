@@ -90,4 +90,5 @@ class ProductController extends Controller {
 
         $this->handleProductList($filters, 'Chủ đề: ' . $category['name']);
     }
+    
 }

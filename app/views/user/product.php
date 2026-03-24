@@ -20,7 +20,6 @@
         ?>
     </h1>
     <p style="color: #666; font-size: 14px; margin: 0;">
-        Hiển thị <strong><?= $total_products ?? 0 ?></strong> sản phẩm
     </p>
 </div>
 
