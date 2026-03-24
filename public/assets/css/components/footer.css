@@ -1,0 +1,83 @@
+/* ==========================================
+   CSS CHO MAIN FOOTER (ĐÃ SỬA LỖI)
+========================================== */
+.main-footer {
+    background-color: #ffffff;
+    font-family: 'Inter', sans-serif;
+}
+
+/* 1. THANH TOP BAR MÀU ĐỎ */
+
+.footer-top .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    justify-content: center; /* Ép nó ra giữa */
+    gap: 80px; /* Khoảng cách an toàn để 3 chữ không dính nhau */
+    flex-wrap: wrap; /* Tự rớt dòng nếu màn hình nhỏ */
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* 2. BODY CỦA FOOTER */
+.footer-body {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 15px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    row-gap: 40px;
+    column-gap: 30px;
+}
+
+.footer-body h4 { color: #b11d1d; font-size: 18px; font-weight: 700; margin-top: 0; margin-bottom: 20px; }
+
+.footer-subscribe .logo img { height: 50px; margin-bottom: 10px; object-fit: contain; }
+.subscribe-title { color: #b11d1d; font-size: 16px; margin: 0 0 15px 0; }
+.subscribe-box form { display: flex; gap: 10px; margin-bottom: 8px; max-width: 400px; }
+.subscribe-box input { flex: 1; padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px; outline: none; font-size: 14px; transition: 0.2s; }
+.subscribe-box input:focus { border-color: #b11d1d; }
+.subscribe-box button { background-color: #b11d1d; color: #ffffff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+.subscribe-box button:hover { background-color: #8b1616; }
+.subscribe-note { color: #888; font-size: 12px; }
+
+.social-links { display: flex; flex-wrap: wrap; gap: 25px; align-items: center; }
+.social-links a { color: #555; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+.social-links a i { color: #b11d1d; font-size: 20px; }
+.social-links a:hover { color: #b11d1d; }
+
+.footer-contact p { color: #555; font-size: 14px; margin: 0 0 12px 0; display: flex; align-items: center; gap: 10px; }
+.footer-contact p i { color: #888; width: 16px; text-align: center; }
+
+.footer-links ul { list-style: none; padding: 0; margin: 0; }
+.footer-links li { margin-bottom: 12px; }
+.footer-links a { color: #555; text-decoration: none; font-size: 14px; transition: 0.2s; }
+.footer-links a:hover { color: #b11d1d; padding-left: 5px; }
+
+/* 3. THANH BOTTOM CUỐI CÙNG */
+.footer-bottom {
+    border-top: none; /* ĐÃ XÓA ĐƯỜNG KẺ Ở ĐÂY */
+    padding: 15px 0;
+    background-color: #fcfcfc;
+}
+.footer-bottom .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.footer-bottom p { margin: 0; color: #666; font-size: 13px; }
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+    .footer-body { grid-template-columns: 1fr; row-gap: 30px; }
+}
+@media (max-width: 576px) {
+    .footer-top .container { flex-direction: column; gap: 10px; }
+    .footer-bottom .container { flex-direction: column; text-align: center; gap: 10px; }
+    .subscribe-box form { flex-direction: column; }
+}

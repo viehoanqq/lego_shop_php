@@ -41,57 +41,59 @@
         </button>
 
         <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
-        
       </div>
 
       <div class="advanced-search-overlay" id="advancedSearchOverlay">
         <div class="advanced-search-modal">
           <div class="advanced-search-header">
             <h2><i class="fa-solid fa-search"></i> Tìm kiếm nâng cao</h2>
-            <button type="button" class="close-popup" id="closeAdvancedSearch">×</button>
+            <button type="button" class="close-popup" id="closeAdvancedSearch">&times;</button>
           </div>
 
-          <form id="advancedSearchForm" class="advanced-search-form">
+          <form id="advancedSearchForm" class="advanced-search-form" action="/lego_shop_php/product/filter" method="GET">
             <div class="form-group">
               <label><i class="fa-solid fa-magnifying-glass"></i> Từ khóa</label>
-              <input type="text" id="keyword" placeholder="Tên sản phẩm, mã SKU, nhân vật...">
+              <input type="text" name="keyword" id="keyword" placeholder="Tên sản phẩm, mã SKU...">
             </div>
 
             <div class="form-group">
               <label><i class="fa-solid fa-layer-group"></i> Danh mục</label>
-              <select id="category">
-                <option value="">Tất cả danh mục</option>
-                <option value="xe-o-to">Xe ô tô mô hình</option>
-                <option value="tau-vu-tru">Tàu vũ trụ</option>
-                <option value="lau-dai">Lâu đài cổ tích</option>
-                <option value="robot">Robot chiến binh</option>
-                <option value="thanh-pho">Thành phố hiện đại</option>
-                <option value="dong-vat">Động vật hoang dã</option>
-                <option value="sieu-anh-hung">Siêu anh hùng</option>
-                <option value="kien-truc">Kiến trúc nổi tiếng</option>
+              <select name="category" id="category">
+                <option value="all">Tất cả danh mục</option>
+                <?php if(!empty($header_categories)): ?>
+                    <?php foreach($header_categories as $cat): ?>
+                        <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                    <?php endforeach; ?>
+                <?php endif; ?>
               </select>
             </div>
 
             <div class="form-group">
               <label><i class="fa-solid fa-child"></i> Độ tuổi</label>
-              <select id="age">
+              <select name="age" id="age">
                 <option value="">Mọi lứa tuổi</option>
-                <option value="4">4+</option>
-                <option value="6">6+</option>
-                <option value="8">8+</option>
-                <option value="10">10+</option>
-                <option value="12">12+</option>
-                <option value="16">16+</option>
-                <option value="18">18+ (Adult)</option>
+                <option value="4+">4+</option>
+                <option value="6+">6+</option>
+                <option value="8+">8+</option>
+                <option value="12+">12+</option>
+                <option value="18+">18+ (Người lớn)</option>
               </select>
             </div>
 
             <div class="form-group">
               <label><i class="fa-solid fa-coins"></i> Khoảng giá (VNĐ)</label>
-              <div class="price-range-input">
-                <input type="number" id="priceMin" placeholder="Từ (VD: 500000)" min="0">
-                <span>→</span>
-                <input type="number" id="priceMax" placeholder="Đến (VD: 5000000)" min="0">
+              
+              <div class="price-slider-container">
+                  <div class="price-slider-values">
+                      <span id="priceMinValue">0đ</span> - <span id="priceMaxValue">10.000.000đ</span>
+                  </div>
+                  
+                  <div class="slider-track-wrapper">
+                      <div class="slider-track"></div>
+                      <div class="slider-highlight" id="sliderHighlight"></div>
+                      <input type="range" name="min_price" id="rangeMin" min="0" max="10000000" step="100000" value="0">
+                      <input type="range" name="max_price" id="rangeMax" min="0" max="10000000" step="100000" value="10000000">
+                  </div>
               </div>
             </div>
 
@@ -116,41 +118,44 @@
                     <li><a href="/lego_shop_php/account/logout" style="color: #dc3545;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
                 </ul>
             </div>
+            
+            <a href="/lego_shop_php/cart" id="cart-link">
+              <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng (1)
+            </a>
+
         <?php else: ?>
             <a href="/lego_shop_php/account/login" id="account-link">
                 <i class="fa-solid fa-user"></i> <span id="name">Đăng nhập</span>
             </a>
+            
+<a href="javascript:void(0);" id="cart-link" onclick="showToast('Bạn cần đăng nhập để xem giỏ hàng!', 'error'); setTimeout(() => window.location.href='/lego_shop_php/account/login', 1500);">              <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+            </a>
         <?php endif; ?>
-
-        <a href="/lego_shop_php/cart" id="cart-link">
-          <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng (1)
-        </a>
       </div>
     </div>
 
     <nav class="nav-bar">
       <ul class="header-menu-ul" style="display: flex; gap: 30px; justify-content: center; padding: 15px 0; background-color: #a4161a;">
-    <li><a href="/lego_shop_php/home" style="color: white; font-weight: 700;">TRANG CHỦ</a></li>
-    <li><a href="/lego_shop_php/product" style="color: white; font-weight: 700;">SẢN PHẨM</a></li>
-    
-    <?php if(!empty($header_categories)): ?>
-        <li style="position: relative;" class="dropdown-chu-de">
-            <a href="#" style="color: white; font-weight: 700;">CHỦ ĐỀ <i class="fa-solid fa-chevron-down" style="font-size: 12px;"></i></a>
-            
-            <ul class="dropdown-menu" style="position: absolute; top: 100%; left: 0; background: white; width: auto; min-width: 200px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 10px 0;">
-                <?php foreach($header_categories as $cat): ?>
-    <li>
-        <a href="/lego_shop_php/product/category/<?= $cat['id'] ?>" 
-           style="color: #333; display: block; padding: 10px 15px; text-transform: none; font-weight: 500;">
-            <?= htmlspecialchars($cat['name']) ?>
-        </a>
-    </li>
-<?php endforeach; ?>
-            </ul>
-        </li>
-    <?php endif; ?>
-
-</ul>
+        <li><a href="/lego_shop_php/home" style="color: white; font-weight: 700;">TRANG CHỦ</a></li>
+        <li><a href="/lego_shop_php/product" style="color: white; font-weight: 700;">SẢN PHẨM</a></li>
+        
+        <?php if(!empty($header_categories)): ?>
+            <li style="position: relative;" class="dropdown-chu-de">
+                <a href="#" style="color: white; font-weight: 700;">CHỦ ĐỀ <i class="fa-solid fa-chevron-down" style="font-size: 12px;"></i></a>
+                
+                <ul class="dropdown-menu" style="position: absolute; top: 100%; left: 0; background: white; width: auto; min-width: 200px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 10px 0;">
+                    <?php foreach($header_categories as $cat): ?>
+                        <li>
+                            <a href="/lego_shop_php/product/category/<?= $cat['id'] ?>" 
+                               style="color: #333; display: block; padding: 10px 15px; text-transform: none; font-weight: 500;">
+                                <?= htmlspecialchars($cat['name']) ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </li>
+        <?php endif; ?>
+      </ul>
 
 <style>
     /* Chống rớt dòng cụm Header */
@@ -159,59 +164,180 @@
     .search-bar { flex: 1; max-width: 500px; }
 
     /* --- DROPDOWN CHỦ ĐỀ --- */
-    .dropdown-chu-de:hover .dropdown-menu {
-        display: block !important;
-    }
-    .dropdown-menu li a {
-        text-align: center !important; /* CĂN GIỮA CHỮ */
-        white-space: nowrap !important; /* CẤM BẺ CHỮ LEGO ARCHITECTURE */
-        transition: 0.2s;
-    }
-    .dropdown-menu li a:hover {
-        background-color: #f8f9fa !important;
-        color: #a4161a !important;
-    }
+    .dropdown-chu-de:hover .dropdown-menu { display: block !important; z-index: 1000;}
+    .dropdown-menu li a { text-align: center !important; white-space: nowrap !important; transition: 0.2s; }
+    .dropdown-menu li a:hover { background-color: #f8f9fa !important; color: #a4161a !important; }
 
     /* --- DROPDOWN USER (ĐĂNG NHẬP) --- */
-    .user-dropdown-wrapper { padding: 0px 0; } /* Tạo vùng đệm để hover không bị ngắt */
-    .user-dropdown-wrapper:hover .user-dropdown-menu {
-        display: block;
+    .user-dropdown-wrapper { padding: 0px 0; } 
+    .user-dropdown-wrapper:hover .user-dropdown-menu { display: block; }
+    .user-dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: white; min-width: 180px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); list-style: none; padding: 5px 0; z-index: 9999; border-radius: 4px; border: 1px solid #eaeaea; }
+    .user-dropdown-menu li a { display: block; padding: 10px 15px; color: #333; text-decoration: none; font-size: 14px; font-weight: 500; transition: 0.2s; }
+    .user-dropdown-menu li a i { width: 20px; text-align: center; margin-right: 5px; }
+    .user-dropdown-menu li a:hover { background-color: #f8f9fa; color: #a4161a; }
+    
+    /* ==========================================
+       CSS POPUP TÌM KIẾM NÂNG CAO (MODAL)
+    ========================================== */
+    .advanced-search-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s ease; backdrop-filter: blur(3px); }
+    .advanced-search-overlay.active { opacity: 1; visibility: visible; }
+    .advanced-search-modal { background: #fff; width: 90%; max-width: 500px; border-radius: 12px; padding: 25px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); transform: translateY(-30px); transition: 0.3s ease; }
+    .advanced-search-overlay.active .advanced-search-modal { transform: translateY(0); }
+    .advanced-search-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px; }
+    .advanced-search-header h2 { margin: 0; color: #a4161a; font-size: 20px; }
+    .close-popup { background: none; border: none; font-size: 28px; color: #666; cursor: pointer; transition: 0.2s; line-height: 1; padding: 0 5px; }
+    .close-popup:hover { color: #a4161a; transform: scale(1.1); }
+    .advanced-search-form .form-group { margin-bottom: 20px; }
+    .advanced-search-form label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; }
+    .advanced-search-form input[type="text"], .advanced-search-form input[type="number"], .advanced-search-form select { width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box; transition: border 0.3s; }
+    .advanced-search-form input:focus, .advanced-search-form select:focus { border-color: #a4161a; }
+    .price-range-input { display: flex; align-items: center; gap: 10px; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; }
+    .btn-reset { background: #f8f9fa; border: 1px solid #ddd; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; color: #666; transition: 0.2s; }
+    .btn-reset:hover { background: #e2e6ea; }
+    .btn-submit { background: #a4161a; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+    .btn-submit:hover { background: #800f13; }
+    /* --- SỬA LỖI MÀU CHỮ TRÊN NỀN ĐỎ --- */
+    .advanced-search-header { 
+        display: flex; justify-content: space-between; align-items: center; 
+        background-color: #a4161a; /* Fix nền đỏ */
+        padding: 15px 20px; 
+        margin: -25px -25px 20px -25px; /* Ép tràn viền popup */
+        border-radius: 12px 12px 0 0;
     }
-    .user-dropdown-menu {
-        display: none;
-        position: absolute;
-        top: 100%; /* Đẩy xuống dưới chữ tên */
-        right: 0;  /* Canh lề phải */
-        background: white;
-        min-width: 180px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        list-style: none;
-        padding: 5px 0;
-        z-index: 9999;
-        border-radius: 4px;
-        border: 1px solid #eaeaea;
-    }
-    .user-dropdown-menu li a {
-        display: block;
-        padding: 10px 15px;
-        color: #333;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 500;
-        transition: 0.2s;
-    }
-    .user-dropdown-menu li a i {
-        width: px;
-        text-align: center;
-        margin-right: 5px;
-    }
-    .user-dropdown-menu li a:hover {
-        background-color: #f8f9fa;
-        color: #a4161a;
+    .advanced-search-header h2 { margin: 0; color: #ffffff; font-size: 18px; } /* Đổi chữ thành màu Trắng */
+    .close-popup { background: none; border: none; font-size: 24px; color: #ffffff; cursor: pointer; transition: 0.2s; }
+    .close-popup:hover { transform: scale(1.1); color: #f0f0f0; }
+
+    /* --- CSS THANH TRƯỢT KÉO GIÁ (DUAL RANGE SLIDER) --- */
+    .price-slider-container { width: 100%; margin-top: 10px; }
+    .price-slider-values { font-weight: 700; color: #a4161a; margin-bottom: 15px; text-align: center; font-size: 15px; }
+    
+    .slider-track-wrapper { position: relative; width: 100%; height: 6px; background: #e0e0e0; border-radius: 5px; }
+    .slider-highlight { position: absolute; height: 100%; background: #a4161a; border-radius: 5px; z-index: 1; left: 0%; width: 100%; }
+    
+    .slider-track-wrapper input[type="range"] {
+        position: absolute; width: 100%; height: 6px; top: -1px;
+        background: none; pointer-events: none; -webkit-appearance: none; outline: none; z-index: 2; margin: 0;
     }
     
+    /* Biến cục gù kéo thành hình tròn click được */
+    .slider-track-wrapper input[type="range"]::-webkit-slider-thumb {
+        pointer-events: auto; -webkit-appearance: none; width: 20px; height: 20px;
+        background: #fff; border: 3px solid #a4161a; border-radius: 50%; cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.1s;
+    }
+    .slider-track-wrapper input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    .slider-track-wrapper input[type="range"]::-moz-range-thumb {
+        pointer-events: auto; width: 20px; height: 20px; background: #fff; border: 3px solid #a4161a; border-radius: 50%; cursor: pointer;
+    }
 </style>
-    </nav>
-  </header>
 
-  <div class="main-content">
+<script>
+  // TẠO BIẾN TOÀN CỤC CHO JAVASCRIPT BIẾT TRẠNG THÁI ĐĂNG NHẬP
+    const IS_LOGGED_IN = <?= isset($_SESSION['user_fullname']) ? 'true' : 'false' ?>;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // --- 1. CODE ĐÓNG/MỞ POPUP TÌM KIẾM NÂNG CAO ---
+        const openBtn = document.getElementById("openAdvancedSearch");
+        const closeBtn = document.getElementById("closeAdvancedSearch");
+        const overlay = document.getElementById("advancedSearchOverlay");
+
+        if (openBtn && overlay) openBtn.addEventListener("click", () => overlay.classList.add("active"));
+        if (closeBtn && overlay) closeBtn.addEventListener("click", () => overlay.classList.remove("active"));
+        if (overlay) overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) overlay.classList.remove("active");
+        });
+    // JS CHỈ DÙNG ĐỂ ĐÓNG/MỞ POPUP
+    document.addEventListener("DOMContentLoaded", function() {
+        const openBtn = document.getElementById("openAdvancedSearch");
+        const closeBtn = document.getElementById("closeAdvancedSearch");
+        const overlay = document.getElementById("advancedSearchOverlay");
+
+        if (openBtn && overlay) {
+            openBtn.addEventListener("click", function() {
+                overlay.classList.add("active");
+            });
+        }
+
+        if (closeBtn && overlay) {
+            closeBtn.addEventListener("click", function() {
+                overlay.classList.remove("active");
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener("click", function(e) {
+                // Đóng nếu người dùng click ra vùng màu đen bên ngoài modal
+                if (e.target === overlay) {
+                    overlay.classList.remove("active");
+                }
+            });
+        }
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        // --- CODE ĐÓNG/MỞ POPUP (Giữ nguyên của bạn) ---
+        const openBtn = document.getElementById("openAdvancedSearch");
+        const closeBtn = document.getElementById("closeAdvancedSearch");
+        const overlay = document.getElementById("advancedSearchOverlay");
+
+        if (openBtn && overlay) {
+            openBtn.addEventListener("click", () => overlay.classList.add("active"));
+        }
+        if (closeBtn && overlay) {
+            closeBtn.addEventListener("click", () => overlay.classList.remove("active"));
+        }
+        if (overlay) {
+            overlay.addEventListener("click", (e) => {
+                if (e.target === overlay) overlay.classList.remove("active");
+            });
+        }
+
+        // --- CODE MỚI: XỬ LÝ THANH TRƯỢT KÉO GIÁ ---
+        const rangeMin = document.getElementById('rangeMin');
+        const rangeMax = document.getElementById('rangeMax');
+        const valMin = document.getElementById('priceMinValue');
+        const valMax = document.getElementById('priceMaxValue');
+        const highlight = document.getElementById('sliderHighlight');
+        const priceGap = 100000; // Khoảng cách tối thiểu là 100k
+
+        function updateSlider() {
+            if (!rangeMin || !rangeMax) return;
+            
+            let minVal = parseInt(rangeMin.value);
+            let maxVal = parseInt(rangeMax.value);
+
+            // Chống 2 cục kéo chạy vượt qua nhau
+            if (maxVal - minVal < priceGap) {
+                if (document.activeElement === rangeMin) {
+                    rangeMin.value = maxVal - priceGap;
+                    minVal = parseInt(rangeMin.value);
+                } else {
+                    rangeMax.value = minVal + priceGap;
+                    maxVal = parseInt(rangeMax.value);
+                }
+            }
+
+            // Định dạng số tiền sang chuẩn VNĐ
+            if (valMin) valMin.textContent = new Intl.NumberFormat('vi-VN').format(minVal) + 'đ';
+            if (valMax) valMax.textContent = new Intl.NumberFormat('vi-VN').format(maxVal) + 'đ';
+
+            // Tô màu đoạn giữa thanh kéo
+            if (highlight) {
+                let percentMin = (minVal / rangeMin.max) * 100;
+                let percentMax = (maxVal / rangeMax.max) * 100;
+                highlight.style.left = percentMin + "%";
+                highlight.style.width = (percentMax - percentMin) + "%";
+            }
+        }
+
+        // Lắng nghe sự kiện kéo (input)
+        if (rangeMin && rangeMax) {
+            rangeMin.addEventListener('input', updateSlider);
+            rangeMax.addEventListener('input', updateSlider);
+            // Gọi hàm 1 lần lúc load trang để set giá trị hiển thị mặc định
+            updateSlider();
+        }
+    });
+                    });
+</script>

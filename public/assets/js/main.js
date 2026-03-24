@@ -62,3 +62,132 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+//advaned search
+document.addEventListener("DOMContentLoaded", function() {
+    const openBtn = document.getElementById("openAdvancedSearch");
+    const closeBtn = document.getElementById("closeAdvancedSearch");
+    const overlay = document.getElementById("advancedSearchOverlay");
+    const form = document.getElementById("advancedSearchForm");
+
+    // 1. Mở Popup
+    if (openBtn) {
+        openBtn.addEventListener("click", function() {
+            overlay.classList.add("active");
+        });
+    }
+
+    // 2. Đóng Popup khi bấm dấu X
+    if (closeBtn) {
+        closeBtn.addEventListener("click", function() {
+            overlay.classList.remove("active");
+        });
+    }
+
+    // 3. Đóng Popup khi click ra vùng đen (overlay)
+    if (overlay) {
+        overlay.addEventListener("click", function(e) {
+            if (e.target === overlay) {
+                overlay.classList.remove("active");
+            }
+        });
+    }
+
+    // 4. Xử lý logic khi bấm nút "Tìm kiếm ngay"
+    if (form) {
+        form.addEventListener("submit", function(e) {
+            e.preventDefault(); // Ngăn form tự reload trang
+
+            // Lấy dữ liệu từ các ô nhập
+            const keyword = document.getElementById("keyword").value;
+            const category = document.getElementById("category").value;
+            const age = document.getElementById("age").value;
+            const priceMin = document.getElementById("priceMin").value;
+            const priceMax = document.getElementById("priceMax").value;
+
+            // Xây dựng URL
+            let searchUrl = '/lego_shop_php/product/filter?';
+            const params = [];
+
+            if (keyword) params.push('keyword=' + encodeURIComponent(keyword));
+            if (category) params.push('category=' + category);
+            
+            // Age (nếu muốn lọc theo tuổi, bạn cần map biến này vào Model _buildFilterWhere của bạn)
+            // Nếu bạn chưa viết lọc theo tuổi trong _buildFilterWhere thì tạm bỏ qua dòng dưới
+            // if (age) params.push('age=' + age); 
+
+            if (priceMin) params.push('min_price=' + priceMin);
+            if (priceMax) params.push('max_price=' + priceMax);
+
+            searchUrl += params.join('&');
+
+            // Chuyển hướng trình duyệt
+            window.location.href = searchUrl;
+        });
+    }
+});
+
+// ==========================================
+// HÀM TẠO TOAST NOTIFICATION
+// Sử dụng: showToast("Nội dung", "error" hoặc "success")
+// ==========================================
+function showToast(message, type = 'error') {
+    // 1. Tìm hoặc tạo vùng chứa Toast
+    let toastBox = document.getElementById('toastBox');
+    if (!toastBox) {
+        toastBox = document.createElement('div');
+        toastBox.id = 'toastBox';
+        document.body.appendChild(toastBox);
+    }
+
+    // 2. Tạo thẻ Toast
+    let toast = document.createElement('div');
+    toast.classList.add('custom-toast', type);
+    
+    // 3. Chọn Icon dựa theo type
+    let icon = type === 'success' 
+        ? '<i class="fa-solid fa-circle-check"></i>' 
+        : '<i class="fa-solid fa-circle-exclamation"></i>';
+        
+    toast.innerHTML = icon + ' <span>' + message + '</span>';
+    
+    // 4. In ra màn hình
+    toastBox.appendChild(toast);
+
+    // 5. Kích hoạt hiệu ứng trượt vào (delay 10ms để CSS nhận diện)
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+
+    // 6. Tự động xóa sau 3 giây
+    setTimeout(() => {
+        toast.classList.remove('show'); // Trượt ra ngoài
+        setTimeout(() => {
+            toast.remove(); // Xóa hẳn khỏi DOM cho nhẹ máy
+        }, 400); // Đợi trượt xong mới xóa
+    }, 3000);
+}
+// ==========================================
+// XỬ LÝ NÚT THÊM VÀO GIỎ HÀNG
+// ==========================================
+function addToCart(productId) {
+    // 1. Kiểm tra trạng thái đăng nhập (Biến IS_LOGGED_IN được khai báo ở Header)
+    if (typeof IS_LOGGED_IN !== 'undefined' && !IS_LOGGED_IN) {
+        // Dùng Toast báo lỗi
+        showToast("Vui lòng đăng nhập để sử dụng giỏ hàng!", "error");
+        
+        // Đợi 1.5 giây rồi chuyển về trang Login
+        setTimeout(() => {
+            window.location.href = "/lego_shop_php/account/login";
+        }, 1500); 
+        
+        return; // Dừng hàm lại
+    }
+
+    // 2. Logic thêm vào giỏ (Bạn sẽ viết Ajax ở đây)
+    // Tạm thời hiển thị Toast thành công để test:
+    showToast("Đã thêm sản phẩm vào giỏ hàng!", "success");
+    
+    // Test thử xem ID sản phẩm có truyền vào đúng không
+    console.log("Adding Product ID:", productId); 
+}
