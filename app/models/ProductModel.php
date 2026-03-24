@@ -108,4 +108,80 @@ class ProductModel extends Database {
         }
         return $products;
     }
+
+    // Lấy sản phẩm theo bộ lọc CÓ PHÂN TRANG
+    public function getFilteredProducts($filters = [], $offset = 0, $limit = 6) {
+        $db = $this->getConnection();
+        
+        $sql = "SELECT p.*, c.name as category_name, pd.pieces,
+                (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM products p 
+                LEFT JOIN categories c ON p.category_id = c.id 
+                LEFT JOIN product_details pd ON p.id = pd.product_id
+                WHERE p.status = 1";
+
+        // Áp dụng các điều kiện lọc (Dùng chung logic cho cả hàm count)
+        $sql .= $this->_buildFilterWhere($filters);
+
+        $sql .= " ORDER BY p.created_at DESC";
+        
+        // Thêm giới hạn phân trang
+        $sql .= " LIMIT " . intval($offset) . ", " . intval($limit);
+
+        $result = $db->query($sql);
+        $products = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $products[] = $row;
+            }
+        }
+        return $products;
+    }
+
+    // Hàm đếm tổng số lượng sản phẩm sau khi lọc (để tính số trang)
+    public function countFilteredProducts($filters = []) {
+        $db = $this->getConnection();
+        $sql = "SELECT COUNT(*) as total FROM products p 
+                LEFT JOIN product_details pd ON p.id = pd.product_id 
+                WHERE p.status = 1";
+        
+        $sql .= $this->_buildFilterWhere($filters);
+        
+        $result = $db->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'];
+    }
+
+    // Hàm phụ để xây dựng câu lệnh WHERE (Tránh viết lặp lại code)
+    private function _buildFilterWhere($filters) {
+        $db = $this->getConnection();
+        $where = "";
+
+        // 1. Lọc theo Danh mục
+        if (!empty($filters['category']) && $filters['category'] !== 'all') {
+            $cat_id = intval($filters['category']);
+            $where .= " AND p.category_id = $cat_id";
+        }
+
+        // 2. Lọc theo Khoảng giá
+        if (!empty($filters['price_range'])) {
+            $range = explode('-', $filters['price_range']);
+            $min = intval($range[0]);
+            $max = intval($range[1]);
+            $where .= " AND p.selling_price BETWEEN $min AND $max";
+        } elseif (!empty($filters['min_price']) || !empty($filters['max_price'])) {
+            if (!empty($filters['min_price'])) $where .= " AND p.selling_price >= " . intval($filters['min_price']);
+            if (!empty($filters['max_price'])) $where .= " AND p.selling_price <= " . intval($filters['max_price']);
+        }
+
+        // 3. Lọc theo Số mảnh ghép
+        if (!empty($filters['pieces'])) {
+            $range = explode('-', $filters['pieces']);
+            $min = intval($range[0]);
+            $max = intval($range[1]);
+            $where .= " AND pd.pieces BETWEEN $min AND $max";
+        }
+
+        return $where;
+    }
 }

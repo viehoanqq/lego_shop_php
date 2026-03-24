@@ -3,26 +3,41 @@
 
 class ProductController extends Controller {
     
+    // Số sản phẩm hiển thị trên 1 trang
+    private $limit = 6;
+
     public function index() {
-        // Load model
+        // 1. Tính toán phân trang
+        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+        $offset = ($page - 1) * $this->limit;
+
+        // 2. Load model
         $prodModel = $this->model('ProductModel');
         $catModel = $this->model('CategoryModel');
 
-        // Lấy dữ liệu
-        $products = $prodModel->getAllProducts();
+        // 3. Lấy dữ liệu (mặc định lấy tất cả nhưng có giới hạn LIMIT)
+        $products = $prodModel->getFilteredProducts($_GET, $offset, $this->limit);
+        
+        // 4. Tính tổng số trang
+        $total_products = $prodModel->countFilteredProducts($_GET);
+        $total_pages = ceil($total_products / $this->limit);
+        
         $categories = $catModel->getCategoriesWithCount();
 
-        // TRUYỀN RA VIEW ĐÚNG THƯ MỤC USER
+        // 5. Truyền ra view
         $this->view('user/product', [
-            'title' => 'Danh sách sản phẩm LEGO',
-            'products' => $products,
-            'categories' => $categories,
-            'total_products' => count($products)
+            'title'          => 'Danh sách sản phẩm LEGO',
+            'products'       => $products,
+            'categories'     => $categories,
+            'total_products' => $total_products,
+            'current_page'   => $page,
+            'total_pages'    => $total_pages
         ]);
     }
+
     public function detail($id = 0) {
         if ($id == 0) {
-            header("Location: /lego_shop_php/product"); // Nếu không có ID, đá về trang danh sách
+            header("Location: /lego_shop_php/product");
             exit;
         }
 
@@ -30,79 +45,101 @@ class ProductController extends Controller {
         $product = $prodModel->getProductById($id);
 
         if (!$product) {
-            // Xử lý nếu ID sản phẩm không tồn tại (Ví dụ: báo lỗi 404)
             die("Sản phẩm không tồn tại!");
         }
 
         $images = $prodModel->getProductImages($id);
-
-       // Lấy thông tin đánh giá tổng quát (số sao TB, tổng đánh giá)
         $rating_info = $prodModel->getProductRating($id);
-        
-        // Lấy danh sách chi tiết các bài đánh giá
         $reviews = $prodModel->getReviewsByProductId($id);
 
-        // Truyền ra View
         $this->view('user/product_detail', [
-            'title' => $product['name'],
-            'parent_title' => 'Sản phẩm',               // Thêm dòng này
-            'parent_link' => '/lego_shop_php/product',  // Thêm dòng này
-            'product' => $product,
-            'images' => $images,
-            'rating_info' => $rating_info,
-            'reviews' => $reviews,
+            'title'         => $product['name'],
+            'parent_title'  => 'Sản phẩm',
+            'parent_link'   => '/lego_shop_php/product',
+            'product'       => $product,
+            'images'        => $images,
+            'rating_info'   => $rating_info,
+            'reviews'       => $reviews,
             'category_name' => $product['category_name']
         ]);
     }
-    // ==================================================
-    // HÀM XỬ LÝ TRANG KẾT QUẢ TÌM KIẾM (Khi bấm Enter)
-    // ==================================================
+
     public function search() {
-        // 1. Lấy từ khóa từ thanh địa chỉ (URL)
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
 
-        // 2. Nếu người dùng không nhập gì mà bấm Enter thì đẩy về trang gốc
         if (empty($keyword)) {
             header("Location: /lego_shop_php/product");
             exit;
         }
 
-        // 3. Load Models
         $prodModel = $this->model('ProductModel');
         $catModel = $this->model('CategoryModel');
 
-        // 4. Lấy dữ liệu từ Database
-        $products = $prodModel->searchProducts($keyword);
+        // Đối với Search thường ta cũng nên áp dụng phân trang nếu sản phẩm tìm được quá nhiều
+        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+        $offset = ($page - 1) * $this->limit;
+
+        // Tận dụng hàm Filter để tìm kiếm (Hàm này bạn cần cập nhật SQL trong Model để hỗ trợ keyword)
+        $products = $prodModel->searchProducts($keyword); // Hoặc dùng Filtered nếu Model đã gộp
         $categories = $catModel->getCategoriesWithCount();
 
-        // 5. Ném dữ liệu ra View (Dùng lại view user/product)
         $this->view('user/product', [
-            'keyword' => $keyword, // Biến này rất quan trọng để View đổi Tiêu đề
-            'products' => $products,
-            'categories' => $categories,
+            'keyword'        => $keyword,
+            'title'          => 'Kết quả tìm kiếm cho: ' . htmlspecialchars($keyword),
+            'products'       => $products,
+            'categories'     => $categories,
             'total_products' => count($products),
-            'title' => 'Kết quả tìm kiếm cho: ' . htmlspecialchars($keyword), // THÊM DÒNG NÀY ĐỂ SỬA BREADCRUMB
+            'total_pages'    => 1 // Tạm thời để 1 cho trang search nếu chưa viết phân trang cho search
         ]);
     }
-    // API Xử lý Live Search (Vừa gõ vừa hiện)
+
     public function liveSearch() {
-        // Khai báo trả về JSON
         header('Content-Type: application/json');
-        
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
         
-        // Nếu gõ ít hơn 2 ký tự thì trả về mảng rỗng cho nhẹ Server
         if (strlen($keyword) < 2) {
             echo json_encode([]);
-            return;
+            exit;
         }
 
         $prodModel = $this->model('ProductModel');
         $products = $prodModel->searchProducts($keyword);
-        
-        // Cắt lấy 5 sản phẩm đầu tiên để dropdown không bị quá dài
         $limit_products = array_slice($products, 0, 5);
         
         echo json_encode($limit_products);
+        exit;
+    }
+
+    public function filter() {
+        // 1. Phân trang cho bộ lọc
+        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+        $offset = ($page - 1) * $this->limit;
+
+        $prodModel = $this->model('ProductModel');
+        $catModel = $this->model('CategoryModel');
+
+        $filters = [
+            'category'    => $_GET['category'] ?? 'all',
+            'price_range' => $_GET['price_range'] ?? null,
+            'min_price'   => $_GET['min_price'] ?? null,
+            'max_price'   => $_GET['max_price'] ?? null,
+            'pieces'      => $_GET['pieces'] ?? null
+        ];
+
+        $products = $prodModel->getFilteredProducts($filters, $offset, $this->limit);
+        $total_products = $prodModel->countFilteredProducts($filters);
+        $total_pages = ceil($total_products / $this->limit);
+
+        $categories = $catModel->getCategoriesWithCount();
+
+        $this->view('user/product', [
+            'title'          => 'Kết quả lọc sản phẩm',
+            'products'       => $products,
+            'categories'     => $categories,
+            'total_products' => $total_products,
+            'current_page'   => $page,
+            'total_pages'    => $total_pages,
+            'keyword'        => null // Đảm bảo view không bị nhầm với trang search
+        ]);
     }
 }

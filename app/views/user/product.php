@@ -47,7 +47,24 @@
                     <p style="text-align: center; grid-column: 1 / -1; color: #666; padding: 40px 0; background: #fff; border-radius: 12px; border: 1px solid #f0f0f0;">Không tìm thấy sản phẩm nào phù hợp!</p>
                 <?php endif; ?>
             </div>
+            <?php if ($total_pages > 1): ?>
+                <div class="pagination-container" style="display: flex; justify-content: center; gap: 10px; margin-top: 40px;">
+                    
+                    <a href="?<?= http_build_query(array_merge($_GET, ['page' => max(1, $current_page - 1)])) ?>" 
+                       class="page-link <?= ($current_page == 1) ? 'disabled' : '' ?>">&laquo;</a>
 
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>" 
+                           class="page-link <?= ($current_page == $i) ? 'active' : '' ?>">
+                           <?= $i ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <a href="?<?= http_build_query(array_merge($_GET, ['page' => min($total_pages, $current_page + 1)])) ?>" 
+                       class="page-link <?= ($current_page == $total_pages) ? 'disabled' : '' ?>">&raquo;</a>
+                    
+                </div>
+            <?php endif; ?>        
         </div>
     </div>
 </div>
@@ -61,5 +78,36 @@
 @media (max-width: 576px) {
     .category-header-bar { flex-direction: column; align-items: flex-start; gap: 15px; }
     .category-sort select { width: 100%; margin-top: 10px; }
+}
+.page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    text-decoration: none;
+    font-weight: 700;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: 0.3s;
+    border: 1px solid #eee;
+}
+
+.page-link:hover {
+    background: #f8f9fa;
+    color: #a4161a;
+}
+
+.page-link.active {
+    background: #a4161a; /* Màu đỏ giống ảnh của bạn */
+    color: #fff;
+    border-color: #a4161a;
+}
+
+.page-link.disabled {
+    pointer-events: none;
+    opacity: 0.5;
 }
 </style>
