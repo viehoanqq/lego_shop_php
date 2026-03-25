@@ -1,100 +1,72 @@
-    <?php
-    class ProductController extends Controller {
-        private $limit = 6; // Tối đa 6 sản phẩm mỗi trang
-        
-        // Hàm dùng chung cho Index, Search, Filter
-        private function handleProductList($filters = [], $title = 'Danh sách sản phẩm LEGO') {
-        // 1. GỌI SESSION VÀ LẤY ID Ở ĐÂY LÀ CHUẨN NHẤT
+<?php
+class ProfileController extends Controller {
+    
+    // Yêu cầu đăng nhập trước khi vào trang cá nhân
+    public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
-        $account_id = $_SESSION['user_account_id'] ?? null;
-
-        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-        $offset = ($page - 1) * $this->limit;
-
-        $prodModel = $this->model('ProductModel');
-        $catModel = $this->model('CategoryModel');
-
-        // 2. NHÉT THÊM $account_id VÀO HÀM NÀY:
-        $products = $prodModel->getFilteredProducts($filters, $offset, $this->limit, $account_id);
-        
-        $total_products = $prodModel->countFilteredProducts($filters);
-        $total_pages = ceil($total_products / $this->limit);
-        
-        $categories = $catModel->getCategoriesWithCount();
-
-        $this->view('user/product', [
-            'title'          => $title,
-            'products'       => $products,
-            'categories'     => $categories,
-            'total_products' => $total_products,
-            'current_page'   => $page,
-            'total_pages'    => $total_pages,
-            'keyword'        => $filters['keyword'] ?? null
-        ]);
-    }   
-
-        public function index() {
-            $this->handleProductList($_GET);
-        }
-
-        public function filter() {
-            $this->handleProductList($_GET, 'Kết quả lọc sản phẩm');
-        }
-
-        public function search() {
-            $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
-            if (empty($keyword)) { header("Location: /lego_shop_php/product"); exit; }
-            
-            $filters = $_GET;
-            $filters['keyword'] = $keyword;
-            $this->handleProductList($filters, 'Kết quả tìm kiếm cho: "' . htmlspecialchars($keyword) . '"');
-        }
-
-        public function detail($id = 0) {
-            if ($id == 0) { header("Location: /lego_shop_php/product"); exit; }
-            $prodModel = $this->model('ProductModel');
-            $product = $prodModel->getProductById($id);
-            if (!$product) die("Sản phẩm không tồn tại!");
-
-            $this->view('user/product_detail', [
-                'title' => $product['name'],
-                'product' => $product,
-                'images' => $prodModel->getProductImages($id),
-                'rating_info' => $prodModel->getProductRating($id),
-                'reviews' => $prodModel->getReviewsByProductId($id),
-                'category_name' => $product['category_name'],
-                'parent_title' => 'Sản phẩm',
-                'parent_link' => '/lego_shop_php/product'
-            ]);
-        }
-
-        public function liveSearch() {
-            header('Content-Type: application/json');
-            $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
-            $prodModel = $this->model('ProductModel');
-            $products = $prodModel->searchProducts($keyword);
-            echo json_encode($products);
+        if (!isset($_SESSION['user_account_id'])) {
+            header("Location: /lego_shop_php/account/login");
             exit;
         }
-
-        public function category($id = 0) {
-            if ($id == 0) {
-                header("Location: /lego_shop_php/product");
-                exit;
-            }
-
-            $catModel = $this->model('CategoryModel');
-            $category = $catModel->getCategoryById($id); // Bạn cần đảm bảo Model Category có hàm này
-
-            if (!$category) {
-                die("Chủ đề không tồn tại!");
-            }
-
-            // Tạo mảng filter để truyền vào hàm chung
-            $filters = $_GET;
-            $filters['category'] = $id;
-
-            $this->handleProductList($filters, 'Chủ đề: ' . $category['name']);
-        }
-        
     }
+
+    // 1. Trang thông tin cá nhân
+    public function index() {
+        // ĐÃ SỬA: Gọi UserModel để lấy thông tin Khách hàng
+        $userModel = $this->model('UserModel');
+        $user_info = $userModel->getUserProfile($_SESSION['user_account_id']);
+
+        // Lấy thông báo nếu có lúc update thành công/thất bại
+        $msg = $_SESSION['profile_msg'] ?? null;
+        $msg_type = $_SESSION['profile_msg_type'] ?? null;
+        unset($_SESSION['profile_msg'], $_SESSION['profile_msg_type']);
+
+        $this->view('user/profile/info', [
+            'title' => 'Thông tin cá nhân',
+            'active_tab' => 'info',
+            'user_info' => $user_info, // Truyền data ra view
+            'msg' => $msg,
+            'msg_type' => $msg_type
+        ]);
+    }
+
+    // 2. Xử lý Form Cập nhật thông tin Khách hàng
+    public function updateInfo() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $fullname = $_POST['fullname'] ?? '';
+            $phone = $_POST['phone'] ?? '';
+            
+            // ĐÃ SỬA: Gọi UserModel
+            $userModel = $this->model('UserModel');
+            $result = $userModel->updateUserProfile($_SESSION['user_account_id'], $fullname, $phone);
+
+            if ($result) {
+                $_SESSION['user_fullname'] = $fullname; // Đổi tên ở Header
+                $_SESSION['profile_msg'] = "Cập nhật thông tin thành công!";
+                $_SESSION['profile_msg_type'] = "success";
+            } else {
+                $_SESSION['profile_msg'] = "Có lỗi xảy ra, vui lòng thử lại!";
+                $_SESSION['profile_msg_type'] = "error";
+            }
+            
+            header("Location: /lego_shop_php/profile/index");
+            exit;
+        }
+    }
+
+    // 3. Trang Đơn hàng
+    public function orders() {
+        $this->view('user/profile/orders', [
+            'title' => 'Đơn hàng của tôi',
+            'active_tab' => 'orders'
+        ]);
+    }
+
+    // 4. Trang Đổi mật khẩu
+    public function password() {
+        $this->view('user/profile/password', [
+            'title' => 'Đổi mật khẩu',
+            'active_tab' => 'password'
+        ]);
+    }
+}

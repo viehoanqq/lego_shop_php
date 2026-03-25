@@ -244,38 +244,38 @@ function addToCart(productId) {
     console.log("Adding Product ID:", productId); 
 }   
 
-// wishlist toggle
-function toggleWishlist(productId, btnElement) {
-    // Tạo FormData để gửi dữ liệu
-    const formData = new FormData();
-    formData.append('product_id', productId);
+    // wishlist toggle
+    function toggleWishlist(productId, btnElement) {
+        // Tạo FormData để gửi dữ liệu
+        const formData = new FormData();
+        formData.append('product_id', productId);
 
-    // Gửi yêu cầu đến Controller
-    fetch('/lego_shop_php/wishlist/toggle', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'error') {
-            // Nếu chưa đăng nhập, showToast lỗi (Hàm showToast bạn đã có)
-            showToast(data.msg, 'error');
-        } else {
-            // Nếu thành công, đổi icon trái tim
-            const icon = btnElement.querySelector('i');
-            if (data.status === 'added') {
-                icon.classList.remove('fa-regular');
-                icon.classList.add('fa-solid');
-                showToast("Đã thêm vào yêu thích!", "success");
+        // Gửi yêu cầu đến Controller
+        fetch('/lego_shop_php/wishlist/toggle', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'error') {
+                // Nếu chưa đăng nhập, showToast lỗi (Hàm showToast bạn đã có)
+                showToast(data.msg, 'error');
             } else {
-                icon.classList.remove('fa-solid');
-                icon.classList.add('fa-regular');
-                showToast("Đã xóa khỏi yêu thích!", "success");
+                // Nếu thành công, đổi icon trái tim
+                const icon = btnElement.querySelector('i');
+                if (data.status === 'added') {
+                    icon.classList.remove('fa-regular');
+                    icon.classList.add('fa-solid');
+                    showToast("Đã thêm vào yêu thích!", "success");
+                } else {
+                    icon.classList.remove('fa-solid');
+                    icon.classList.add('fa-regular');
+                    showToast("Đã xóa khỏi yêu thích!", "success");
+                }
             }
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast("Có lỗi xảy ra, vui lòng thử lại!", "error");
-    });
-}
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast("Có lỗi xảy ra, vui lòng thử lại!", "error");
+        });
+    }

@@ -1,11 +1,11 @@
 <?php
 class AccountModel extends Database {
     
-    // Xử lý Đăng ký
+    // 1. Xử lý Đăng ký
     public function registerFull($data) {
         $db = $this->getConnection();
         
-        // 1. Kiểm tra SDT hoặc Email đã tồn tại chưa
+        // Kiểm tra SDT hoặc Email đã tồn tại chưa
         $phone = $db->real_escape_string(trim($data['phone']));
         $email = $db->real_escape_string(trim($data['email']));
         
@@ -16,21 +16,21 @@ class AccountModel extends Database {
 
         $db->begin_transaction();
         try {
-            // 2. Chèn vào bảng accounts
+            // Chèn vào bảng accounts
             $password = password_hash($data['password'], PASSWORD_DEFAULT);
             $sqlAcc = "INSERT INTO accounts (phone, email, password, role, status) 
                        VALUES ('$phone', '$email', '$password', 'customer', 'active')";
             $db->query($sqlAcc);
             $account_id = $db->insert_id;
 
-            // 3. Chèn vào bảng users
+            // Chèn vào bảng users
             $fullname = $db->real_escape_string(trim($data['fullname']));
             $sqlUser = "INSERT INTO users (account_id, fullname) 
                         VALUES ('$account_id', '$fullname')";
             $db->query($sqlUser);
             $user_id = $db->insert_id;
 
-            // 4. Chèn vào bảng user_addresses
+            // Chèn vào bảng user_addresses
             $street = $db->real_escape_string(trim($data['street']));
             $ward = $db->real_escape_string(trim($data['ward']));
             $district = $db->real_escape_string(trim($data['district']));
@@ -48,7 +48,7 @@ class AccountModel extends Database {
         }
     }
 
-    // Xử lý Đăng nhập
+    // 2. Xử lý Đăng nhập Khách hàng
     public function login($username, $password) {
         $db = $this->getConnection();
         $username = $db->real_escape_string(trim($username));
@@ -70,35 +70,11 @@ class AccountModel extends Database {
         return false; 
     }
 
-    // Kiểm tra tài khoản tồn tại (dùng cho quên mật khẩu)  
-    public function checkAccountExists($username) {
-        $db = $this->getConnection();
-        $username = $db->real_escape_string(trim($username));
-        
-        $sql = "SELECT id FROM accounts WHERE (phone = '$username' OR email = '$username') AND status = 'active'";
-        $result = $db->query($sql);
-        
-        if ($result && $result->num_rows > 0) {
-            return $result->fetch_assoc(); // Trả về mảng chứa id tài khoản
-        }
-        return false;
-    }
-
-    // Cập nhật mật khẩu mới
-    public function updatePassword($account_id, $new_password) {
-        $db = $this->getConnection();
-        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-        
-        $sql = "UPDATE accounts SET password = '$hashed_password' WHERE id = '$account_id'";
-        return $db->query($sql);
-    }
-
-    //admin login
+    // 3. Xử lý Đăng nhập Admin
     public function checkAdminLogin($username, $password) {
         $db = $this->getConnection();
         $username = $db->real_escape_string(trim($username));
         
-        // ĐOẠN NÀY QUAN TRỌNG NHẤT: Thêm LEFT JOIN để lấy cột fullname từ bảng users
         $sql = "SELECT a.*, u.fullname 
                 FROM accounts a 
                 LEFT JOIN users u ON a.id = u.account_id 
@@ -124,62 +100,27 @@ class AccountModel extends Database {
         }
         return false;
     }
-    /* ==============================================
-       CÁC HÀM HỖ TRỢ CHO TRANG PROFILE ADMIN
-    ============================================== */
 
-    // Lấy thông tin chi tiết của Admin
-    public function getAdminById($admin_id) {
+    // 4. Kiểm tra tài khoản tồn tại (Quên mật khẩu)  
+    public function checkAccountExists($username) {
         $db = $this->getConnection();
-        // Dùng LEFT JOIN để lấy phone, email từ bảng accounts VÀ fullname từ bảng users
-        $sql = "SELECT a.phone, a.email, u.fullname 
-                FROM accounts a 
-                LEFT JOIN users u ON a.id = u.account_id 
-                WHERE a.id = '$admin_id'";
-        $result = $db->query($sql);
+        $username = $db->real_escape_string(trim($username));
         
-        return $result ? $result->fetch_assoc() : false;
-    }
-
-    // Cập nhật thông tin cá nhân (Cập nhật 2 bảng cùng lúc)
-    public function updateAdminProfile($admin_id, $fullname, $phone, $email) {
-        $db = $this->getConnection();
-        $fullname = $db->real_escape_string($fullname);
-        $phone = $db->real_escape_string($phone);
-        $email = $db->real_escape_string($email);
-
-        $db->begin_transaction();
-        try {
-            // Update SĐT và Email ở bảng accounts
-            $sqlAcc = "UPDATE accounts SET phone = '$phone', email = '$email' WHERE id = '$admin_id'";
-            $db->query($sqlAcc);
-
-            // Update Họ Tên ở bảng users
-            $sqlUser = "UPDATE users SET fullname = '$fullname' WHERE account_id = '$admin_id'";
-            $db->query($sqlUser);
-
-            $db->commit();
-            return true;
-        } catch (Exception $e) {
-            $db->rollback();
-            return false;
-        }
-    }
-
-    // Kiểm tra mật khẩu cũ có đúng không
-    public function verifyOldPassword($admin_id, $old_password) {
-        $db = $this->getConnection();
-        $sql = "SELECT password FROM accounts WHERE id = '$admin_id'";
+        $sql = "SELECT id FROM accounts WHERE (phone = '$username' OR email = '$username') AND status = 'active'";
         $result = $db->query($sql);
         
         if ($result && $result->num_rows > 0) {
-            $account = $result->fetch_assoc();
-            
-            // Xử lý cả pass mã hóa (password_verify) lẫn pass fix cứng như '123456'
-            if (password_verify($old_password, $account['password']) || $old_password === $account['password']) {
-                return true;
-            }
+            return $result->fetch_assoc();
         }
         return false;
+    }
+
+    // 5. Cập nhật mật khẩu mới (Reset mật khẩu)
+    public function updatePassword($account_id, $new_password) {
+        $db = $this->getConnection();
+        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+        
+        $sql = "UPDATE accounts SET password = '$hashed_password' WHERE id = '$account_id'";
+        return $db->query($sql);
     }
 }
