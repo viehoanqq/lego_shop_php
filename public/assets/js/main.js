@@ -226,23 +226,6 @@ function showToast(message, type = 'error') {
 // ==========================================
 // XỬ LÝ NÚT THÊM VÀO GIỎ HÀNG
 // ==========================================
-function addToCart(productId) {
-    // 1. Kiểm tra trạng thái đăng nhập (Biến IS_LOGGED_IN được khai báo ở Header)
-    if (typeof IS_LOGGED_IN !== 'undefined' && !IS_LOGGED_IN) {
-        // Dùng Toast báo lỗi
-        showToast("Vui lòng đăng nhập để sử dụng giỏ hàng!", "error");
-        
-        // Đợi 1.5 giây rồi chuyển về trang Login
-        return; // Dừng hàm lại
-    }
-
-    // 2. Logic thêm vào giỏ (Bạn sẽ viết Ajax ở đây)
-    // Tạm thời hiển thị Toast thành công để test:
-    showToast("Đã thêm sản phẩm vào giỏ hàng!", "success");
-    
-    // Test thử xem ID sản phẩm có truyền vào đúng không
-    console.log("Adding Product ID:", productId); 
-}   
 
     // wishlist toggle
     function toggleWishlist(productId, btnElement) {
@@ -279,3 +262,41 @@ function addToCart(productId) {
             showToast("Có lỗi xảy ra, vui lòng thử lại!", "error");
         });
     }
+
+//// HÀM XỬ LÝ THÊM GIỎ HÀNG VÀ MUA NGAY
+function addToCart(productId, isBuyNow = false) {
+    // Biến IS_LOGGED_IN đã được anh em mình định nghĩa ở Header hôm trước
+    if (typeof IS_LOGGED_IN !== 'undefined' && !IS_LOGGED_IN) {
+        showToast("Bạn cần đăng nhập để mua hàng!", "error");
+        return;
+    }
+
+    // Đóng gói dữ liệu gửi đi
+    const formData = new FormData();
+    formData.append('product_id', productId);
+    formData.append('quantity', 1); // Ở trang ngoài luôn mặc định thêm 1 cái
+
+    // Gửi AJAX bằng Fetch API
+    fetch('/lego_shop_php/cart/add', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            if (isBuyNow) {
+                // Nếu là Mua Ngay -> Chuyển hướng
+                window.location.href = '/lego_shop_php/cart';
+            } else {
+                // Nếu là Thêm Giỏ -> Báo Toast xanh lá
+                showToast(data.msg, "success");
+            }
+        } else {
+            showToast(data.msg, "error");
+        }
+    })
+    .catch(error => {
+        console.error('Lỗi Cart:', error);
+        showToast("Lỗi kết nối đến máy chủ!", "error");
+    });
+}

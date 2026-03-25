@@ -254,4 +254,33 @@ class ProfileController extends Controller {
             exit;
         }
     }
+    public function addAddressAjax() {
+    // Tắt hiển thị lỗi trực tiếp ra màn hình để tránh làm bẩn chuỗi JSON
+    ini_set('display_errors', 0); 
+    header('Content-Type: application/json');
+
+    try {
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        if (!$input) {
+            echo json_encode(['success' => false, 'message' => 'Dữ liệu không hợp lệ']);
+            exit;
+        }
+
+        $user_id = $_SESSION['user_id'];
+        $model = $this->model('UserModel');
+        
+        // Thực hiện lưu
+        $new_id = $model->saveAddress($user_id, $input); 
+        
+        if ($new_id) {
+            echo json_encode(['success' => true, 'new_id' => $new_id]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Không thể lưu địa chỉ vào Database']);
+        }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit; // Luôn exit để đảm bảo không có HTML thừa từ Header/Footer chèn vào
+}
 }

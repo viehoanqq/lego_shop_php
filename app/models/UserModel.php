@@ -180,4 +180,29 @@ class UserModel extends Database {
         $sql = "DELETE FROM user_addresses WHERE id = $address_id AND user_id = $user_id";
         return $db->query($sql);
     }
+    // Hàm lưu địa chỉ mới từ trang Checkout (Dùng AJAX)
+    public function saveAddress($user_id, $data) {
+        $db = $this->getConnection();
+        
+        $receiver_name = $data['receiver_name'];
+        $receiver_phone = $data['receiver_phone'];
+        $city = $data['city'];
+        $district = $data['district'];
+        $ward = $data['ward'];
+        $street = $data['street'];
+        
+        // Mặc định địa chỉ mới thêm từ checkout sẽ không phải là mặc định (is_default = 0)
+        // Nếu bạn muốn nó làm mặc định luôn thì đổi số 0 thành 1
+        $sql = "INSERT INTO user_addresses (user_id, receiver_name, receiver_phone, city, district, ward, street, is_default) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("issssss", $user_id, $receiver_name, $receiver_phone, $city, $district, $ward, $street);
+        
+        if ($stmt->execute()) {
+            return $db->insert_id; // Trả về ID của dòng vừa chèn để gửi lại cho AJAX
+        }
+        
+        return false;
+    }
 }
