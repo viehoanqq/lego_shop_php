@@ -69,6 +69,22 @@ class AccountModel extends Database {
         }
         return false; 
     }
+    public function verifyOldPassword($account_id, $old_password) {
+        $db = $this->getConnection();
+        $account_id = intval($account_id);
+        
+        $sql = "SELECT password FROM accounts WHERE id = $account_id AND status = 'active'";
+        $result = $db->query($sql);
+        
+        if ($result && $result->num_rows > 0) {
+            $account = $result->fetch_assoc();
+            // Hàm password_verify tự động so sánh pass nhập vào với pass đã băm trong DB
+            if (password_verify($old_password, $account['password'])) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // 3. Xử lý Đăng nhập Admin
     public function checkAdminLogin($username, $password) {

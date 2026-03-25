@@ -2,24 +2,33 @@
    PROFILE PAGE - GIAO DIỆN CHUẨN (ĐÃ LỌC)
    ============================================================== */
 
-/* --- Bố cục tổng thể --- */
-body {
-    background-color: #f9f9f9 !important;
+/* ÉP TRẮNG HOÀN TOÀN KHU VỰC NỀN CHỨA PROFILE */
+html, body {
+    background-color: #f9f9f9 !important; /* Màu xám nhạt cực đẹp cho nền */
 }
 
-/* Đảm bảo khung chứa bên ngoài cũng có màu xám */
-.main-content {
-    background-color: #f9f9f9 !important;
+/* Ghi đè mọi thiết lập màu nền của thẻ chứa (wrapper) nếu có từ Header/Footer truyền xuống */
+.main-content, 
+.profile-wrapper, 
+main {
+    background-color: #f9f9f9 !important; 
 }
 
-/* CSS hiện tại của bạn */
+/* Container chính của Profile */
 .profile-container {
     min-height: calc(100vh - 280px);
     display: flex;
     gap: 30px;
     padding: 30px 15px;
-    background: #f9f9f9 !important; /* Thêm !important cho chắc chắn */
+    background-color: transparent !important; /* Để trong suốt lấy màu nền body */
     flex-wrap: wrap;
+}
+
+/* Các thẻ div chứa nội dung (Box trắng) thì giữ nguyên nền trắng tinh */
+.profile-form-box,
+.profile-sidebar {
+    background-color: #ffffff !important; 
+
 }
 .profile-container {
     min-height: calc(100vh - 280px);
@@ -261,4 +270,129 @@ body {
     .radio-group {
         gap: 15px;
     }
+}
+/* ==============================================================
+   TRANG ĐỊA CHỈ (ADDRESSES)
+   ============================================================== */
+
+/* Phần Header & Nút Thêm địa chỉ */
+.address-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 5px;
+}
+
+.btn-add-address {
+    background-color: #a4161a;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-add-address:hover { 
+    background-color: #800f13; 
+}
+
+/* Khung chứa từng địa chỉ */
+.address-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    background: #fff;
+    transition: box-shadow 0.2s ease;
+}
+
+.address-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.address-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.addr-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.addr-divider {
+    margin: 0 10px;
+    color: #ccc;
+}
+
+.addr-phone {
+    color: #666;
+}
+
+/* Nhãn Mặc định */
+.addr-badge {
+    display: inline-block;
+    border: 1px solid #a4161a;
+    color: #a4161a;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 15px;
+    background-color: #fffafb;
+}
+
+/* Các nút Cập nhật / Xóa */
+.address-actions a {
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 15px;
+}
+
+.text-blue { color: #0056b3; }
+    .text-blue:hover { text-decoration: underline; }
+.text-red { color: #d32f2f; }
+    .text-red:hover { text-decoration: underline; }
+
+.address-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.address-detail p {
+    margin: 0 0 6px 0;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Nút Thiết lập mặc định */
+.btn-set-default {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-set-default:not(.disabled):hover {
+    border-color: #333;
+    background: #f9f9f9;
+}
+
+.btn-set-default.disabled {
+    color: #aaa;
+    background: #f5f5f5;
+    cursor: not-allowed;
+    border-color: #eee;
 }

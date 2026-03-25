@@ -96,12 +96,162 @@ class ProfileController extends Controller {
             'active_tab' => 'orders'
         ]);
     }
+    // 3.5 Trang địa chỉ
+    public function addresses() {
+        // Gọi Model lấy danh sách địa chỉ
+        $userModel = $this->model('UserModel');
+        
+        // LƯU Ý: Lấy từ $_SESSION['user_id'] (id của bảng users), KHÔNG PHẢI user_account_id
+        $addresses = $userModel->getUserAddresses($_SESSION['user_id']);
 
+        // Hứng thông báo nếu có (phục vụ cho chức năng Thêm/Sửa/Xóa sau này)
+        $msg = $_SESSION['address_msg'] ?? null;
+        $msg_type = $_SESSION['address_msg_type'] ?? null;
+        unset($_SESSION['address_msg'], $_SESSION['address_msg_type']);
+
+        $this->view('user/profile/addresses', [
+            'title' => 'Địa chỉ của tôi',
+            'active_tab' => 'addresses',
+            'addresses' => $addresses, // Đẩy mảng dữ liệu ra View
+            'msg' => $msg,
+            'msg_type' => $msg_type
+        ]);
+    }
+    // [MỚI THÊM] - Xử lý Form Thêm địa chỉ
+    public function addAddress() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $name = trim($_POST['receiver_name'] ?? '');
+            $phone = trim($_POST['receiver_phone'] ?? '');
+            $street = trim($_POST['street'] ?? '');
+            $city = trim($_POST['city'] ?? '');
+
+            // Xác thực cơ bản
+            if (empty($name) || empty($phone) || empty($street) || empty($city)) {
+                $_SESSION['address_msg'] = "Vui lòng nhập đầy đủ thông tin bắt buộc!";
+                $_SESSION['address_msg_type'] = "error";
+            } elseif (!preg_match('/^(0[3|5|7|8|9])+([0-9]{8})$/', $phone)) {
+                $_SESSION['address_msg'] = "Số điện thoại không hợp lệ!";
+                $_SESSION['address_msg_type'] = "error";
+            } else {
+                $userModel = $this->model('UserModel');
+                $result = $userModel->addUserAddress($_SESSION['user_id'], $_POST);
+
+                if ($result) {
+                    $_SESSION['address_msg'] = "Thêm địa chỉ mới thành công!";
+                    $_SESSION['address_msg_type'] = "success";
+                } else {
+                    $_SESSION['address_msg'] = "Hệ thống bận, vui lòng thử lại!";
+                    $_SESSION['address_msg_type'] = "error";
+                }
+            }
+            
+            // Xong việc thì quay lại trang danh sách địa chỉ
+            header("Location: /lego_shop_php/profile/addresses");
+            exit;
+        }
+    }
     // 4. Trang Đổi mật khẩu
     public function password() {
+        $msg = $_SESSION['profile_msg'] ?? null;
+        $msg_type = $_SESSION['profile_msg_type'] ?? null;
+        unset($_SESSION['profile_msg'], $_SESSION['profile_msg_type']);
+
         $this->view('user/profile/password', [
             'title' => 'Đổi mật khẩu',
-            'active_tab' => 'password'
+            'active_tab' => 'password',
+            'msg' => $msg,
+            'msg_type' => $msg_type
         ]);
+    }
+    // [MỚI] - Xử lý Nút "Thiết lập mặc định"
+    public function setDefaultAddress() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['address_id'])) {
+            $userModel = $this->model('UserModel');
+            if ($userModel->setDefaultAddress($_POST['address_id'], $_SESSION['user_id'])) {
+                $_SESSION['address_msg'] = "Đã thay đổi địa chỉ mặc định!";
+                $_SESSION['address_msg_type'] = "success";
+            }
+        }
+        header("Location: /lego_shop_php/profile/addresses");
+        exit;
+    }
+
+    // [MỚI] - Xử lý Form Sửa địa chỉ
+    public function editAddress() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['address_id'])) {
+            $address_id = $_POST['address_id'];
+            $phone = trim($_POST['receiver_phone'] ?? '');
+
+            if (!preg_match('/^(0[3|5|7|8|9])+([0-9]{8})$/', $phone)) {
+                $_SESSION['address_msg'] = "Số điện thoại không hợp lệ!";
+                $_SESSION['address_msg_type'] = "error";
+            } else {
+                $userModel = $this->model('UserModel');
+                if ($userModel->updateUserAddress($address_id, $_SESSION['user_id'], $_POST)) {
+                    $_SESSION['address_msg'] = "Cập nhật địa chỉ thành công!";
+                    $_SESSION['address_msg_type'] = "success";
+                } else {
+                    $_SESSION['address_msg'] = "Lỗi hệ thống, vui lòng thử lại!";
+                    $_SESSION['address_msg_type'] = "error";
+                }
+            }
+            header("Location: /lego_shop_php/profile/addresses");
+            exit;
+        }
+    }
+    // [MỚI] - Xử lý chức năng Xóa địa chỉ
+    public function deleteAddress() {
+        if (isset($_GET['id'])) {
+            $address_id = $_GET['id'];
+            $userModel = $this->model('UserModel');
+
+            if ($userModel->deleteUserAddress($address_id, $_SESSION['user_id'])) {
+                $_SESSION['address_msg'] = "Đã xóa địa chỉ thành công!";
+                $_SESSION['address_msg_type'] = "success";
+            } else {
+                $_SESSION['address_msg'] = "Lỗi: Không thể xóa địa chỉ mặc định!";
+                $_SESSION['address_msg_type'] = "error";
+            }
+        }
+        
+        // Xóa xong thì quay lại trang danh sách
+        header("Location: /lego_shop_php/profile/addresses");
+        exit;
+    }
+
+    // [MỚI] - Xử lý Form Đổi mật khẩu Khách hàng
+    public function actionUpdatePassword() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $old_pass = $_POST['old_password'] ?? '';
+            $new_pass = $_POST['new_password'] ?? '';
+            $confirm_pass = $_POST['confirm_password'] ?? '';
+
+            if (empty($old_pass) || empty($new_pass) || empty($confirm_pass)) {
+                $_SESSION['profile_msg'] = "Vui lòng nhập đầy đủ các trường mật khẩu!";
+                $_SESSION['profile_msg_type'] = "error";
+            } elseif ($new_pass !== $confirm_pass) {
+                $_SESSION['profile_msg'] = "Mật khẩu xác nhận không khớp!";
+                $_SESSION['profile_msg_type'] = "error";
+            } elseif (strlen($new_pass) < 6) {
+                $_SESSION['profile_msg'] = "Mật khẩu mới phải từ 6 ký tự trở lên!";
+                $_SESSION['profile_msg_type'] = "error";
+            } else {
+                $userModel = $this->model('AccountModel');
+                
+                // Kiểm tra mật khẩu cũ
+                if ($userModel->verifyOldPassword($_SESSION['user_account_id'], $old_pass)) {
+                    // Đổi mật khẩu
+                    $userModel->updatePassword($_SESSION['user_account_id'], $new_pass);
+                    $_SESSION['profile_msg'] = "Đổi mật khẩu thành công!";
+                    $_SESSION['profile_msg_type'] = "success";
+                } else {
+                    $_SESSION['profile_msg'] = "Mật khẩu hiện tại không chính xác!";
+                    $_SESSION['profile_msg_type'] = "error";
+                }
+            }
+            
+            header("Location: /lego_shop_php/profile/password");
+            exit;
+        }
     }
 }
