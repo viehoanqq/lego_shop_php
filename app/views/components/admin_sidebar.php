@@ -47,12 +47,12 @@
         <ul class="system">
             <li class="menu-label">Sản phẩm</li>
             <li>
-                <a href="/lego_shop_php/admin/products" class="<?= isActive('products', $current_page) ?>">
+                <a href="/lego_shop_php/adminproduct" class="<?= isActive('adminproduct', $current_page) ?>">
                     <i class="fa-solid fa-cubes"></i>Danh sách LEGO
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admin/categories" class="<?= isActive('categories', $current_page) ?>">
+                <a href="/lego_shop_php/admincategory" class="<?= isActive('admincategory', $current_page) ?>">
                     <i class="fa-solid fa-layer-group"></i>Danh mục
                 </a>
             </li>

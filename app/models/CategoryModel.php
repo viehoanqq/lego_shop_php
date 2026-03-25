@@ -41,4 +41,26 @@ class CategoryModel extends Database {
     }
     // Nếu bạn muốn đếm số lượng trong giỏ hàng luôn thì viết thêm hàm ở đây
     // public function getCartCount($user_id) { ... }
+
+    public function insert($data) {
+        $db = $this->getConnection();
+        $name = $db->real_escape_string($data['name']);
+        $desc = $db->real_escape_string($data['description']);
+        $img = $db->real_escape_string($data['image_url']);
+        
+        $sql = "INSERT INTO categories (name, description, image_url, status) 
+                VALUES ('$name', '$desc', '$img', 'active')";
+        return $db->query($sql);
+    }
+
+    public function update($id, $data) {
+        $db = $this->getConnection();
+        $id = intval($id);
+        $name = $db->real_escape_string($data['name']);
+        $desc = $db->real_escape_string($data['description']);
+        $img = $db->real_escape_string($data['image_url']);
+        
+        $sql = "UPDATE categories SET name='$name', description='$desc', image_url='$img' WHERE id=$id";
+        return $db->query($sql);
+    }
 }
