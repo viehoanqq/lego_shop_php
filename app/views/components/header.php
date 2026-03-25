@@ -114,13 +114,14 @@
                 
                 <ul class="user-dropdown-menu">
                     <li><a href="/lego_shop_php/profile/orders"><i class="fa-solid fa-box-open"></i> Đơn hàng</a></li>
+                    <li><a href="/lego_shop_php/wishlist"><i class="fa-solid fa-heart"></i> Sản phẩm yêu thích</a></li>
                     <li><a href="/lego_shop_php/profile/edit"><i class="fa-solid fa-user-pen"></i> Sửa trang cá nhân</a></li>
                     <li><a href="/lego_shop_php/account/logout" style="color: #dc3545;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
                 </ul>
             </div>
             
             <a href="/lego_shop_php/cart" id="cart-link">
-              <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng (1)
+              <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
             </a>
 
         <?php else: ?>

@@ -77,3 +77,15 @@ ul {
 
 .custom-toast.success { border-left-color: #28a745; }
 .custom-toast.success i { color: #28a745; font-size: 22px; }
+/* whishlist */
+.btn-wishlist i.fa-solid.fa-heart {
+    color: #ef4444; /* Màu đỏ */
+}
+
+.btn-wishlist {
+    transition: transform 0.2s ease;
+}
+
+.btn-wishlist:active {
+    transform: scale(1.2); /* Hiệu ứng nhấn vào tim sẽ nảy lên một chút */
+}

@@ -2,26 +2,53 @@
 class ProductModel extends Database {
 
     // Lấy chi tiết 1 sản phẩm kèm thông số kỹ thuật
-    public function getProductById($id) {
+    public function getProductById($id, $account_id = null) {
         $db = $this->getConnection();
-        $sql = "SELECT p.*, c.name as category_name, pd.* FROM products p 
+        $id = intval($id);
+        
+        $select_liked = "0 as is_liked";
+        $join_wishlist = "";
+
+        if ($account_id) {
+            $acc_id = intval($account_id);
+            $select_liked = "IF(w.id IS NOT NULL, 1, 0) as is_liked";
+            $join_wishlist = "LEFT JOIN wishlists w ON p.id = w.product_id AND w.account_id = $acc_id";
+        }
+
+        $sql = "SELECT p.*, c.name as category_name, pd.*, $select_liked 
+                FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.id 
                 LEFT JOIN product_details pd ON p.id = pd.product_id 
-                WHERE p.id = " . intval($id);
+                $join_wishlist
+                WHERE p.id = $id";
         
         $result = $db->query($sql);
         return ($result && $result->num_rows > 0) ? $result->fetch_assoc() : false;
     }
 
     // HÀM QUAN TRỌNG NHẤT: Lấy danh sách sản phẩm (Dùng cho tất cả các trang)
-    public function getFilteredProducts($filters = [], $offset = 0, $limit = 6) {
+    public function getFilteredProducts($filters = [], $offset = 0, $limit = 6, $account_id = null) {
         $db = $this->getConnection();
         
-        $sql = "SELECT p.*, c.name as category_name, pd.pieces,
+        // --- 1. Xử lý câu SQL JOIN với Wishlist ---
+        $select_liked = "0 as is_liked"; // Mặc định là 0 (Chưa thích)
+        $join_wishlist = "";
+
+        // Nếu user đã đăng nhập, nối bảng wishlists để tìm xem họ có thích sản phẩm này không
+        if ($account_id) {
+            $acc_id = intval($account_id);
+            // Nếu có kết quả nối bảng (w.id IS NOT NULL) thì is_liked = 1
+            $select_liked = "IF(w.id IS NOT NULL, 1, 0) as is_liked";
+            $join_wishlist = "LEFT JOIN wishlists w ON p.id = w.product_id AND w.account_id = $acc_id";
+        }
+        // -------------------------------------------
+
+        $sql = "SELECT p.*, c.name as category_name, pd.pieces, $select_liked,
                 (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
                 FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.id 
                 LEFT JOIN product_details pd ON p.id = pd.product_id
+                $join_wishlist
                 WHERE p.status = 1";
 
         $sql .= $this->_buildFilterWhere($filters);
@@ -115,13 +142,25 @@ class ProductModel extends Database {
         if ($res) { while($row = $res->fetch_assoc()) { $data[] = $row; } }
         return $data;
     }
-    public function getRandomProducts($limit = 8) {
+    public function getRandomProducts($limit = 8, $account_id = null) {
         $db = $this->getConnection();
         
-        $sql = "SELECT p.*, c.name as category_name,
+        // --- Tương tự như trên ---
+        $select_liked = "0 as is_liked";
+        $join_wishlist = "";
+
+        if ($account_id) {
+            $acc_id = intval($account_id);
+            $select_liked = "IF(w.id IS NOT NULL, 1, 0) as is_liked";
+            $join_wishlist = "LEFT JOIN wishlists w ON p.id = w.product_id AND w.account_id = $acc_id";
+        }
+        // -------------------------
+        
+        $sql = "SELECT p.*, c.name as category_name, $select_liked,
                 (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
                 FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.id 
+                $join_wishlist
                 WHERE p.status = 1 
                 ORDER BY RAND() 
                 LIMIT " . intval($limit);

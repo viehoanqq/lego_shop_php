@@ -44,13 +44,22 @@
             <?php endif; ?>
         </div>
 
-        <div class="product-actions">
-            <button class="btn-add-cart" onclick="addToCart(<?= $product['id'] ?>)">
-                <i class="fa-solid fa-cart-shopping"></i> Thêm vào giỏ
-            </button>
-            <button class="btn-wishlist" title="Thêm vào yêu thích">
-                <i class="fa-solid fa-heart"></i>
-            </button>
+      
+            <div class="product-actions">
+    <button class="btn-add-cart" onclick="addToCart(<?= $product['id'] ?>)">
+        <i class="fa-solid fa-cart-shopping"></i> Thêm vào giỏ
+    </button>
+    
+    <?php 
+        // Biến $is_liked này bạn cần xử lý ở Controller/Model trước khi truyền sang View
+        // Nếu chưa làm logic check, tạm thời để mặc định là fa-regular
+        $wishlist_icon = (isset($product['is_liked']) && $product['is_liked']) ? 'fa-solid' : 'fa-regular';
+    ?>
+    <button class="btn-wishlist" 
+            title="Yêu thích" 
+            onclick="toggleWishlist(<?= $product['id'] ?>, this)">
+        <i class="<?= $wishlist_icon ?> fa-heart"></i>
+    </button>
+</div>
         </div>
     </div>
-</div>
