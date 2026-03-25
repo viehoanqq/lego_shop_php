@@ -95,30 +95,33 @@ class AccountModel extends Database {
 
     //admin login
     public function checkAdminLogin($username, $password) {
-    $db = $this->getConnection();
-    $username = $db->real_escape_string(trim($username));
-    
-    // 1. Chỉ lấy ra tài khoản có phone hoặc email khớp và là admin
-    $sql = "SELECT * FROM accounts WHERE (phone = '$username' OR email = '$username') AND role = 'admin' AND status = 'active'";
-    $result = $db->query($sql);
+        $db = $this->getConnection();
+        $username = $db->real_escape_string(trim($username));
+        
+        // ĐOẠN NÀY QUAN TRỌNG NHẤT: Thêm LEFT JOIN để lấy cột fullname từ bảng users
+        $sql = "SELECT a.*, u.fullname 
+                FROM accounts a 
+                LEFT JOIN users u ON a.id = u.account_id 
+                WHERE (a.phone = '$username' OR a.email = '$username') 
+                AND a.role = 'admin' AND a.status = 'active'";
+                
+        $result = $db->query($sql);
 
-    if ($result && $result->num_rows > 0) {
-        $admin = $result->fetch_assoc();
-        
-        // 2. KIỂM TRA MẬT KHẨU
-        // Dùng password_verify để kiểm tra với mật khẩu đã mã hóa trong DB
-        if (password_verify($password, $admin['password'])) {
-            unset($admin['password']); 
-            return $admin;
+        if ($result && $result->num_rows > 0) {
+            $admin = $result->fetch_assoc();
+            
+            // KIỂM TRA MẬT KHẨU (Đã mã hóa)
+            if (password_verify($password, $admin['password'])) {
+                unset($admin['password']); 
+                return $admin;
+            }
+            
+            // KIỂM TRA MẬT KHẨU (Chưa mã hóa - dự phòng)
+            if ($password === $admin['password'] && !empty($admin['password'])) {
+                unset($admin['password']);
+                return $admin;
+            }
         }
-        
-        // 3. (Tạm thời) Nếu bạn chưa kịp mã hóa pass admin trong DB (vẫn để 123456)
-        // thì dùng dòng dưới này, nhưng sau đó phải đổi sang hash ngay!
-        if ($password === $admin['password'] && !empty($admin['password'])) {
-            unset($admin['password']);
-            return $admin;
-        }
+        return false;
     }
-    return false;
-}
 }

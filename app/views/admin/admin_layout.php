@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin_global.css">
+    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin.css">
+    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin_dashboard.css">
 </head>
 <body>
 

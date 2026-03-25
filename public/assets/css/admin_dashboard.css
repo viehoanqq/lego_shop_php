@@ -1,0 +1,183 @@
+/* ==========================================
+   CSS CHO TRANG DASHBOARD TỔNG QUAN
+========================================== */
+
+/* --- 1. HÀNG THẺ THỐNG KÊ (STAT CARDS) --- */
+.stat-top {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+/* Icon chính của thẻ */
+.stat-header i:first-child {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Set màu Gradient cho từng Icon */
+.stat-card:nth-child(1) .stat-header i:first-child { background: linear-gradient(135deg, #3b82f6, #2563eb); } /* Xanh biển */
+.stat-card:nth-child(2) .stat-header i:first-child { background: linear-gradient(135deg, #10b981, #059669); } /* Xanh lá */
+.stat-card:nth-child(3) .stat-header i:first-child { background: linear-gradient(135deg, #f59e0b, #d97706); } /* Cam */
+
+.stat-name { flex: 1; margin-left: 15px; }
+.stat-name h3 { font-size: 14px; color: #64748b; font-weight: 600; margin-bottom: 4px; }
+.stat-name p { font-size: 12px; color: #94a3b8; }
+
+.stat-header .fa-chevron-right { color: #cbd5e1; cursor: pointer; }
+
+.stat-value h2 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+
+.stat-footer { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.stat-footer .percent { font-weight: 700; }
+.stat-footer .fa-arrow-trend-up, .stat-footer .percent:contains('+') { color: #22c55e; }
+.stat-footer .fa-arrow-trend-down, .stat-footer .percent:contains('-') { color: #ef4444; }
+.stat-footer .subtext { color: #94a3b8; font-size: 13px; font-weight: 500; }
+
+
+/* --- 2. KHU VỰC BIỂU ĐỒ BÊN DƯỚI --- */
+.stat-bottom {
+    display: grid;
+    grid-template-columns: 1fr 380px; /* Chia tỉ lệ: Trái to, Phải nhỏ */
+    gap: 30px;
+}
+
+/* Reset Box chung cho các Chart */
+.sale-performance, .category-chart-container, .delivery-status {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+}
+
+/* --- BIỂU ĐỒ ĐƯỜNG (CỘT TRÁI) --- */
+.sale-performance .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.sale-performance h2 { font-size: 18px; font-weight: 800; color: #1e293b; }
+
+.export { display: flex; gap: 10px; }
+.export button {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.export button:hover { background: #eef2ff; color: #6366f1; border-color: #c4b5fd; }
+
+.legend-line { display: flex; gap: 25px; margin-bottom: 15px; font-size: 13px; font-weight: 600; }
+.legend-item-line { display: flex; align-items: center; gap: 8px; }
+.legend-item-line::before { content: ''; width: 12px; height: 4px; background: currentColor; border-radius: 2px; }
+
+/* Khu vực vẽ biểu đồ đường */
+.chart-line { display: flex; height: 260px; margin-top: 10px; }
+.y-axis { 
+    display: flex; flex-direction: column; justify-content: space-between; 
+    text-align: right; padding-right: 15px; color: #94a3b8; font-size: 12px; font-weight: 600; 
+}
+.chart-area { flex: 1; position: relative; border-left: 1px dashed #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+.grid-lines { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+.grid-line { border-top: 1px dashed #e2e8f0; position: absolute; width: 100%; }
+
+/* SVG Chart Line */
+.data-line { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; }
+.line-earnings { fill: none; stroke: #3b82f6; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 6px 6px rgba(59,130,246,0.3)); }
+.line-costs { fill: none; stroke: #f59e0b; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 6px 6px rgba(245,158,11,0.3)); }
+.dot { fill: white; stroke-width: 3; }
+.dot-earnings { stroke: #3b82f6; }
+.dot-costs { stroke: #f59e0b; }
+
+.x-labels { display: flex; justify-content: space-between; margin-top: 15px; margin-left: 45px; color: #94a3b8; font-size: 12px; font-weight: 600; }
+
+
+/* --- CỘT PHẢI (DONUT & THANH TIẾN ĐỘ) --- */
+.right-chart { display: flex; flex-direction: column; gap: 30px; }
+.right-chart h2 { font-size: 16px; font-weight: 800; color: #1e293b; margin-bottom: 25px; }
+
+/* Donut Chart */
+.donut-container { display: flex; flex-direction: column; align-items: center; }
+.donut-chart { width: 180px; height: 180px; position: relative; margin-bottom: 25px; }
+.donut-chart svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.donut-bg { fill: none; stroke: #f1f5f9; stroke-width: 25; }
+.donut-segment { fill: none; stroke-width: 25; stroke-linecap: round; }
+.donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; font-weight: 800; color: #1e293b; }
+
+.donut-legend { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.donut-legend-item { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: #475569; }
+.donut-legend-item span:first-child::before { 
+    content: ''; display: inline-block; width: 12px; height: 12px; 
+    border-radius: 4px; margin-right: 10px; background: currentColor; 
+}
+
+/* Delivery Status (Tiến độ giao hàng) */
+.status-bars { 
+    display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin-bottom: 20px; 
+}
+.bar-delivered { background: #22c55e; }
+.bar-shipping { background: #f59e0b; }
+.bar-pending { background: #cbd5e1; }
+
+.bar-legend { display: flex; flex-direction: column; gap: 12px; }
+.bar-legend-item { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: #475569; align-items: center; }
+.bar-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 10px; }
+
+
+/* ==========================================
+   RESPONSIVE (CO GIÃN MÀN HÌNH)
+========================================== */
+@media (max-width: 1300px) {
+    .stat-bottom { grid-template-columns: 1fr; } /* Đẩy 2 cục bên phải rớt xuống dưới */
+    .right-chart { flex-direction: row; } /* 2 cục bên phải nằm ngang nhau */
+    .category-chart-container, .delivery-status { flex: 1; }
+}
+
+@media (max-width: 900px) {
+    .right-chart { flex-direction: column; } /* Màn hình nhỏ thì lại nằm dọc */
+    .x-labels span:nth-child(even) { display: none; } /* Ẩn bớt text ngày tháng cho đỡ chật */
+}

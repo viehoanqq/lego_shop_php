@@ -5,6 +5,10 @@ body {
   color: #1e293b;
   line-height: 1.6;
 }
+a {
+    text-decoration: none;
+  color: inherit    ;
+}
 .side-bar {
     position: fixed;
     left: 0;
@@ -230,3 +234,160 @@ body {
     object-fit: cover;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
+/* dropdown menu header */
+/* ==========================================
+   CSS CHO HEADER DROPDOWN
+========================================== */
+.admin-profile-wrapper {
+    position: relative; /* Cực kỳ quan trọng để giữ menu không bị chạy lung tung */
+}
+
+.dropdown-icon {
+    color: #94a3b8;
+    margin-left: 5px;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.profile-dropdown-menu {
+    position: absolute;
+    top: 120%; /* Đẩy menu thụt xuống một chút */
+    right: 0;
+    background: #ffffff;
+    min-width: 220px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+    list-style: none;
+    padding: 8px 0;
+    
+    /* Hiệu ứng ẩn mặc định */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+/* Khi rê chuột vào khu vực Profile thì hiện menu và xoay mũi tên */
+.admin-profile-wrapper:hover .profile-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.admin-profile-wrapper:hover .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.profile-dropdown-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #475569;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.profile-dropdown-menu li a:hover {
+    background: #f8fafc;
+    color: #6366f1; /* Đổi màu xanh tím khi hover */
+}
+
+/* Nút Đăng xuất làm nổi bật màu đỏ */
+.profile-dropdown-menu .logout-link {
+    border-top: 1px solid #f1f5f9;
+    margin-top: 5px;
+    padding-top: 5px;
+}
+.profile-dropdown-menu .logout-link a {
+    color: #ef4444;
+}
+.profile-dropdown-menu .logout-link a:hover {
+    background: #fef2f2;
+}
+/* Màu vàng hổ phách cho badge Ghi chú */
+.icon-badge .badge.yellow {
+    background: #f59e0b; 
+    border: 2px solid #fff;
+}
+
+/* Hiệu ứng riêng cho icon Ghi chú khi hover */
+.note-icon:hover {
+    background: #fffbeb !important;
+    color: #f59e0b !important;
+}
+
+/* Các thuộc tính dropdown và layout header giữ nguyên như cũ */
+.admin-header {
+    height: 80px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    border-bottom: 1px solid #f1f5f9;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+/* ... (Các CSS cũ bạn đã có) ... */
+
+/* --- admin layout --- */
+/* ==========================================
+   CSS BỐ CỤC KHUNG (LAYOUT CHÍNH)
+========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f8fafc;
+    font-family: 'Nunito Sans', sans-serif;
+}
+
+/* Sidebar cố định bên trái */
+.side-bar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 260px; /* Chiều rộng sidebar */
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    z-index: 1000;
+}
+
+/* KHỐI NÀY QUAN TRỌNG NHẤT: Đẩy nội dung né cái Sidebar ra */
+.main-content {
+    margin-left: 260px; /* Phải bằng đúng width của .side-bar */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Vùng chứa nội dung thống kê */
+.content {
+    padding: 30px;
+    flex: 1;
+}
+
+/* Đảm bảo Header luôn dính ở trên cùng và không bị đè */
+.admin-header {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    height: 80px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+

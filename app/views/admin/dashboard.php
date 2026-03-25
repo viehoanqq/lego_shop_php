@@ -76,11 +76,13 @@
                     <div class="grid-line" style="top:60%"></div>
                     <div class="grid-line" style="top:80%"></div>
                 </div>
-                <svg class="data-line">
+                <svg class="data-line" viewBox="0 0 700 100" preserveAspectRatio="none">
                     <polyline class="line-earnings" points="0,72 100,56 200,60 300,32 400,24 500,96 600,72 700,40" />
                     <polyline class="line-costs" points="0,52 100,80 200,52 300,60 400,40 500,76 600,64 700,56" />
-                    <circle class="dot dot-earnings" cx="300" cy="32" /><circle class="dot dot-earnings" cx="400" cy="24" />
-                    <circle class="dot dot-costs" cx="300" cy="60" /><circle class="dot dot-costs" cx="400" cy="40" />
+                    <circle class="dot dot-earnings" cx="300" cy="32" r="4" />
+                    <circle class="dot dot-earnings" cx="400" cy="24" r="4" />
+                    <circle class="dot dot-costs" cx="300" cy="60" r="4" />
+                    <circle class="dot dot-costs" cx="400" cy="40" r="4" />
                 </svg>
             </div>
         </div>
@@ -95,7 +97,7 @@
             <h2>Top danh mục</h2>
             <div class="donut-container">
                 <div class="donut-chart">
-                    <svg>
+                    <svg viewBox="0 0 160 160">
                         <circle class="donut-bg" cx="80" cy="80" r="66"></circle>
                         <circle class="donut-segment" cx="80" cy="80" r="66" stroke="#3b82f6" stroke-dasharray="207.3 377.0" stroke-dashoffset="0"></circle>
                         <circle class="donut-segment" cx="80" cy="80" r="66" stroke="#10b981" stroke-dasharray="94.2 377.0" stroke-dashoffset="-207.3"></circle>
