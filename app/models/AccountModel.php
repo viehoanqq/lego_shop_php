@@ -124,4 +124,62 @@ class AccountModel extends Database {
         }
         return false;
     }
+    /* ==============================================
+       CÁC HÀM HỖ TRỢ CHO TRANG PROFILE ADMIN
+    ============================================== */
+
+    // Lấy thông tin chi tiết của Admin
+    public function getAdminById($admin_id) {
+        $db = $this->getConnection();
+        // Dùng LEFT JOIN để lấy phone, email từ bảng accounts VÀ fullname từ bảng users
+        $sql = "SELECT a.phone, a.email, u.fullname 
+                FROM accounts a 
+                LEFT JOIN users u ON a.id = u.account_id 
+                WHERE a.id = '$admin_id'";
+        $result = $db->query($sql);
+        
+        return $result ? $result->fetch_assoc() : false;
+    }
+
+    // Cập nhật thông tin cá nhân (Cập nhật 2 bảng cùng lúc)
+    public function updateAdminProfile($admin_id, $fullname, $phone, $email) {
+        $db = $this->getConnection();
+        $fullname = $db->real_escape_string($fullname);
+        $phone = $db->real_escape_string($phone);
+        $email = $db->real_escape_string($email);
+
+        $db->begin_transaction();
+        try {
+            // Update SĐT và Email ở bảng accounts
+            $sqlAcc = "UPDATE accounts SET phone = '$phone', email = '$email' WHERE id = '$admin_id'";
+            $db->query($sqlAcc);
+
+            // Update Họ Tên ở bảng users
+            $sqlUser = "UPDATE users SET fullname = '$fullname' WHERE account_id = '$admin_id'";
+            $db->query($sqlUser);
+
+            $db->commit();
+            return true;
+        } catch (Exception $e) {
+            $db->rollback();
+            return false;
+        }
+    }
+
+    // Kiểm tra mật khẩu cũ có đúng không
+    public function verifyOldPassword($admin_id, $old_password) {
+        $db = $this->getConnection();
+        $sql = "SELECT password FROM accounts WHERE id = '$admin_id'";
+        $result = $db->query($sql);
+        
+        if ($result && $result->num_rows > 0) {
+            $account = $result->fetch_assoc();
+            
+            // Xử lý cả pass mã hóa (password_verify) lẫn pass fix cứng như '123456'
+            if (password_verify($old_password, $account['password']) || $old_password === $account['password']) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

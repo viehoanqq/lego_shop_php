@@ -7,7 +7,7 @@ body {
 }
 a {
     text-decoration: none;
-  color: inherit    ;
+  color: inherit    g;
 }
 .side-bar {
     position: fixed;
@@ -391,3 +391,38 @@ body {
 }
 
 
+/*--- ADMIN TOAST --- */
+/* ==========================================
+   CSS CHO TOAST NOTIFICATION (ADMIN)
+========================================== */
+#toastBox {
+    position: fixed;
+    top: 85px; /* Đẩy xuống 85px để không bị đè lên cái Header cao 80px của bạn */
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    overflow: hidden;
+    padding: 20px;
+    z-index: 99999;
+}
+.custom-toast {
+    width: 350px;
+    background: #fff;
+    font-weight: 600;
+    margin-top: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    padding: 15px;
+    transform: translateX(120%); /* Ẩn ra ngoài viền phải */
+    transition: transform 0.4s ease-in-out;
+}
+
+.custom-toast.show {
+    transform: translateX(0); /* Trượt vào trong */
+}
+
+.custom-toast.success i { color: #22c55e; font-size: 24px; margin-right: 15px; }
+.custom-toast.error i { color: #ef4444; font-size: 24px; margin-right: 15px; }

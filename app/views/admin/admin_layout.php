@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin_global.css">
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin.css">
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin_dashboard.css">
+    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin_profile.css">
+    <script src="/lego_shop_php/public/assets/js/admin.js" defer></script>
 </head>
 <body>
 
