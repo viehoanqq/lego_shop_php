@@ -205,4 +205,15 @@ class UserModel extends Database {
         
         return false;
     }
+    public function getAddressById($address_id, $user_id) {
+        $db = $this->getConnection();
+        $sql = "SELECT * FROM user_addresses WHERE id = ? AND user_id = ?";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("ii", $address_id, $user_id);
+        $stmt->execute();
+        
+        $result = $stmt->get_result();
+        return $result->fetch_assoc(); // Trả về 1 dòng dữ liệu mảng
+    }
 }

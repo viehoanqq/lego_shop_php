@@ -18,7 +18,7 @@ $step = $current_step ?? 1;
     
     <div class="step <?= $step >= 3 ? 'active' : '' ?>">
         <div class="step-circle">3</div>
-        <div class="step-text">Xác nhận</div>
+        <div class="step-text">Chuyển khoản</div>
     </div>
     <div class="step-line <?= $step >= 4 ? 'active-line' : '' ?>"></div>
     

@@ -90,12 +90,6 @@ class ProfileController extends Controller {
     }
 
     // 3. Trang Đơn hàng
-    public function orders() {
-        $this->view('user/profile/orders', [
-            'title' => 'Đơn hàng của tôi',
-            'active_tab' => 'orders'
-        ]);
-    }
     // 3.5 Trang địa chỉ
     public function addresses() {
         // Gọi Model lấy danh sách địa chỉ
@@ -283,4 +277,69 @@ class ProfileController extends Controller {
     }
     exit; // Luôn exit để đảm bảo không có HTML thừa từ Header/Footer chèn vào
 }
+
+
+    // =========================================================================
+    // 6. HIỂN THỊ TRANG LỊCH SỬ ĐƠN HÀNG CỦA USER
+    // =========================================================================
+    public function orders() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        
+        // Phải đăng nhập mới xem được lịch sử
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /lego_shop_php/account/login");
+            exit;
+        }
+
+        $user_id = $_SESSION['user_id'];
+        
+        // Gọi Model để lấy tất cả đơn hàng của user này
+        $orderModel = $this->model('OrderModel');
+        // Đảm bảo bạn đã viết hàm getOrdersByUserId trong OrderModel nhé!
+        $orders = $orderModel->getOrdersByUserId($user_id);
+
+        // Trỏ đến view orders.php mà bạn vừa tạo
+        $this->view('/user/profile/orders', [
+            'title' => 'Lịch sử mua hàng',
+            'orders' => $orders
+        ]);
+    }
+
+    // =========================================================================
+    // 7. API ĐỂ LẤY CHI TIẾT ĐƠN HÀNG HIỂN THỊ LÊN POPUP (AJAX)
+    // =========================================================================
+    public function getOrderDetailsAjax() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        header('Content-Type: application/json'); // Báo cho web biết mình trả về JSON
+        
+        // Lấy ID đơn hàng từ JS gửi lên
+        $input = json_decode(file_get_contents('php://input'), true);
+        $order_id = $input['order_id'] ?? 0;
+        $user_id = $_SESSION['user_id'] ?? 0;
+
+        if (!$order_id || !$user_id) {
+            echo json_encode(['success' => false, 'message' => 'Thiếu thông tin']);
+            exit;
+        }
+
+        $orderModel = $this->model('OrderModel');
+        $order = $orderModel->getOrderById($order_id);
+
+        // Bảo mật: Không tìm thấy đơn, hoặc đơn đó không phải của user đang đăng nhập
+        if (!$order || $order['user_id'] != $user_id) {
+            echo json_encode(['success' => false, 'message' => 'Không tìm thấy đơn hàng']);
+            exit;
+        }
+
+        // Lấy chi tiết các sản phẩm trong đơn đó
+        $items = $orderModel->getOrderItems($order_id);
+
+        // Trả kết quả về cho JS vẽ lên Modal
+        echo json_encode([
+            'success' => true,
+            'order' => $order,
+            'items' => $items
+        ]);
+        exit;
+    }
 }

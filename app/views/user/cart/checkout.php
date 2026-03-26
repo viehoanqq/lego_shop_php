@@ -8,7 +8,7 @@
             <p style="color: #666;">Vui lòng kiểm tra lại thông tin trước khi xác nhận.</p>
         </div>
 
-        <form action="/lego_shop_php/order/create" method="POST" id="checkoutForm">
+        <form action="/lego_shop_php/checkout/process" method="POST" id="checkoutForm">
             <div class="checkout-layout">
                 
                 <div class="checkout-left">
@@ -85,11 +85,11 @@
                         <h3 class="box-title"><i class="fa-solid fa-credit-card"></i> Phương thức thanh toán</h3>
                         <div class="payment-methods">
                             <label class="payment-item">
-                                <input type="radio" name="payment_method" value="cod" checked>
+                                <input type="radio" name="payment_method" value="cash" checked>
                                 <span>Thanh toán khi nhận hàng (COD)</span>
                             </label>
                             <label class="payment-item">
-                                <input type="radio" name="payment_method" value="banking">
+                                <input type="radio" name="payment_method" value="transfer">
                                 <span>Chuyển khoản ngân hàng</span>
                             </label>
                             <div id="bankingInfo" class="banking-details" style="display: none;">

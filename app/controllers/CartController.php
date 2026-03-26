@@ -88,5 +88,37 @@ class CartController extends Controller {
             }
         }
     }
-    
+
+    // Thêm vào giỏ hàng ngầm qua AJAX
+    public function addAjax() {
+        header('Content-Type: application/json');
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập để mua hàng!']);
+            exit;
+        }
+
+        $user_id = $_SESSION['user_id'];
+        $product_id = $_POST['product_id'] ?? 0;
+        $quantity = $_POST['quantity'] ?? 1;
+
+        if ($product_id > 0) {
+            $cartModel = $this->model('CartModel');
+            // CHÚ Ý: Kiểm tra tên hàm trong CartModel của bạn là gì (addToCart hay addProductToCart)
+            // Tôi giả định dùng addProductToCart theo hàm add() cũ của bạn
+            $result = $cartModel->addProductToCart($user_id, $product_id, $quantity);
+            
+            if ($result) {
+                // Đếm tổng số lượng sản phẩm trong giỏ để cập nhật icon giỏ hàng
+                $count = $cartModel->countCartItems($user_id); 
+                echo json_encode(['success' => true, 'cart_count' => $count]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Lỗi hệ thống khi thêm vào giỏ!']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Sản phẩm không hợp lệ!']);
+        }
+        exit;
+    }
 }
