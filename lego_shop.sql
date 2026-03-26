@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Cấu trúc bảng cho bảng `accounts`
 --
 
-CREATE TABLE `accounts` (
+CREATE TABLE IF NOT EXISTS `accounts` (
   `id` int(11) NOT NULL,
   `phone` varchar(20) NOT NULL,
   `email` varchar(100) NOT NULL,
@@ -53,7 +53,7 @@ INSERT INTO `accounts` (`id`, `phone`, `email`, `password`, `role`, `status`, `c
 -- Cấu trúc bảng cho bảng `carts`
 --
 
-CREATE TABLE `carts` (
+CREATE TABLE IF NOT EXISTS `carts` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -64,7 +64,7 @@ CREATE TABLE `carts` (
 -- Cấu trúc bảng cho bảng `cart_items`
 --
 
-CREATE TABLE `cart_items` (
+CREATE TABLE IF NOT EXISTS `cart_items` (
   `id` int(11) NOT NULL,
   `cart_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE `cart_items` (
 -- Cấu trúc bảng cho bảng `categories`
 --
 
-CREATE TABLE `categories` (
+CREATE TABLE IF NOT EXISTS `categories` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `description` text DEFAULT NULL,
@@ -104,7 +104,7 @@ INSERT INTO `categories` (`id`, `name`, `description`, `image_url`, `status`, `o
 -- Cấu trúc bảng cho bảng `import_receipts`
 --
 
-CREATE TABLE `import_receipts` (
+CREATE TABLE IF NOT EXISTS `import_receipts` (
   `id` int(11) NOT NULL,
   `admin_id` int(11) NOT NULL,
   `supplier_id` int(11) NOT NULL,
@@ -119,7 +119,7 @@ CREATE TABLE `import_receipts` (
 -- Cấu trúc bảng cho bảng `import_receipt_details`
 --
 
-CREATE TABLE `import_receipt_details` (
+CREATE TABLE IF NOT EXISTS `import_receipt_details` (
   `id` int(11) NOT NULL,
   `receipt_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE `import_receipt_details` (
 -- Cấu trúc bảng cho bảng `inventory_transactions`
 --
 
-CREATE TABLE `inventory_transactions` (
+CREATE TABLE IF NOT EXISTS `inventory_transactions` (
   `id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   `transaction_type` enum('IN','OUT') NOT NULL,
@@ -150,7 +150,7 @@ CREATE TABLE `inventory_transactions` (
 -- Cấu trúc bảng cho bảng `orders`
 --
 
-CREATE TABLE `orders` (
+CREATE TABLE IF NOT EXISTS `orders` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `status` enum('pending','confirmed','delivered','cancelled') DEFAULT 'pending',
@@ -171,7 +171,7 @@ CREATE TABLE `orders` (
 -- Cấu trúc bảng cho bảng `order_details`
 --
 
-CREATE TABLE `order_details` (
+CREATE TABLE IF NOT EXISTS `order_details` (
   `id` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
@@ -185,7 +185,7 @@ CREATE TABLE `order_details` (
 -- Cấu trúc bảng cho bảng `products`
 --
 
-CREATE TABLE `products` (
+CREATE TABLE IF NOT EXISTS `products` (
   `id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   `sku` varchar(50) NOT NULL,
@@ -221,7 +221,7 @@ INSERT INTO `products` (`id`, `category_id`, `sku`, `name`, `description`, `unit
 -- Cấu trúc bảng cho bảng `product_details`
 --
 
-CREATE TABLE `product_details` (
+CREATE TABLE IF NOT EXISTS `product_details` (
   `product_id` int(11) NOT NULL,
   `manufacturer` varchar(150) DEFAULT 'Tập đoàn LEGO',
   `country_of_origin` varchar(100) DEFAULT 'Đan Mạch',
@@ -254,7 +254,7 @@ INSERT INTO `product_details` (`product_id`, `manufacturer`, `country_of_origin`
 -- Cấu trúc bảng cho bảng `product_images`
 --
 
-CREATE TABLE `product_images` (
+CREATE TABLE IF NOT EXISTS `product_images` (
   `id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   `image_url` varchar(255) NOT NULL,
@@ -281,7 +281,7 @@ INSERT INTO `product_images` (`id`, `product_id`, `image_url`, `is_main`) VALUES
 -- Cấu trúc bảng cho bảng `product_reviews`
 --
 
-CREATE TABLE `product_reviews` (
+CREATE TABLE IF NOT EXISTS `product_reviews` (
   `id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -304,7 +304,7 @@ INSERT INTO `product_reviews` (`id`, `product_id`, `user_id`, `rating`, `comment
 -- Cấu trúc bảng cho bảng `suppliers`
 --
 
-CREATE TABLE `suppliers` (
+CREATE TABLE IF NOT EXISTS `suppliers` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL COMMENT 'Tên công ty/nhà cung cấp',
   `phone` varchar(20) NOT NULL,
@@ -329,7 +329,7 @@ INSERT INTO `suppliers` (`id`, `name`, `phone`, `email`, `address`, `status`, `c
 -- Cấu trúc bảng cho bảng `users`
 --
 
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL,
   `account_id` int(11) NOT NULL,
   `fullname` varchar(100) NOT NULL
@@ -350,7 +350,7 @@ INSERT INTO `users` (`id`, `account_id`, `fullname`) VALUES
 -- Cấu trúc bảng cho bảng `user_addresses`
 --
 
-CREATE TABLE `user_addresses` (
+CREATE TABLE IF NOT EXISTS `user_addresses` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `receiver_name` varchar(100) NOT NULL,

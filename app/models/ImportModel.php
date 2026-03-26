@@ -1,0 +1,183 @@
+<?php
+class ImportModel extends Database {
+    
+    // 1. Lấy danh sách Nhà cung cấp cho form nhập hàng
+    public function getAllSuppliers() {
+        $db = $this->getConnection();
+        $sql = "SELECT * FROM suppliers WHERE status = 'active'";
+        $result = $db->query($sql);
+        $data = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) { $data[] = $row; }
+        }
+        return $data;
+    }
+
+    // 2. Lấy danh sách Lịch sử phiếu nhập
+    public function getAllImports() {
+        $db = $this->getConnection();
+        $sql = "SELECT r.*, u.fullname as admin_name, s.name as supplier_name 
+                FROM import_receipts r
+                LEFT JOIN accounts acc ON r.admin_id = acc.id
+                LEFT JOIN users u ON acc.id = u.account_id
+                LEFT JOIN suppliers s ON r.supplier_id = s.id
+                ORDER BY r.created_at DESC";
+        $result = $db->query($sql);
+        $data = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) { $data[] = $row; }
+        }
+        return $data;
+    }
+
+    // 3. Xử lý lưu Phiếu nhập và Tính Giá Bình Quân Gia Quyền (WAC)
+    public function createImportTransaction($admin_id, $supplier_id, $products_list, $status = 'draft') {
+        $db = $this->getConnection();
+        $db->begin_transaction(); 
+
+        try {
+            // 1. Tính tổng tiền
+            $total_amount = 0;
+            foreach ($products_list as $item) {
+                $total_amount += intval($item['quantity']) * intval($item['price']);
+            }
+
+            // 2. Lưu Phiếu nhập chung với biến $status
+            $sqlReceipt = "INSERT INTO import_receipts (admin_id, supplier_id, total_amount, status) VALUES (?, ?, ?, ?)";
+            $stmtR = $db->prepare($sqlReceipt);
+            $stmtR->bind_param("iiis", $admin_id, $supplier_id, $total_amount, $status);
+            $stmtR->execute();
+            $receipt_id = $db->insert_id;
+
+            // 3. Xử lý từng sản phẩm
+            foreach ($products_list as $item) {
+                $p_id = intval($item['product_id']);
+                $qty_in = intval($item['quantity']);
+                $price_in = intval($item['price']); 
+                
+                $new_wac = 0;
+                $new_selling_price = 0;
+
+                // CHỈ TÍNH GIÁ VÀ TĂNG KHO KHI TRẠNG THÁI LÀ 'completed'
+                if ($status === 'completed') {
+                    $res = $db->query("SELECT stock_quantity, import_price, profit_margin FROM products WHERE id = $p_id");
+                    $prod = $res->fetch_assoc();
+
+                    $old_stock = intval($prod['stock_quantity']);
+                    $old_wac = intval($prod['import_price']);
+                    $margin = floatval($prod['profit_margin']);
+
+                    // TÍNH BÌNH QUÂN GIA QUYỀN (WAC)
+                    $new_stock = $old_stock + $qty_in;
+                    $new_wac = round((($old_stock * $old_wac) + ($qty_in * $price_in)) / $new_stock);
+
+                    // Tính giá bán mới
+                    $new_selling_price = round($new_wac * (1 + $margin));
+
+                    // Cập nhật lại kho và giá vào bảng products
+                    $sqlUpdate = "UPDATE products SET stock_quantity = ?, import_price = ?, selling_price = ? WHERE id = ?";
+                    $stmtU = $db->prepare($sqlUpdate);
+                    $stmtU->bind_param("iiii", $new_stock, $new_wac, $new_selling_price, $p_id);
+                    $stmtU->execute();
+                }
+
+                // 4. Lưu chi tiết phiếu nhập (Nếu là draft thì WAC và giá bán lưu = 0)
+                $sqlDetail = "INSERT INTO import_receipt_details (receipt_id, product_id, quantity, price, calculated_average_price, calculated_selling_price) VALUES (?, ?, ?, ?, ?, ?)";
+                $stmtD = $db->prepare($sqlDetail);
+                $stmtD->bind_param("iiiiii", $receipt_id, $p_id, $qty_in, $price_in, $new_wac, $new_selling_price);
+                $stmtD->execute();
+            }
+
+            $db->commit();
+            return true;
+        } catch (Exception $e) {
+            $db->rollback();
+            return false;
+        }
+    }
+    // --- Lấy thông tin chung của 1 phiếu nhập ---
+    public function getImportById($id) {
+        $db = $this->getConnection();
+        $sql = "SELECT r.*, u.fullname as admin_name, s.name as supplier_name 
+                FROM import_receipts r
+                LEFT JOIN accounts acc ON r.admin_id = acc.id
+                LEFT JOIN users u ON acc.id = u.account_id
+                LEFT JOIN suppliers s ON r.supplier_id = s.id
+                WHERE r.id = " . intval($id);
+        $result = $db->query($sql);
+        return $result ? $result->fetch_assoc() : false;
+    }
+
+    // --- Lấy danh sách sản phẩm chi tiết của phiếu nhập đó ---
+    public function getImportDetails($receipt_id) {
+        $db = $this->getConnection();
+        
+        $sql = "SELECT d.*, p.name as product_name, p.sku, p.stock_quantity as current_stock,
+                       (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM import_receipt_details d
+                JOIN products p ON d.product_id = p.id
+                WHERE d.receipt_id = " . intval($receipt_id);
+                
+        $result = $db->query($sql);
+        $data = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) { $data[] = $row; }
+        }
+        return $data;
+    }
+
+    // --- LOGIC QUAN TRỌNG: Chuyển Bản nháp -> Hoàn tất (Tính WAC và Tăng kho) ---
+    public function completeImport($receipt_id) {
+        $db = $this->getConnection();
+        $receipt_id = intval($receipt_id);
+
+        // Kiểm tra xem phiếu này có tồn tại và đang là draft không
+        $receipt = $this->getImportById($receipt_id);
+        if (!$receipt || $receipt['status'] === 'completed') return false;
+
+        $db->begin_transaction();
+        try {
+            // 1. Cập nhật trạng thái phiếu thành completed
+            $db->query("UPDATE import_receipts SET status = 'completed' WHERE id = $receipt_id");
+
+            // 2. Lấy chi tiết để tính toán
+            $details = $this->getImportDetails($receipt_id);
+            foreach ($details as $item) {
+                $p_id = intval($item['product_id']);
+                $qty_in = intval($item['quantity']);
+                $price_in = intval($item['price']);
+
+                // Lấy thông tin tồn kho hiện tại
+                $res = $db->query("SELECT stock_quantity, import_price, profit_margin FROM products WHERE id = $p_id");
+                $prod = $res->fetch_assoc();
+
+                $old_stock = intval($prod['stock_quantity']);
+                $old_wac = intval($prod['import_price']);
+                $margin = floatval($prod['profit_margin']);
+
+                // TÍNH BÌNH QUÂN GIA QUYỀN (WAC)
+                $new_stock = $old_stock + $qty_in;
+                $new_wac = round((($old_stock * $old_wac) + ($qty_in * $price_in)) / $new_stock);
+
+                // Tính giá bán mới
+                $new_selling_price = round($new_wac * (1 + $margin));
+
+                // 3. Cập nhật vào bảng Products
+                $stmtU = $db->prepare("UPDATE products SET stock_quantity = ?, import_price = ?, selling_price = ? WHERE id = ?");
+                $stmtU->bind_param("iiii", $new_stock, $new_wac, $new_selling_price, $p_id);
+                $stmtU->execute();
+
+                // 4. Cập nhật lại giá đã tính vào chi tiết phiếu (để lưu lịch sử)
+                $stmtD = $db->prepare("UPDATE import_receipt_details SET calculated_average_price = ?, calculated_selling_price = ? WHERE id = ?");
+                $stmtD->bind_param("iii", $new_wac, $new_selling_price, $item['id']);
+                $stmtD->execute();
+            }
+
+            $db->commit();
+            return true;
+        } catch (Exception $e) {
+            $db->rollback();
+            return false;
+        }
+    }
+}
