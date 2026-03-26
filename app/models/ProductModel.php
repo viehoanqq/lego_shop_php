@@ -177,6 +177,11 @@ class ProductModel extends Database {
 
 
 
+
+
+
+
+
     // Thêm sản phẩm mới với Transaction
     public function insertProduct($data) {
         $db = $this->getConnection();
@@ -265,6 +270,123 @@ class ProductModel extends Database {
         return $db->query("UPDATE products SET status = $status WHERE id = $id");
     }
 
+    // Hàm lấy danh sách dành riêng cho Admin (Lấy cả status 1 và 2)
+    public function getAdminProducts($filters = [], $offset = 0, $limit = 6) {
+        $db = $this->getConnection();
+        
+        // Mặc định lấy cả 1 và 2
+        $where = "WHERE p.status IN (1, 2)"; 
 
+        // Kiểm tra nếu lọc status là số cụ thể (1 hoặc 2)
+        if (isset($filters['status']) && is_numeric($filters['status'])) {
+            $where = "WHERE p.status = " . intval($filters['status']);
+        } 
+        // Nếu lọc là một danh sách (ví dụ '1,2')
+        elseif (!empty($filters['status']) && $filters['status'] !== 'all' && strpos($filters['status'], ',') !== false) {
+            // Làm sạch chuỗi để tránh SQL Injection (ví dụ: "1,2")
+            $safe_status = $db->real_escape_string($filters['status']);
+            $where = "WHERE p.status IN ($safe_status)";
+        }
+
+        $sql = "SELECT p.*, c.name as category_name, pd.pieces,
+                (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM products p 
+                LEFT JOIN categories c ON p.category_id = c.id 
+                LEFT JOIN product_details pd ON p.id = pd.product_id 
+                $where";
+
+        if (!empty($filters['keyword'])) {
+            $k = $db->real_escape_string(trim($filters['keyword']));
+            $sql .= " AND (p.name LIKE '%$k%' OR p.sku LIKE '%$k%')";
+        }
+        
+        if (!empty($filters['category']) && $filters['category'] !== 'all') {
+            $sql .= " AND p.category_id = " . intval($filters['category']);
+        }
+
+        $sql .= " ORDER BY p.created_at DESC LIMIT " . intval($offset) . ", " . intval($limit);
+
+        $result = $db->query($sql);
+        $products = [];
+        if ($result) {
+            while ($row = $result->fetch_assoc()) { $products[] = $row; }
+        }
+        return $products;
+    }
+
+    // Hàm đếm tổng sản phẩm dành riêng cho Admin
+    public function countAdminProducts($filters = []) {
+        $db = $this->getConnection();
+        $where = "WHERE p.status IN (1, 2)";
+
+        if (isset($filters['status']) && is_numeric($filters['status'])) {
+            $where = "WHERE p.status = " . intval($filters['status']);
+        } elseif (!empty($filters['status']) && $filters['status'] !== 'all' && strpos($filters['status'], ',') !== false) {
+            $safe_status = $db->real_escape_string($filters['status']);
+            $where = "WHERE p.status IN ($safe_status)";
+        }
+
+        $sql = "SELECT COUNT(*) as total FROM products p $where";
+        
+        if (!empty($filters['keyword'])) {
+            $k = $db->real_escape_string(trim($filters['keyword']));
+            $sql .= " AND (p.name LIKE '%$k%' OR p.sku LIKE '%$k%')";
+        }
+        
+        if (!empty($filters['category']) && $filters['category'] !== 'all') {
+            $sql .= " AND p.category_id = " . intval($filters['category']);
+        }
+
+        $result = $db->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'] ?? 0;
+    }
+
+    public function getProductFullDetail($id) {
+        $db = $this->getConnection();
+        $id = intval($id);
+
+        $sql = "SELECT p.*, d.*, c.name as category_name,
+                (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM products p 
+                LEFT JOIN product_details d ON p.id = d.product_id 
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.id = ?";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return ($result && $result->num_rows > 0) ? $result->fetch_assoc() : false;
+    
+    }
+
+    // Nếu bạn có dùng hàm updateProductDetails ở Controller thì cũng nên thêm vào đây:
+    public function updateProductDetail($id, $data) {
+        $db = $this->getConnection();
+        $sql = "UPDATE product_details SET 
+                manufacturer = ?, 
+                material = ?, 
+                dimensions = ?, 
+                age_range = ?, 
+                pieces = ?, 
+                theme_story = ? ,
+                release_year = ?
+                WHERE product_id = ?";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("ssssissi", 
+            $data['manufacturer'], 
+            $data['material'], 
+            $data['dimensions'], 
+            $data['age_range'], 
+            $data['pieces'], 
+            $data['theme_story'], 
+            $data['release_year'], 
+            $id
+        );
+        
+        return $stmt->execute();
+    }
 
 }

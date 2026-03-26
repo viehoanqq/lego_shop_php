@@ -4,14 +4,13 @@
         border-radius: 12px; 
         box-shadow: 0 2px 12px rgba(0,0,0,0.08); 
         margin-top: 10px;
-        /* THÊM 2 DÒNG DƯỚI ĐÂY */
+
         max-height: 70vh; /* Chiều cao bằng 70% màn hình */
         overflow-y: auto; 
     }
 
     .lego-table { width: 100%; border-collapse: separate; border-spacing: 0; }
 
-    /* GIỮ TIÊU ĐỀ ĐỨNG YÊN KHI CUỘN */
     .lego-table th { 
         position: sticky; 
         top: 0; 
@@ -27,7 +26,6 @@
 
     .lego-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
     
-    /* Tùy chỉnh thanh cuộn cho đẹp */
     .table-container::-webkit-scrollbar { width: 6px; }
     .table-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
     .product-cell { display: flex; align-items: center; gap: 15px; }
@@ -47,6 +45,15 @@
     .form-control:focus { border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
     .btn-submit { background: #3182ce; color: white; padding: 10px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
 
+    .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; padding-bottom: 30px; }
+    .page-link { 
+        padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 6px; 
+        text-decoration: none; color: #4a5568; background: #fff; transition: 0.2s;
+    }
+    .page-link:hover { background: #edf2f7; border-color: #cbd5e0; }
+    .page-link.active { background: #3182ce; color: white; border-color: #3182ce; font-weight: bold; }
+    .page-link.disabled { color: #cbd5e0; pointer-events: none; background: #f8fafc; }
+    .stock-empty { background: #fff5f5; color: #c53030; border: 1px solid #63171b; }
 </style>
 
 <?php if(isset($_GET['msg']) || isset($_GET['error'])): ?>
@@ -56,10 +63,11 @@
                 <i class="fa-solid fa-circle-check"></i>
                 <span>
                     <?php
-                        if($_GET['msg'] == 'success') echo "✨ Thêm sản phẩm thành công!";
-                        elseif($_GET['msg'] == 'updated') echo "✅ Đã cập nhật thông tin sản phẩm!";
-                        elseif($_GET['msg'] == 'hidden') echo "🔒 Đã ẩn sản phẩm khỏi cửa hàng!";
-                        elseif($_GET['msg'] == 'deleted') echo "🗑️ Đã xóa sản phẩm thành công!";
+                        if($_GET['msg'] == 'success') echo "Thêm sản phẩm thành công!";
+                        elseif($_GET['msg'] == 'updated') echo "Đã cập nhật thông tin sản phẩm!";
+                        elseif($_GET['msg'] == 'show') echo "Đã mở khóa sản phẩm!";
+                        elseif($_GET['msg'] == 'hidden') echo "Đã khóa sản phẩm khỏi cửa hàng!";
+                        elseif($_GET['msg'] == 'deleted') echo "Đã xóa sản phẩm thành công!";
                     ?>
                 </span>
             </div>
@@ -70,10 +78,12 @@
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span>
                     <?php
-                        if($_GET['error'] == 'empty') echo "⚠️ Vui lòng điền đầy đủ các trường bắt buộc!";
-                        elseif($_GET['error'] == 'db') echo "❌ Lỗi hệ thống: Không thể xử lý dữ liệu.";
-                        elseif($_GET['error'] == 'sku_exists') echo "🆔 Lỗi: Mã SKU này đã tồn tại!";
-                        else echo "❌ Có lỗi xảy ra, vui lòng thử lại.";
+                        if($_GET['error'] == 'empty') echo "Vui lòng điền đầy đủ các trường bắt buộc!";
+                        elseif($_GET['error'] == 'db') echo "Lỗi hệ thống: Không thể xử lý dữ liệu.";
+                        elseif($_GET['error'] == 'sku_exists') echo "Lỗi: Mã SKU này đã tồn tại!";
+                        elseif($_GET['error'] == 'already_hidden') echo "Sản phẩm này đã bị khóa!";
+                        elseif($_GET['error'] == 'already_shown') echo "Sản phẩm này hiện đang được mở bán!";
+                        else echo "Có lỗi xảy ra, vui lòng thử lại.";
                     ?>
                 </span>
             </div>
@@ -81,13 +91,40 @@
     </div>
 <?php endif; ?>
 
-<div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px;">
-    <div>
-        <h2 style="margin:0; color: #1a202c;">📦 Danh Sách LEGO</h2>
-        <small style="color: #718096;">Quản lý chi tiết</small>
+<div class="admin-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; gap: 20px;">
+    <div style="flex-grow: 1;">
+        <h2 style="margin:0; color: #1a202c;">📦 Quản lý Kho LEGO</h2>
+        
+        <form action="/lego_shop_php/adminproduct" method="GET" style="display: flex; gap: 10px; margin-top: 15px; align-items: center;">
+            <div style="position: relative; flex: 2;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: #a0aec0;"></i>
+                <input type="text" name="keyword" class="form-control" 
+                       placeholder="Tìm tên sản phẩm" 
+                       value="<?= $_GET['keyword'] ?? '' ?>"
+                       style="padding-left: 35px; border-radius: 8px;">
+            </div>
+
+            <select name="category" class="form-control" onchange="this.form.submit()" style="flex: 1; border-radius: 8px; cursor: pointer;">
+                <option value="all">-- Tất cả danh mục --</option>
+                <?php foreach($categories as $cat): ?>
+                    <option value="<?= $cat['id'] ?>" <?= (isset($_GET['category']) && $_GET['category'] == $cat['id']) ? 'selected' : '' ?>>
+                        <?= $cat['name'] ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <select name="status" class="form-control" onchange="this.form.submit()" style="flex: 1; border-radius: 8px; cursor: pointer;">
+                <option value="1,2" <?= (!isset($_GET['status']) || $_GET['status'] == '1,2') ? 'selected' : '' ?>>Tất cả trạng thái</option>
+                <option value="1" <?= (isset($_GET['status']) && $_GET['status'] == '1') ? 'selected' : '' ?>>Đang bán</option>
+                <option value="2" <?= (isset($_GET['status']) && $_GET['status'] == '2') ? 'selected' : '' ?>>Tạm khóa</option>
+            </select>
+        </form>
     </div>
+
     <?php if(!isset($is_form) || $is_form === false): ?>
-        <a href="/lego_shop_php/adminproduct/add" style="background: #3182ce; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600;">+ Thêm sản phẩm</a>
+        <a href="/lego_shop_php/adminproduct/add" style="background: #3182ce; color: white; text-decoration: none; padding: 12px 25px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+            <i class="fa-solid fa-plus"></i> Thêm sản phẩm
+        </a>
     <?php endif; ?>
 </div>
 
@@ -166,10 +203,16 @@
                     <td>
                         <div class="product-cell">
                             <img src="/lego_shop_php/public/assets/images/<?= !empty($p['main_image']) ? $p['main_image'] : 'default.jpg' ?>" 
-                                 class="img-product" 
-                                 onerror="this.src='https://placehold.co/60x60?text=LEGO'">
+                                class="img-product" 
+                                onerror="this.src='https://placehold.co/60x60?text=LEGO'">
                             <div>
-                                <div style="font-weight: 700; color: #2d3748;"><?= htmlspecialchars($p['name']) ?></div>
+                                <a href="/lego_shop_php/adminproduct/detail/<?= $p['id'] ?>" 
+                                style="text-decoration: none; display: block; group">
+                                    <div style="font-weight: 700; color: #3182ce; transition: 0.2s;" onmouseover="this.style.color='#2c5282'" onmouseout="this.style.color='#3182ce'">
+                                        <?= htmlspecialchars($p['name']) ?> 
+                                        <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px; margin-left: 4px; opacity: 0.5;"></i>
+                                    </div>
+                                </a>
                                 <div style="font-size: 11px; color: #a0aec0; letter-spacing: 0.5px;">SKU: <?= strtoupper($p['sku']) ?></div>
                             </div>
                         </div>
@@ -182,7 +225,9 @@
                         <strong><?= number_format($p['pieces']) ?></strong> pcs
                     </td>
                     <td>
-                        <?php if($p['stock_quantity'] <= $p['min_stock_level']): ?>
+                        <?php if($p['stock_quantity'] <= 0): ?>
+                            <span class="stock-badge stock-empty">Hết hàng</span>
+                        <?php elseif($p['stock_quantity'] <= $p['min_stock_level']): ?>
                             <span class="stock-badge stock-low">Sắp hết: <?= $p['stock_quantity'] ?></span>
                         <?php else: ?>
                             <span class="stock-badge stock-ok">Còn: <?= $p['stock_quantity'] ?></span>
@@ -192,7 +237,7 @@
                         <?php if($p['status'] == 1): ?>
                             <span style="color: #38a169; font-size: 13px; font-weight: 600;"><span class="status-pill" style="background:#48bb78"></span>Đang bán</span>
                         <?php else: ?>
-                            <span style="color: #e53e3e; font-size: 13px; font-weight: 600;"><span class="status-pill" style="background:#f56565"></span>Tạm ẩn</span>
+                            <span style="color: #e53e3e; font-size: 13px; font-weight: 600;"><span class="status-pill" style="background:#f56565"></span>Tạm khóa</span>
                         <?php endif; ?>
                     </td>
                     <td>
@@ -200,8 +245,11 @@
                             <a href="/lego_shop_php/adminproduct/edit/<?= $p['id'] ?>" class="btn-action" title="Chỉnh sửa" style="color: #3182ce;">
                                 <i class="fa-solid fa-pen-to-square"></i> Sửa
                             </a>
-                            <a href="/lego_shop_php/adminproduct/hide/<?= $p['id'] ?>" class="btn-action" title="Xóa" style="color: #e53e3e;" onclick="return confirm('Bạn có chắc chắn muốn ẩn sản phẩm <?= $p['name'] ?>?')">
-                                <i class="fa-solid fa-eye-slash"></i> Ẩn
+                            <a href="/lego_shop_php/adminproduct/hide/<?= $p['id'] ?>" class="btn-action" title="Xóa" style="color: #e53e3e;" onclick="return confirm('Bạn có chắc chắn muốn khóa sản phẩm <?= $p['name'] ?>?')">
+                                <i class="fa-solid fa-eye-slash"></i> Khóa
+                            </a>
+                            <a href="/lego_shop_php/adminproduct/show/<?= $p['id'] ?>" class="btn-action" title="Hiển thị lại" style="color: #38a169;">
+                                <i class="fa-solid fa-eye"></i> Mở khóa
                             </a>
                             <a href="/lego_shop_php/adminproduct/delete/<?= $p['id'] ?>" class="btn-action" style="color: #e53e3e;" onclick="return confirm('Xóa vĩnh viễn sản phẩm?')">
                                 <i class="fa-solid fa-trash"></i> Xóa
@@ -218,6 +266,29 @@
         </tbody>
     </table>
 </div>
+<?php if(isset($totalPages) && $totalPages > 1): ?>
+    <div class="pagination">
+        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $currentPage - 1])) ?>" 
+           class="page-link <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+
+        <?php for($i = 1; $i <= $totalPages; $i++): ?>
+            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>" 
+               class="page-link <?= ($i == $currentPage) ? 'active' : '' ?>">
+                <?= $i ?>
+            </a>
+        <?php endfor; ?>
+
+        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $currentPage + 1])) ?>" 
+           class="page-link <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+    </div>
+    <div style="text-align: center; color: #718096; font-size: 13px; margin-top: -10px;">
+        Hiển thị trang <?= $currentPage ?> / <?= $totalPages ?> (Tổng <?= $totalItems ?> sản phẩm)
+    </div>
+<?php endif; ?>
 
 <script>
 // Tự động ẩn thông báo sau 5 giây
