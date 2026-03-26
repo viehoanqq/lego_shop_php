@@ -57,10 +57,10 @@
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admin/pricing" class="<?= isActive('pricing', $current_page) ?>">
-                    <i class="fa-solid fa-tags"></i>Quản lý giá bán
-                </a>
-            </li>
+    <a href="/lego_shop_php/adminprice" class="<?= isActive('adminprice', $current_page) ?>">
+        <i class="fa-solid fa-tags"></i>Quản lý giá bán
+    </a>
+</li>
         </ul>
 
         <ul class="system">
@@ -71,10 +71,10 @@
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admin/imports" class="<?= isActive('imports', $current_page) ?>">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>Phiếu nhập hàng
-                </a>
-            </li>
+    <a href="/lego_shop_php/adminimport" class="<?= isActive('adminimport', $current_page) ?>">
+        <i class="fa-solid fa-file-invoice-dollar"></i>Quản lý phiếu nhập
+    </a>
+</li>
             <li>
                 <a href="/lego_shop_php/admin/reports" class="<?= isActive('reports', $current_page) ?>">
                     <i class="fa-solid fa-chart-line"></i>Thống kê báo cáo

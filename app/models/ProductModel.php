@@ -2,53 +2,26 @@
 class ProductModel extends Database {
 
     // Lấy chi tiết 1 sản phẩm kèm thông số kỹ thuật
-    public function getProductById($id, $account_id = null) {
+    public function getProductById($id) {
         $db = $this->getConnection();
-        $id = intval($id);
-        
-        $select_liked = "0 as is_liked";
-        $join_wishlist = "";
-
-        if ($account_id) {
-            $acc_id = intval($account_id);
-            $select_liked = "IF(w.id IS NOT NULL, 1, 0) as is_liked";
-            $join_wishlist = "LEFT JOIN wishlists w ON p.id = w.product_id AND w.account_id = $acc_id";
-        }
-
-        $sql = "SELECT p.*, c.name as category_name, pd.*, $select_liked 
-                FROM products p 
+        $sql = "SELECT p.*, c.name as category_name, pd.* FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.id 
                 LEFT JOIN product_details pd ON p.id = pd.product_id 
-                $join_wishlist
-                WHERE p.id = $id";
+                WHERE p.id = " . intval($id);
         
         $result = $db->query($sql);
         return ($result && $result->num_rows > 0) ? $result->fetch_assoc() : false;
     }
 
     // HÀM QUAN TRỌNG NHẤT: Lấy danh sách sản phẩm (Dùng cho tất cả các trang)
-    public function getFilteredProducts($filters = [], $offset = 0, $limit = 6, $account_id = null) {
+    public function getFilteredProducts($filters = [], $offset = 0, $limit = 6) {
         $db = $this->getConnection();
         
-        // --- 1. Xử lý câu SQL JOIN với Wishlist ---
-        $select_liked = "0 as is_liked"; // Mặc định là 0 (Chưa thích)
-        $join_wishlist = "";
-
-        // Nếu user đã đăng nhập, nối bảng wishlists để tìm xem họ có thích sản phẩm này không
-        if ($account_id) {
-            $acc_id = intval($account_id);
-            // Nếu có kết quả nối bảng (w.id IS NOT NULL) thì is_liked = 1
-            $select_liked = "IF(w.id IS NOT NULL, 1, 0) as is_liked";
-            $join_wishlist = "LEFT JOIN wishlists w ON p.id = w.product_id AND w.account_id = $acc_id";
-        }
-        // -------------------------------------------
-
-        $sql = "SELECT p.*, c.name as category_name, pd.pieces, $select_liked,
+        $sql = "SELECT p.*, c.name as category_name, pd.pieces,
                 (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
                 FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.id 
                 LEFT JOIN product_details pd ON p.id = pd.product_id
-                $join_wishlist
                 WHERE p.status = 1";
 
         $sql .= $this->_buildFilterWhere($filters);
@@ -142,25 +115,13 @@ class ProductModel extends Database {
         if ($res) { while($row = $res->fetch_assoc()) { $data[] = $row; } }
         return $data;
     }
-    public function getRandomProducts($limit = 8, $account_id = null) {
+    public function getRandomProducts($limit = 8) {
         $db = $this->getConnection();
         
-        // --- Tương tự như trên ---
-        $select_liked = "0 as is_liked";
-        $join_wishlist = "";
-
-        if ($account_id) {
-            $acc_id = intval($account_id);
-            $select_liked = "IF(w.id IS NOT NULL, 1, 0) as is_liked";
-            $join_wishlist = "LEFT JOIN wishlists w ON p.id = w.product_id AND w.account_id = $acc_id";
-        }
-        // -------------------------
-        
-        $sql = "SELECT p.*, c.name as category_name, $select_liked,
+        $sql = "SELECT p.*, c.name as category_name,
                 (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
                 FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.id 
-                $join_wishlist
                 WHERE p.status = 1 
                 ORDER BY RAND() 
                 LIMIT " . intval($limit);
@@ -174,92 +135,26 @@ class ProductModel extends Database {
         }
         return $products;
     }
-
-
-
-
-
-
-
-
-    // Thêm sản phẩm mới với Transaction
-    public function insertProduct($data) {
+    // --- Cập nhật Giá bán và Tỉ lệ lợi nhuận ---
+   // --- Lấy danh sách sản phẩm để quản lý giá ---
+    public function getAllProductsWithPrices() {
         $db = $this->getConnection();
-        $db->begin_transaction();
-        try {
-            // 1. Insert bảng products
-            $sql = "INSERT INTO products (name, sku, category_id, selling_price, stock_quantity, description, status) 
-                    VALUES (?, ?, ?, ?, 0, ?, 1)";
-            $stmt = $db->prepare($sql);
-            $stmt->bind_param("ssiis", $data['name'], $data['sku'], $data['category_id'], $data['selling_price'], $data['description']);
-            $stmt->execute();
-            $product_id = $db->insert_id;
-
-            // 2. Insert bảng product_details
-            $sqlDetails = "INSERT INTO product_details (product_id, pieces, age_range) VALUES (?, ?, '12+')";
-            $stmtDetails = $db->prepare($sqlDetails);
-            $stmtDetails->bind_param("ii", $product_id, $data['pieces']);
-            $stmtDetails->execute();
-
-            // 3. Xử lý ảnh nếu có
-            if (!empty($data['main_image'])) {
-                $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
-                $stmtImg = $db->prepare($sqlImg);
-                $stmtImg->bind_param("is", $product_id, $data['main_image']);
-                $stmtImg->execute();
-            }
-
-            $db->commit();
-            return true;
-        } catch (Exception $e) {
-            $db->rollback();
-            return false;
-        }
-    }
-
-    // Cập nhật sản phẩm
-    public function updateProduct($id, $data) {
-        $db = $this->getConnection();
-        $db->begin_transaction();
-        try {
-            $id = intval($id);
-            // 1. Update products
-            $sql = "UPDATE products SET name=?, sku=?, selling_price=?, category_id=? WHERE id=?";
-            $stmt = $db->prepare($sql);
-            $stmt->bind_param("ssiii", $data['name'], $data['sku'], $data['selling_price'], $data['category_id'], $id);
-            $stmt->execute();
-
-            // 2. Update product_details
-            $sqlDetails = "UPDATE product_details SET pieces=? WHERE product_id=?";
-            $stmtDetails = $db->prepare($sqlDetails);
-            $stmtDetails->bind_param("ii", $data['pieces'], $id);
-            $stmtDetails->execute();
-
-            // 3. Update Image nếu có ảnh mới
-            if (!empty($data['main_image'])) {
-                $db->query("UPDATE product_images SET is_main = 0 WHERE product_id = $id");
-                $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
-                $stmtImg = $db->prepare($sqlImg);
-                $stmtImg->bind_param("is", $id, $data['main_image']);
-                $stmtImg->execute();
-            }
-
-            $db->commit();
-            return true;
-        } catch (Exception $e) {
-            $db->rollback();
-            return false;
-        }
-    }
-
-    // Kiểm tra SKU tồn tại
-    public function isSkuExists($sku, $exclude_id = null) {
-        $db = $this->getConnection();
-        $sku = $db->real_escape_string($sku);
-        $sql = "SELECT id FROM products WHERE sku = '$sku'";
-        if ($exclude_id) $sql .= " AND id != " . intval($exclude_id);
+        
+       
+        $sql = "SELECT p.*, 
+                       (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM products p 
+                WHERE p.status IN ('1', '2') 
+                ORDER BY p.created_at DESC";
+        
         $result = $db->query($sql);
-        return ($result && $result->num_rows > 0);
+        $data = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+        }
+        return $data;
     }
 
     // Thay đổi trạng thái (Dùng cho cả Ẩn và Xóa mềm)

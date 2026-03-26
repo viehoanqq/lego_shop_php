@@ -1,0 +1,161 @@
+<style>
+    /* CSS ĐỒNG BỘ 100% VỚI BẢNG QUẢN LÝ SẢN PHẨM */
+    .table-container { 
+        background: #fff; 
+        border-radius: 12px; 
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08); 
+        margin-top: 10px;
+        max-height: 70vh; 
+        overflow-y: auto; 
+    }
+
+    .lego-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .lego-table th { 
+        position: sticky; 
+        top: 0; 
+        z-index: 10;
+        background: #f8fafc; 
+        padding: 15px; 
+        text-align: left; 
+        color: #64748b; 
+        font-size: 13px; 
+        text-transform: uppercase; 
+        border-bottom: 2px solid #e2e8f0; 
+    }
+    .lego-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    
+    .table-container::-webkit-scrollbar { width: 6px; }
+    .table-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
+
+    /* FIX LỖI ẢNH TRÀN VIỀN VÀ CĂN CHỈNH TÊN SẢN PHẨM */
+    .product-cell { display: flex; align-items: center; gap: 15px; }
+    .img-product { width: 60px; height: 60px; min-width: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; }
+
+    /* CSS cho Form Input Giá */
+    .form-control { padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; outline: none; transition: 0.2s; }
+    .form-control:focus { border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+</style>
+
+<div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px;">
+    <div>
+        <h2 style="margin:0; color: #1a202c;">💰 Quản Lý Giá Bán</h2>
+        <small style="color: #718096;">Cập nhật tỉ lệ lợi nhuận và giá bán niêm yết</small>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="lego-table" id="priceTable">
+        <thead>
+            <tr>
+                <th style="width: 80px; text-align: center;">Mã</th>
+                <th style="width: 350px;">Sản phẩm</th>
+                <th style="text-align: right;">Giá vốn WAC (VNĐ)</th>
+                <th style="text-align: center; width: 150px;">Lợi nhuận (%)</th>
+                <th style="text-align: right; width: 180px;">Giá bán (VNĐ)</th>
+                <th style="text-align: center; width: 120px;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach($products as $p): 
+                $margin_percent = floatval($p['profit_margin'] ?? 0) * 100;
+                $import_price = intval($p['import_price'] ?? 0);
+                $selling_price = intval($p['selling_price'] ?? 0);
+            ?>
+            <tr id="row_<?= $p['id'] ?>">
+                <td style="text-align: center; font-weight: 600; color: #718096;">#<?= $p['id'] ?></td>
+                
+                <td>
+                    <div class="product-cell">
+                        <img src="/lego_shop_php/public/assets/images/<?= !empty($p['main_image']) ? $p['main_image'] : 'default.jpg' ?>" 
+                             class="img-product" 
+                             onerror="this.src='https://placehold.co/60x60?text=LEGO'">
+                        <div>
+                            <div style="font-weight: 700; color: #2d3748;"><?= htmlspecialchars($p['name']) ?></div>
+                            <div style="font-size: 11px; color: #a0aec0; letter-spacing: 0.5px;">SKU: <?= strtoupper($p['sku']) ?></div>
+                        </div>
+                    </div>
+                </td>
+                
+                <td style="text-align: right; font-weight: 600; color: #4a5568;">
+                    <span class="wac-value" data-wac="<?= $import_price ?>">
+                        <?= number_format($import_price, 0, ',', '.') ?>đ
+                    </span>
+                    <?php if($import_price == 0): ?>
+                        <div style="font-size: 11px; color: #e53e3e; margin-top: 4px;">Chưa nhập kho</div>
+                    <?php endif; ?>
+                </td>
+                
+                <td style="text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        <input type="number" class="form-control input-margin" value="<?= $margin_percent ?>" 
+                               step="0.1" style="width: 70px; text-align: center; font-weight: bold; color: #2d3748;" 
+                               oninput="calcFromMargin(<?= $p['id'] ?>)"> 
+                        <span style="font-weight: bold; color: #718096;">%</span>
+                    </div>
+                </td>
+                
+                <td style="text-align: right;">
+                    <input type="number" class="form-control input-sell" value="<?= $selling_price ?>" 
+                           style="width: 130px; text-align: right; font-weight: bold; color: #3182ce;" 
+                           oninput="calcFromSell(<?= $p['id'] ?>)">
+                </td>
+                
+                <td style="text-align: center;">
+                    <button class="btn-save-price" onclick="savePrice(<?= $p['id'] ?>)" 
+                            style="background: #38a169; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;">
+                        <i class="fa-solid fa-floppy-disk"></i> Lưu
+                    </button>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+
+<script>
+function calcFromMargin(id) {
+    const row = document.getElementById('row_' + id);
+    const wac = parseFloat(row.querySelector('.wac-value').getAttribute('data-wac')) || 0;
+    const margin = parseFloat(row.querySelector('.input-margin').value) || 0;
+    if (wac > 0) row.querySelector('.input-sell').value = Math.round(wac * (1 + (margin / 100)));
+}
+
+function calcFromSell(id) {
+    const row = document.getElementById('row_' + id);
+    const wac = parseFloat(row.querySelector('.wac-value').getAttribute('data-wac')) || 0;
+    const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
+    if (wac > 0) row.querySelector('.input-margin').value = (((sell - wac) / wac) * 100).toFixed(1);
+}
+
+async function savePrice(id) {
+    const row = document.getElementById('row_' + id);
+    const btn = row.querySelector('.btn-save-price');
+    const margin = parseFloat(row.querySelector('.input-margin').value) || 0;
+    const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
+
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    btn.style.background = '#718096';
+    
+    try {
+        const res = await fetch('/lego_shop_php/adminprice/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ product_id: id, profit_margin: margin, selling_price: sell })
+        });
+        if ((await res.json()).success) {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Đã lưu';
+            btn.style.background = '#3182ce';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu';
+                btn.style.background = '#38a169';
+            }, 1500);
+        }
+    } catch (e) { 
+        alert("Lỗi kết nối máy chủ!"); 
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu';
+        btn.style.background = '#38a169';
+    }
+}
+</script>
