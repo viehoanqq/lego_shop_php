@@ -2,31 +2,135 @@
 class AdminProductController extends Controller {
     private $productModel;
     private $categoryModel;
+    private $limit = 6; // Đặt limit chung
 
     public function __construct() {
         $this->productModel = $this->model('ProductModel');
         $this->categoryModel = $this->model('CategoryModel');
     }
 
-    // 1. Hiển thị danh sách: Lấy cả status 1 và 2 cho Admin
-    public function index() {
-        $products = $this->productModel->getFilteredProducts(['status' => '1,2'], 0, 100); 
+    // Hàm helper để lấy dữ liệu phân trang dùng chung cho index, add, edit
+    private function getPaginationData($filters) {
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $offset = ($page - 1) * $this->limit;
 
-        $this->view('admin/products', [
+        //Gọi hàm Admin thay vì hàm Filter mặc định
+        $products = $this->productModel->getAdminProducts($filters, $offset, $this->limit);
+        $totalProducts = $this->productModel->countAdminProducts($filters);
+        
+        $totalPages = ceil($totalProducts / $this->limit);
+
+        return [
             'products' => $products,
-            'is_form' => false
-        ]);
+            'totalItems' => $totalProducts,
+            'totalPages' => $totalPages,
+            'currentPage' => $page
+        ];
+    }
+
+    public function index() {
+        // Lấy dữ liệu lọc từ URL (Nếu không có thì dùng mặc định)
+        $filters = [
+            'keyword'  => $_GET['keyword'] ?? '',
+            'category' => $_GET['category'] ?? 'all',
+            'status'   => $_GET['status'] ?? '1,2' // Mặc định hiện cả Đang bán và Tạm ẩn
+        ];
+
+        //Lấy dữ liệu
+        $pageData = $this->getPaginationData($filters);
+        $categories = $this->categoryModel->getAllCategories();
+
+
+        $this->view('admin/products', array_merge($pageData, [
+            'categories' => $categories,
+            'is_form'    => false,
+            'filters'    => $filters
+        ]));
     }
 
     // 2. Form Thêm mới
     public function add() {
-        $products = $this->productModel->getFilteredProducts(['status' => '1,2'], 0, 100);
+        // Vẫn dùng bộ lọc mặc định để hiển thị danh sách bên dưới form
+        $filters = ['keyword' => '', 'category' => 'all', 'status' => '1,2'];
+        $pageData = $this->getPaginationData($filters);
         $categories = $this->categoryModel->getAllCategories();
-        $this->view('admin/products', [
-            'products' => $products,
+
+        $this->view('admin/products', array_merge($pageData, [
             'categories' => $categories,
-            'is_form' => true
-        ]);
+            'is_form'    => true,
+            'filters'    => $filters
+        ]));
+    }
+
+    // Hàm Edit 
+    public function edit($id) {
+        $product = $this->productModel->getProductById($id);
+        if (!$product) {
+            header('Location: /lego_shop_php/adminproduct');
+            exit();
+        }
+
+        $filters = ['keyword' => '', 'category' => 'all', 'status' => '1,2'];
+        $pageData = $this->getPaginationData($filters);
+        $categories = $this->categoryModel->getAllCategories();
+
+        $this->view('admin/products', array_merge($pageData, [
+            'product'    => $product,
+            'categories' => $categories,
+            'is_form'    => true,
+            'filters'    => $filters
+        ]));
+    }
+
+    // Hàm Khóa sản phẩm (Chuyển từ 1 sang 2)
+    public function hide($id) {
+        $id = intval($id);
+        $product = $this->productModel->getProductById($id);
+
+        // Kiểm tra xem sản phẩm có tồn tại không
+        if (!$product) {
+            header('Location: /lego_shop_php/adminproduct?error=db');
+            exit();
+        }
+
+        // Nếu sản phẩm ĐÃ BỊ KHÓA RỒI (status == 2)
+        if ($product['status'] == 2) {
+            header('Location: /lego_shop_php/adminproduct?error=already_hidden');
+            exit();
+        }
+
+        // Nếu chưa khóa thì mới tiến hành khóa
+        if ($this->productModel->updateStatus($id, 2)) {
+            header('Location: /lego_shop_php/adminproduct?msg=hidden');
+        } else {
+            header('Location: /lego_shop_php/adminproduct?error=db');
+        }
+        exit();
+    }
+
+// Hàm Mở khóa sản phẩm (Chuyển từ 2 sang 1)
+    public function show($id) {
+        $id = intval($id);
+        $product = $this->productModel->getProductById($id);
+
+        if (!$product) {
+            header('Location: /lego_shop_php/adminproduct?error=db');
+            exit();
+        }
+
+        // Nếu sản phẩm ĐANG MỞ RỒI (status == 1)
+        if ($product['status'] == 1) {
+            header('Location: /lego_shop_php/adminproduct?error=already_shown');
+            exit();
+        }
+
+        // Nếu đang khóa thì mới mở
+        if ($this->productModel->updateStatus($id, 1)) {
+            header('Location: /lego_shop_php/adminproduct?msg=show');
+        } else {
+            header('Location: /lego_shop_php/adminproduct?error=db');
+        }
+        exit();
     }
 
     // 3. Logic Lưu sản phẩm mới
@@ -83,15 +187,6 @@ class AdminProductController extends Controller {
         }
     }
 
-    public function hide($id) {
-        if ($this->productModel->updateStatus($id, 2)) {
-            header('Location: /lego_shop_php/adminproduct?msg=hidden');
-        } else {
-            header('Location: /lego_shop_php/adminproduct?error=db');
-        }
-        exit();
-    }
-
     public function delete($id) {
         if ($this->productModel->updateStatus($id, 0)) {
             header('Location: /lego_shop_php/adminproduct?msg=deleted');
@@ -101,24 +196,6 @@ class AdminProductController extends Controller {
         exit();
     }
 
-    // Hàm Edit (Cần thiết để bổ sung tham số cho View)
-    public function edit($id) {
-        $products = $this->productModel->getFilteredProducts(['status' => '1,2'], 0, 100);
-        $categories = $this->categoryModel->getAllCategories();
-        $product = $this->productModel->getProductById($id);
-
-        if (!$product) {
-            header('Location: /lego_shop_php/adminproduct');
-            exit();
-        }
-
-        $this->view('admin/products', [
-            'products' => $products,
-            'categories' => $categories,
-            'product' => $product,
-            'is_form' => true
-        ]);
-    }
 
     private function uploadFile($file) {
         $targetDir = "public/assets/images/";
@@ -126,5 +203,48 @@ class AdminProductController extends Controller {
         $fileName = time() . '_' . basename($file["name"]);
         $targetFile = $targetDir . $fileName;
         return move_uploaded_file($file["tmp_name"], $targetFile) ? $fileName : 'default.jpg';
+    }
+
+
+
+    // Hàm hiển thị trang chi tiết kỹ thuật
+    public function detail($id) {
+        $product = $this->productModel->getProductFullDetail($id);
+        if (!$product) {
+            header('Location: /lego_shop_php/adminproduct?error=notfound');
+            exit();
+        }
+        
+        $this->view('admin/product_detail', [
+            'product' => $product,
+            'msg'     => $_GET['msg'] ?? null,    
+            'error'   => $_GET['error'] ?? null   
+        ]);
+    }
+
+    // Hàm xử lý LƯU dữ liệu từ trang chi tiết kỹ thuật
+    public function updateDetail($id) {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $data = [
+                'manufacturer' => $_POST['manufacturer'] ?? '',
+                'material'     => $_POST['material'] ?? '',
+                'dimensions'   => $_POST['dimensions'] ?? '',
+                'age_range'    => $_POST['age_range'] ?? '',
+                'pieces'       => intval($_POST['pieces'] ?? 0),
+                'theme_story'  => $_POST['theme_story'] ?? '',
+                'release_year'  => $_POST['release_year'] ?? ''
+            ];
+
+            $result = $this->productModel->updateProductDetail($id, $data);
+
+            if ($result) {
+                // Redirect về trang chi tiết kèm thông báo thành công
+                header("Location: /lego_shop_php/adminproduct/detail/" . $id . "?msg=updated");
+            } else {
+                // Redirect về trang chi tiết kèm thông báo lỗi
+                header("Location: /lego_shop_php/adminproduct/detail/" . $id . "?error=db");
+            }
+            exit();
+        }
     }
 }
