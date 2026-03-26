@@ -95,7 +95,7 @@ class CartController extends Controller {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         
         if (!isset($_SESSION['user_id'])) {
-            echo json_encode(['success' => false, 'message' => 'Bạn cần đăng nhập']);
+            echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập để mua hàng!']);
             exit;
         }
 
@@ -103,22 +103,22 @@ class CartController extends Controller {
         $product_id = $_POST['product_id'] ?? 0;
         $quantity = $_POST['quantity'] ?? 1;
 
-        if ($product_id) {
+        if ($product_id > 0) {
             $cartModel = $this->model('CartModel');
-            // Hàm addToCart của bạn: Kiểm tra nếu có rồi thì cộng dồn số lượng, chưa có thì insert mới
-            $result = $cartModel->addToCart($user_id, $product_id, $quantity);
+            // CHÚ Ý: Kiểm tra tên hàm trong CartModel của bạn là gì (addToCart hay addProductToCart)
+            // Tôi giả định dùng addProductToCart theo hàm add() cũ của bạn
+            $result = $cartModel->addProductToCart($user_id, $product_id, $quantity);
             
             if ($result) {
-                // Lấy tổng số loại sp trong giỏ để cập nhật Badge (Tuỳ chọn)
-                $count = $cartModel->countCartItems($user_id);
+                // Đếm tổng số lượng sản phẩm trong giỏ để cập nhật icon giỏ hàng
+                $count = $cartModel->countCartItems($user_id); 
                 echo json_encode(['success' => true, 'cart_count' => $count]);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Lỗi DB khi thêm!']);
+                echo json_encode(['success' => false, 'message' => 'Lỗi hệ thống khi thêm vào giỏ!']);
             }
         } else {
-            echo json_encode(['success' => false, 'message' => 'Lỗi ID sản phẩm!']);
+            echo json_encode(['success' => false, 'message' => 'Sản phẩm không hợp lệ!']);
         }
         exit;
     }
-    
 }
