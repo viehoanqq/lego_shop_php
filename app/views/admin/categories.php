@@ -1,5 +1,37 @@
 <style>
-    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+/* --- HEADER ĐỒNG BỘ VỚI PRODUCT VIEW --- */
+    .header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: flex-end; 
+        margin-bottom: 25px; 
+        gap: 20px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+
+    .header-left-group { flex-grow: 1; }
+    .header-left-group h2 { margin: 0; color: #1a202c; font-size: 24px; font-weight: 700; }
+
+    .filter-form { display: flex; gap: 10px; margin-top: 15px; align-items: center; }
+    
+    .search-wrapper { position: relative; flex: 2; }
+    .search-wrapper i { position: absolute; left: 12px; top: 12px; color: #a0aec0; }
+
+    .form-control { 
+        width: 100%; padding: 10px; border: 1px solid #e2e8f0; 
+        border-radius: 8px; outline: none; font-size: 14px;
+    }
+    .form-control:focus { border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
+
+    .btn-add-sync {
+        background: #3182ce; color: white; text-decoration: none; padding: 12px 25px; 
+        border-radius: 8px; font-weight: 600; display: flex; align-items: center; 
+        gap: 8px; white-space: nowrap; transition: 0.2s;
+    }
+    .btn-add-sync:hover { background: #2b6cb0; }
     .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 10px; }
     .card-cat { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #edf2f7; transition: 0.3s; position: relative; }
     .card-cat:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -90,31 +122,115 @@
         display: inline-block;
     }
 
+    /* --- CSS CHO THÔNG BÁO FLASH MESSAGE --- */
+#status-alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+}
+
+.alert-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    font-weight: 600;
+    animation: slideInRight 0.5s ease;
+    color: #fff;
+}
+
+.success-js {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    border-left: 5px solid #276749;
+}
+
+.error-js {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    border-left: 5px solid #9b2c2c;
+}
+
+.alert-box i {
+    font-size: 20px;
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.page-link {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #4a5568;
+    background: #fff;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.page-link:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+}
+
+.page-link.active {
+    background: #3182ce;
+    color: #fff;
+    border-color: #3182ce;
+}
+
+.page-link.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    background: #f7fafc;
+}
+
 </style>
 
 
-<?php if(isset($_GET['msg']) || isset($_GET['error'])): ?>
+<?php 
+// Lấy thông báo từ session
+$session_msg = get_flash_message('msg');
+$session_error = get_flash_message('error');
+?>
+
+<?php if($session_msg || $session_error): ?>
     <div id="status-alert-container" style="margin-bottom: 20px;">
-        <?php if(isset($_GET['msg'])): ?>
-            <div class="alert-box success-js" style="padding: 15px; border-radius: 8px; background: #f0fff4; color: #2f855a; border: 1px solid #c6f6d5; display: flex; align-items: center; gap: 10px;">
+        <?php if($session_msg): ?>
+            <div class="alert-box success-js" ...>
                 <i class="fa-solid fa-circle-check"></i>
                 <span>
                     <?php
-                        if($_GET['msg'] == 'success') echo "✨ Thêm danh mục mới thành công!";
-                        if($_GET['msg'] == 'updated') echo "✅ Đã cập nhật thông tin danh mục!";
-                        if($_GET['msg'] == 'hidden') echo "🔒 Đã chuyển danh mục sang trạng thái Khóa!";
+                        if($session_msg == 'success') echo "Thêm danh mục mới thành công!";
+                        if($session_msg == 'updated') echo "Đã cập nhật thông tin danh mục!";
+                        if($session_msg == 'hidden') echo "Đã chuyển danh mục sang trạng thái Khóa!";
+                        if($session_msg == 'unlocked') echo "Đã mở khóa danh mục thành công!";
                     ?>
                 </span>
             </div>
         <?php endif; ?>
 
-        <?php if(isset($_GET['error'])): ?>
-            <div class="alert-box error-js" style="padding: 15px; border-radius: 8px; background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; display: flex; align-items: center; gap: 10px;">
+        <?php if($session_error): ?>
+            <div class="alert-box error-js" ...>
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span>
                     <?php
-                        if($_GET['error'] == 'db') echo "❌ Lỗi hệ thống: Không thể xử lý dữ liệu.";
-                        if($_GET['error'] == 'empty') echo "⚠️ Vui lòng không để trống các trường bắt buộc!";
+                        if($session_error == 'db') echo "Lỗi hệ thống: Không thể xử lý dữ liệu.";
+                        if($session_error == 'empty') echo "Vui lòng không để trống các trường bắt buộc!";
                     ?>
                 </span>
             </div>
@@ -122,12 +238,32 @@
     </div>
 <?php endif; ?>
 
-<div class="admin-header">
-    <div>
-        <h2 style="margin:0">📂 Quản lý Danh Mục LEGO</h2>
-        <small style="color: #a0aec0;">Tổng cộng <?= count($categories) ?> danh mục đang hoạt động</small>
+<div class="header">
+    <div class="header-left-group">
+        <h2>📁 Quản lý Danh mục</h2>
+        
+        <form action="/lego_shop_php/admincategory" method="GET" class="filter-form">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="keyword" class="form-control" 
+                       placeholder="Tìm tên danh mục..." 
+                       value="<?= $filters['keyword'] ?? '' ?>"
+                       style="padding-left: 35px;">
+            </div>
+
+            <select name="status" class="form-control" onchange="this.form.submit()" style="flex: 1; cursor: pointer;">
+                <option value="all" <?= ($filters['status'] == 'all') ? 'selected' : '' ?>>-- Tất cả trạng thái --</option>
+                <option value="active" <?= ($filters['status'] == 'active') ? 'selected' : '' ?>>Đang hoạt động</option>
+                <option value="locked" <?= ($filters['status'] == 'locked') ? 'selected' : '' ?>>Đã khóa</option>
+            </select>
+        </form>
     </div>
-    <a href="/lego_shop_php/admincategory/add" style="background: #e3000b; color: #fff; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;">+ THÊM DANH MỤC MỚI</a>
+
+    <?php if(!isset($is_form) || $is_form === false): ?>
+        <a href="/lego_shop_php/admincategory/add" class="btn-add-sync">
+            <i class="fa-solid fa-plus"></i> Thêm danh mục
+        </a>
+    <?php endif; ?>
 </div>
 
 <?php if (isset($is_form) && $is_form == true): ?>
@@ -185,39 +321,66 @@
 <?php endif; ?>
 
 <div class="category-grid">
-    <?php if(!empty($categories)): ?>
-        <?php foreach ($categories as $cat): ?>
-        <div class="card-cat">
-            <span class="cat-badge"><?= $cat['product_count'] ?> PRODUCTS</span>
+    <?php foreach ($categories as $cat): ?>
+        <div class="card-cat" style="<?= $cat['status'] == 'locked' ? 'opacity: 0.7; background: #f8f9fa;' : '' ?>">
             
+            <?php if($cat['status'] == 'locked'): ?>
+                <span class="cat-badge" style="background: #718096; color: #fff;">LOCKED</span>
+            <?php else: ?>
+                <span class="cat-badge"><?= $cat['product_count'] ?> PRODUCTS</span>
+            <?php endif; ?>
+
             <div class="cat-img-wrapper">
                 <img src="/lego_shop_php/public/assets/images/<?= !empty($cat['image_url']) ? $cat['image_url'] : 'default.jpg' ?>" 
-                     class="cat-img" 
-                     onerror="this.src='https://placehold.co/400x200?text=LEGO+<?= urlencode($cat['name']) ?>'">
+                     class="cat-img" style="<?= $cat['status'] == 'locked' ? 'filter: grayscale(1);' : '' ?>">
             </div>
 
             <div class="cat-info">
-                <div class="cat-name"><?= htmlspecialchars($cat['name']) ?></div>
+                <div class="cat-name">
+                    <?= htmlspecialchars($cat['name']) ?> 
+                    <?= $cat['status'] == 'locked' ? '<small>(Bị khóa)</small>' : '' ?>
+                </div>
                 <div class="cat-desc"><?= htmlspecialchars($cat['description']) ?></div>
                 
                 <div class="cat-meta">
                     <span style="font-size: 12px; color: #cbd5e0;">ID: #<?= $cat['id'] ?></span>
-                    <div style="display: flex; gap: 15px;">
-                        <a href="/lego_shop_php/admincategory/edit/<?= $cat['id'] ?>" class="btn-edit">✎ Sửa</a>
-                        <a href="/lego_shop_php/admincategory/delete/<?= $cat['id'] ?>" 
-                           class="btn-delete" 
-                           onclick="return confirm('Bạn có chắc chắn muốn ẩn danh mục <?= htmlspecialchars($cat['name']) ?>?')">🗑 Ẩn</a>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="/lego_shop_php/admincategory/edit/<?= $cat['id'] ?>" class="btn-edit">Sửa</a>
+                        
+                        <?php if($cat['status'] == 'locked'): ?>
+                            <a href="/lego_shop_php/admincategory/unlock/<?= $cat['id'] ?>" 
+                               class="btn-edit" style="color: #38a169;">Mở khóa</a>
+                        <?php else: ?>
+                            <a href="/lego_shop_php/admincategory/delete/<?= $cat['id'] ?>" 
+                               class="btn-delete" 
+                               onclick="return confirm('Ẩn danh mục này?')">Khóa</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <div style="grid-column: 1/-1; text-align: center; padding: 50px; background: #fff; border-radius: 10px;">
-            <h3>Chưa có dữ liệu danh mục.</h3>
-        </div>
-    <?php endif; ?>
+    <?php endforeach; ?>
 </div>
+<?php if (isset($totalPages) && $totalPages > 1): ?>
+    <div class="pagination">
+        <a href="?keyword=<?= urlencode($filters['keyword']) ?>&status=<?= $filters['status'] ?>&page=<?= $currentPage - 1 ?>" 
+           class="page-link <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+
+        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <a href="?keyword=<?= urlencode($filters['keyword']) ?>&status=<?= $filters['status'] ?>&page=<?= $i ?>" 
+               class="page-link <?= ($currentPage == $i) ? 'active' : '' ?>">
+                <?= $i ?>
+            </a>
+        <?php endfor; ?>
+
+        <a href="?keyword=<?= urlencode($filters['keyword']) ?>&status=<?= $filters['status'] ?>&page=<?= $currentPage + 1 ?>" 
+           class="page-link <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+    </div>
+<?php endif; ?>
 
 <script>
 // Tự động ẩn thông báo sau 5 giây
