@@ -66,7 +66,7 @@ class CheckoutController extends Controller {
 
             // Gọi OrderModel để lưu
             $orderModel = $this->model('OrderModel');
-            $status = 'Chờ xử lý'; 
+            $status = 'pending'; 
             
             $order_id = $orderModel->createOrder(
                 $user_id, 
@@ -126,6 +126,34 @@ class CheckoutController extends Controller {
             'title' => 'Thanh toán chuyển khoản',
             'order_id' => $order_id,
             'total_price' => $total_price
+        ]);
+    }
+
+    // xem chi tiết đơn hàng sau khi đặt
+    public function view_order() {
+        $order_id = $_GET['order_id'] ?? 0;
+        
+        if (!$order_id) {
+            header("Location: /lego_shop_php/home");
+            exit;
+        }
+
+        $orderModel = $this->model('OrderModel');
+        $order = $orderModel->getOrderById($order_id);
+        
+        // BẢO MẬT: Kiểm tra xem đơn hàng có tồn tại và có đúng là của user đang đăng nhập không
+        if (!$order || $order['user_id'] != $_SESSION['user_id']) {
+            echo "<script>alert('Bạn không có quyền xem đơn hàng này!'); window.location.href='/lego_shop_php/home';</script>";
+            exit;
+        }
+
+        // Lấy danh sách sản phẩm
+        $order_items = $orderModel->getOrderItems($order_id);
+
+        $this->view('/user/cart/view_order', [
+            'title' => 'Chi tiết đơn hàng #' . $order_id,
+            'order' => $order,
+            'order_items' => $order_items
         ]);
     }
 }

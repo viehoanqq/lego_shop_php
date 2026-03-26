@@ -96,5 +96,50 @@
 
             $this->handleProductList($filters, 'Chủ đề: ' . $category['name']);
         }
+        public function orders() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        if (!isset($_SESSION['user_id'])) { header("Location: /lego_shop_php/account/login"); exit; }
+
+        $orderModel = $this->model('OrderModel');
+        $orders = $orderModel->getOrdersByUserId($_SESSION['user_id']);
+
+        $this->view('/user/profile/orders', [
+            'title' => 'Lịch sử mua hàng',
+            'orders' => $orders
+        ]);
+    }
+
+    // Hàm API (AJAX) trả về chi tiết đơn hàng
+    public function getOrderDetailsAjax() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
         
+        $input = json_decode(file_get_contents('php://input'), true);
+        $order_id = $input['order_id'] ?? 0;
+        $user_id = $_SESSION['user_id'] ?? 0;
+
+        if (!$order_id || !$user_id) {
+            echo json_encode(['success' => false, 'message' => 'Thiếu thông tin']);
+            exit;
+        }
+
+        $orderModel = $this->model('OrderModel');
+        $order = $orderModel->getOrderById($order_id);
+
+        // Bảo mật: Chỉ cho phép chủ đơn hàng xem
+        if (!$order || $order['user_id'] != $user_id) {
+            echo json_encode(['success' => false, 'message' => 'Không tìm thấy đơn hàng']);
+            exit;
+        }
+
+        // Lấy danh sách sản phẩm của đơn hàng này
+        $items = $orderModel->getOrderItems($order_id);
+
+        echo json_encode([
+            'success' => true,
+            'order' => $order,
+            'items' => $items
+        ]);
+        exit;
+    }
     }
