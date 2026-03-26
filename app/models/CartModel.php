@@ -50,18 +50,21 @@ class CartModel extends Database {
         return false; 
     }
 }
+    
     // [ĐÃ SỬA] - Lấy danh sách sản phẩm trong giỏ hàng (Kèm ảnh chính từ bảng product_images)
+    // Lấy danh sách sản phẩm trong giỏ hàng
     public function getCartItems($user_id) {
         $db = $this->getConnection();
         $user_id = intval($user_id);
         
-        // Dùng LEFT JOIN kết nối với bảng product_images và chỉ lấy ảnh có is_main = 1
+        // CHÚ Ý DÒNG SELECT: Đã thêm p.stock_quantity
         $sql = "SELECT 
                     ci.id as cart_item_id, 
                     ci.quantity, 
                     p.id as product_id, 
                     p.name, 
                     p.selling_price, 
+                    p.stock_quantity, 
                     pi.image_url as main_image 
                 FROM cart_items ci
                 JOIN carts c ON ci.cart_id = c.id
@@ -84,21 +87,35 @@ class CartModel extends Database {
     public function updateQuantity($cart_item_id, $user_id, $action) {
         $db = $this->getConnection();
         $cart_item_id = intval($cart_item_id);
+        $user_id = intval($user_id);
         
-        // Kiểm tra xem item này có đúng là của user này không (Bảo mật)
-        $checkSql = "SELECT ci.quantity FROM cart_items ci JOIN carts c ON ci.cart_id = c.id WHERE ci.id = $cart_item_id AND c.user_id = $user_id";
+        // 1. JOIN thêm bảng products để lấy stock_quantity
+        $checkSql = "SELECT ci.quantity, p.stock_quantity 
+                     FROM cart_items ci 
+                     JOIN carts c ON ci.cart_id = c.id 
+                     JOIN products p ON ci.product_id = p.id
+                     WHERE ci.id = $cart_item_id AND c.user_id = $user_id";
+        
         $result = $db->query($checkSql);
         
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $current_qty = $row['quantity'];
+            $max_stock = $row['stock_quantity']; // Lấy số lượng tối đa trong kho
             
             $new_qty = ($action === 'increase') ? $current_qty + 1 : $current_qty - 1;
             
+            // 2. Chặn ngay nếu tăng vượt quá kho
+            if ($action === 'increase' && $new_qty > $max_stock) {
+                return 'out_of_stock'; 
+            }
+            
+            // 3. Nếu số lượng hợp lệ (> 0) thì cho phép cập nhật
             if ($new_qty > 0) {
-                return $db->query("UPDATE cart_items SET quantity = $new_qty WHERE id = $cart_item_id");
+                $db->query("UPDATE cart_items SET quantity = $new_qty WHERE id = $cart_item_id");
+                return true;
             } else {
-                return false; // Không cho giảm xuống dưới 1 (Muốn xóa thì dùng nút Xóa)
+                return false; // Không cho giảm xuống dưới 1
             }
         }
         return false;

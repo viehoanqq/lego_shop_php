@@ -36,6 +36,8 @@
                         <?php foreach ($cart_items as $item): 
                             $img_src = !empty($item['main_image']) ? $item['main_image'] : 'default-lego.jpg';
                             $item_total = $item['selling_price'] * $item['quantity'];
+                            // CHÚ Ý: Bắt buộc model CartModel phải JOIN lấy cột stock_quantity nhé
+                            $max_stock = $item['stock_quantity'] ?? 999; 
                         ?>
                             <div class="cart-item" id="item-<?= $item['cart_item_id'] ?>">
                                 <div class="item-col item-info" style="width: 45%;">
@@ -52,10 +54,12 @@
                                 </div>
 
                                 <div class="item-col item-qty" style="width: 20%; justify-content: center;">
-                                    <div class="qty-control">
-                                        <button class="btn-qty" onclick="updateCartQty(<?= $item['cart_item_id'] ?>, 'decrease')"><i class="fa-solid fa-minus"></i></button>
-                                        <input type="text" class="input-qty" id="qty-<?= $item['cart_item_id'] ?>" value="<?= $item['quantity'] ?>" readonly>
-                                        <button class="btn-qty" onclick="updateCartQty(<?= $item['cart_item_id'] ?>, 'increase')"><i class="fa-solid fa-plus"></i></button>
+                                    <div class="qty-wrapper">
+                                        <button class="qty-btn" onclick="checkAndUpdateCartQty(<?= $item['cart_item_id'] ?>, 'decrease')">-</button>
+                                        
+                                       <input type="number" class="qty-input input-qty" id="qty-<?= $item['cart_item_id'] ?>" value="<?= $item['quantity'] ?>" min="1" max="<?= $max_stock ?>" readonly>
+                                        
+                                        <button class="qty-btn" onclick="checkAndUpdateCartQty(<?= $item['cart_item_id'] ?>, 'increase')">+</button>
                                     </div>
                                 </div>
 
@@ -96,5 +100,86 @@
         <?php endif; ?>
     </div>
 </div>
+
+<style>
+/* CSS CHO BỘ CHỌN SỐ LƯỢNG (+ / -) CHUẨN ĐẸP */
+.qty-wrapper {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    height: 38px;
+}
+.qty-wrapper .qty-btn {
+    background: #f8f9fa;
+    border: none;
+    width: 35px;
+    height: 100%;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #333;
+    transition: 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+.qty-wrapper .qty-btn:hover { background: #e9ecef; color: #a4161a; }
+.qty-wrapper .qty-input {
+    width: 45px;
+    height: 100%;
+    border: none;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    outline: none;
+    pointer-events: none; /* Khóa không cho nhập tay */
+}
+.qty-wrapper .qty-input::-webkit-outer-spin-button,
+.qty-wrapper .qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+</style>
+
+<script>
+// Hàm trung gian: Kiểm tra tồn kho trước, nếu hợp lệ mới nhả lệnh cho cart.js
+function checkAndUpdateCartQty(cartItemId, action) {
+    const input = document.getElementById('qty-' + cartItemId);
+    let currentVal = parseInt(input.value);
+    let max = parseInt(input.getAttribute('max')) || 999;
+
+    // Logic kiểm tra bấm Tăng
+    if (action === 'increase') {
+        if (currentVal >= max) {
+            // Quá số lượng trong kho -> Chặn & Báo lỗi
+            if(typeof showToast === 'function') {
+                showToast(`Sản phẩm này chỉ còn ${max} cái trong kho!`, "warning");
+            } else {
+                alert(`Sản phẩm này chỉ còn ${max} cái trong kho!`);
+            }
+            return; // Ngưng tại đây, không cho gọi hàm tiếp theo
+        }
+    } 
+    // Logic kiểm tra bấm Giảm (Không cho bé hơn 1)
+    else if (action === 'decrease') {
+        if (currentVal <= 1) return; // Nếu là 1 thì ko cho giảm nữa
+    }
+
+    // NẾU VƯỢT QUA ĐƯỢC BÀI KIỂM TRA BÊN TRÊN -> GỌI HÀM CŨ CỦA CART.JS
+    if (typeof updateCartQty === 'function') {
+        updateCartQty(cartItemId, action);
+    } else {
+        console.error("Không tìm thấy hàm updateCartQty trong cart.js");
+    }
+}
+
+</script>
 
 <script src="/lego_shop_php/public/assets/js/cart.js?v=<?= time() ?>"></script>

@@ -61,16 +61,23 @@ class CartController extends Controller {
     // API Cập nhật số lượng (+ / -)
     public function updateQty() {
         header('Content-Type: application/json');
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['user_id'])) {
             $item_id = $_POST['item_id'] ?? 0;
             $action = $_POST['action'] ?? ''; // 'increase' hoặc 'decrease'
             
             $cartModel = $this->model('CartModel');
-            if ($cartModel->updateQuantity($item_id, $_SESSION['user_id'], $action)) {
+            $update_result = $cartModel->updateQuantity($item_id, $_SESSION['user_id'], $action);
+
+            if ($update_result === true) {
                 echo json_encode(['status' => 'success']);
+            } elseif ($update_result === 'out_of_stock') {
+                echo json_encode(['status' => 'error', 'msg' => 'Sản phẩm đã đạt giới hạn tồn kho!']);
             } else {
-                echo json_encode(['status' => 'error', 'msg' => 'Không thể cập nhật!']);
+                echo json_encode(['status' => 'error', 'msg' => 'Không thể cập nhật số lượng!']);
             }
+            exit;
         }
     }
 
