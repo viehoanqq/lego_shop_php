@@ -388,5 +388,38 @@ class ProductModel extends Database {
         
         return $stmt->execute();
     }
+    // Lấy đánh giá cũ của user cho 1 sản phẩm
+    public function getReviewByUserAndProduct($user_id, $product_id) {
+        $db = $this->getConnection();
+        $sql = "SELECT * FROM product_reviews WHERE user_id = ? AND product_id = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("ii", $user_id, $product_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return ($result && $result->num_rows > 0) ? $result->fetch_assoc() : null;
+    }
+
+    // Lưu hoặc Sửa đánh giá (Luôn set status = pending)
+    public function saveProductReview($user_id, $product_id, $rating, $comment) {
+        $db = $this->getConnection();
+        $comment = $db->real_escape_string(trim($comment));
+
+        // Kiểm tra xem đã có chưa
+        $existing = $this->getReviewByUserAndProduct($user_id, $product_id);
+
+        if ($existing) {
+            // ĐÃ CÓ -> CẬP NHẬT & Set lại thành 'pending'
+            $sql = "UPDATE product_reviews SET rating = ?, comment = ?, status = 'pending', created_at = NOW() WHERE id = ?";
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param("isi", $rating, $comment, $existing['id']);
+            return $stmt->execute();
+        } else {
+            // CHƯA CÓ -> INSERT MỚI là 'pending'
+            $sql = "INSERT INTO product_reviews (product_id, user_id, rating, comment, status, created_at) VALUES (?, ?, ?, ?, 'pending', NOW())";
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param("iiis", $product_id, $user_id, $rating, $comment);
+            return $stmt->execute();
+        }
+    }
 
 }

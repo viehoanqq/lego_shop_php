@@ -24,7 +24,7 @@
                                 'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'badge-confirmed'],
                                 'delivered' => ['label' => 'Giao thành công', 'class' => 'badge-delivered'],
                                 'cancelled' => ['label' => 'Đã hủy', 'class' => 'badge-cancelled'],
-                                'shipping' => ['label' => 'Đang giao hàng', 'class' => 'badge-confirmed']
+                                'shipping' => ['label' => 'Đang giao hàng', 'class' => 'badge-shipping'] // Sửa lại class cho shipping
                             ];
                         ?>
 
@@ -110,51 +110,99 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="reviewModal">
+    <div class="modal-box" style="max-width: 500px; padding: 25px; border-radius: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; font-size: 18px; color: #333;">Đánh giá sản phẩm</h3>
+            <button type="button" class="btn-close-modal" id="closeReviewModalBtn">&times;</button>
+        </div>
+        
+        <p id="reviewProductName" style="color: #a4161a; font-weight: bold; margin-bottom: 15px;"></p>
+        
+        <form id="reviewForm">
+            <input type="hidden" id="rev_product_id" name="product_id">
+            <input type="hidden" id="rev_rating" name="rating" value="0">
+            
+            <div class="star-rating-box" style="text-align: center; margin-bottom: 20px;">
+                <p style="margin-bottom: 10px; color: #666; font-size: 14px;">Bạn cảm thấy sản phẩm này như thế nào?</p>
+                <div class="stars" id="starContainer">
+                    <i class="fa-regular fa-star" data-val="1"></i>
+                    <i class="fa-regular fa-star" data-val="2"></i>
+                    <i class="fa-regular fa-star" data-val="3"></i>
+                    <i class="fa-regular fa-star" data-val="4"></i>
+                    <i class="fa-regular fa-star" data-val="5"></i>
+                </div>
+                <p id="starText" style="color: #ffc107; font-weight: 600; font-size: 14px; height: 20px; margin-top: 5px;"></p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <textarea id="rev_comment" name="comment" rows="4" placeholder="Hãy chia sẻ nhận xét của bạn về sản phẩm này nhé..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
+            </div>
+            
+            <button type="button" id="submitReviewBtn" class="btn-submit-modal" style="width: 100%;">GỬI ĐÁNH GIÁ</button>
+        </form>
+    </div>
+</div>
+
 <style>
-    /* Nhãn trạng thái thu nhỏ cho gọn */
+    /* CSS Cũ */
     .order-status-badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; }
     .badge-pending { background: #fff3cd; color: #f08c00; border: 1px solid #ffe066; }
     .badge-confirmed { background: #e7f5ff; color: #1971c2; border: 1px solid #a5d8ff; }
+    .badge-shipping { background: #e7f5ff; color: #1c7ed6; border: 1px solid #a5d8ff; }
     .badge-delivered { background: #ebfbee; color: #2f9e44; border: 1px solid #b2f2bb; }
     .badge-cancelled { background: #fff5f5; color: #e03131; border: 1px solid #ffc9c9; }
 
-    /* Nút xem chi tiết hover */
     .btn-view-order:hover { text-decoration: underline; }
-
-    /* Style cho Modal */
+    
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center;
+        background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center;
         z-index: 9999; opacity: 0; transition: opacity 0.3s ease;
     }
     .modal-overlay.show { display: flex; opacity: 1; }
-    .modal-box { transform: translateY(-20px); transition: transform 0.3s ease; background: #fff; border-radius: 10px; }
+    .modal-box { transform: translateY(-20px); transition: transform 0.3s ease; background: #fff; }
     .modal-overlay.show .modal-box { transform: translateY(0); }
-    .btn-close-modal { background: none; border: none; font-size: 24px; cursor: pointer; }
-    .btn-close-modal:hover { opacity: 1 !important; }
+    .btn-close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #888; }
+    .btn-close-modal:hover { color: #a4161a !important; }
 
-    /* CSS Nút Hủy Đơn trong Modal */
     .btn-cancel-order {
         display: inline-block; padding: 10px 20px; border: 1px solid #e03131;
         color: #e03131; background: #fff; border-radius: 6px;
         font-size: 14px; font-weight: 600; text-decoration: none; transition: 0.2s; cursor: pointer;
     }
     .btn-cancel-order:hover:not(.disabled) { background: #fff5f5; }
-    .btn-cancel-order.disabled {
-        border-color: #ddd; color: #aaa; background: #f5f5f5; cursor: not-allowed;
+    .btn-cancel-order.disabled { border-color: #ddd; color: #aaa; background: #f5f5f5; cursor: not-allowed; }
+
+    /* CSS CHO NÚT ĐÁNH GIÁ TRONG MODAL CHI TIẾT */
+    .btn-mini-review {
+        background: #fff; border: 1px solid #ffc107; color: #d39e00; padding: 4px 10px; border-radius: 4px;
+        font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 5px; transition: 0.2s;
     }
+    .btn-mini-review:hover { background: #fffde7; }
+
+    /* CSS CHỌN NGÔI SAO */
+    .star-rating-box .stars { font-size: 30px; color: #ccc; cursor: pointer; }
+    .star-rating-box .stars i { transition: 0.2s; margin: 0 5px; }
+    .star-rating-box .stars i.active, .star-rating-box .stars i.hover { color: #ffc107; }
+    
+    .btn-submit-modal { 
+        background: #a4161a; color: white; border: none; padding: 12px 24px; 
+        border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+    }
+    .btn-submit-modal:hover { background: #800f13; }
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // --- XỬ LÝ MODAL CHI TIẾT ĐƠN HÀNG ---
     const modal = document.getElementById('orderDetailModal');
     const closeBtn = document.getElementById('closeOrderModalBtn');
     const cancelBtn = document.getElementById('md_cancel_btn');
     
     const closeModal = () => modal.classList.remove('show');
     closeBtn.addEventListener('click', closeModal);
-    window.addEventListener('click', (e) => { if (e.target == modal) closeModal(); });
-
+    
     const formatVND = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
 
     const statusDict = {
@@ -200,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     stBox.innerText = statusDict[order.status] || order.status;
                     if(order.status === 'cancelled') { stBox.style.background = '#fff5f5'; stBox.style.color = '#e03131'; stBox.style.border = '1px solid #ffc9c9'; }
                     else if(order.status === 'delivered') { stBox.style.background = '#ebfbee'; stBox.style.color = '#2f9e44'; stBox.style.border = '1px solid #b2f2bb'; }
-                    else if(order.status === 'confirmed' || order.status === 'shipping') { stBox.style.background = '#e7f5ff'; stBox.style.color = '#1971c2'; stBox.style.border = '1px solid #a5d8ff'; }
+                    else if(order.status === 'confirmed' || order.status === 'shipping') { stBox.style.background = '#e7f5ff'; stBox.style.color = '#1c7ed6'; stBox.style.border = '1px solid #a5d8ff'; }
                     else { stBox.style.background = '#fff3cd'; stBox.style.color = '#f08c00'; stBox.style.border = '1px solid #ffe066'; }
 
                     document.getElementById('md_total_amount').innerText = formatVND(order.total_amount);
@@ -216,23 +264,35 @@ document.addEventListener("DOMContentLoaded", function() {
                         cancelBtn.style.display = 'inline-block';
                         cancelBtn.className = 'btn-cancel-order disabled';
                         cancelBtn.href = 'javascript:void(0)';
-                        cancelBtn.onclick = function() { alert('Đơn hàng đang giao hoặc đã giao, không thể hủy.'); return false; };
-                        cancelBtn.innerText = 'Không thể hủy (Đang giao)';
+                        cancelBtn.onclick = function() { showToast('Đơn hàng đang giao hoặc đã giao, không thể hủy.', 'warning'); return false; };
+                        cancelBtn.innerText = 'Không thể hủy';
                     } else {
-                        // Trạng thái đã hủy thì ẩn nút đi
                         cancelBtn.style.display = 'none';
                     }
 
                     // Đổ list sản phẩm
                     const tbody = document.getElementById('md_items_body');
                     tbody.innerHTML = ''; 
+                    
+                    const isDelivered = (order.status === 'delivered');
+
                     items.forEach(item => {
                         const imgUrl = item.image_url ? item.image_url : 'default-lego.jpg'; 
+                        
+                        // Thêm nút Đánh giá vào dưới tên SP nếu đã giao
+                        let reviewBtnHtml = '';
+                        if (isDelivered) {
+                            reviewBtnHtml = `<br><button class="btn-mini-review" onclick="openReviewModal(${item.product_id}, '${item.name.replace(/'/g, "\\'")}')"><i class="fa-regular fa-star"></i> Đánh giá</button>`;
+                        }
+
                         const tr = `
                             <tr>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px;">
+                                <td style="padding: 12px 15px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; gap: 12px;">
                                     <img src="/lego_shop_php/public/assets/images/${imgUrl}" style="width:45px; height:45px; object-fit:contain; border:1px solid #ddd; border-radius:6px; background:#fff;">
-                                    <span style="font-weight: 500; color: #333;">${item.name}</span>
+                                    <div>
+                                        <span style="font-weight: 500; color: #333;">${item.name}</span>
+                                        ${reviewBtnHtml}
+                                    </div>
                                 </td>
                                 <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center; color: #666;">${formatVND(item.price)}</td>
                                 <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center; font-weight: 600; color: #333;">${item.quantity}</td>
@@ -244,16 +304,159 @@ document.addEventListener("DOMContentLoaded", function() {
 
                     modal.classList.add('show');
                 } else {
-                    alert(data.message || 'Có lỗi xảy ra khi tải đơn hàng!');
+                    showToast(data.message || 'Có lỗi xảy ra khi tải đơn hàng!', 'error');
                 }
             })
             .catch(err => {
                 console.error("Lỗi Fetch: ", err);
                 this.innerText = originalText;
                 this.style.pointerEvents = 'auto';
-                alert("Lỗi kết nối đến máy chủ!");
+                showToast("Lỗi kết nối đến máy chủ!", "error");
             });
         });
     });
+
+    // --- XỬ LÝ MODAL ĐÁNH GIÁ ---
+    const reviewModal = document.getElementById('reviewModal');
+    const closeReviewBtn = document.getElementById('closeReviewModalBtn');
+    
+    closeReviewBtn.addEventListener('click', () => { reviewModal.classList.remove('show'); });
+    
+    window.addEventListener('click', (e) => { 
+        if (e.target == modal) closeModal(); 
+        if (e.target == reviewModal) reviewModal.classList.remove('show');
+    });
+
+    // Logic chọn Ngôi sao
+    const stars = document.querySelectorAll('.star-rating-box .stars i');
+    const ratingInput = document.getElementById('rev_rating');
+    const starText = document.getElementById('starText');
+    const textDesc = ["", "Rất tệ", "Tệ", "Bình thường", "Tốt", "Tuyệt vời"];
+
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            let val = parseInt(this.getAttribute('data-val'));
+            stars.forEach(s => {
+                if(parseInt(s.getAttribute('data-val')) <= val) { s.classList.remove('fa-regular'); s.classList.add('fa-solid', 'hover'); }
+                else { s.classList.add('fa-regular'); s.classList.remove('fa-solid', 'hover'); }
+            });
+        });
+
+        star.addEventListener('mouseout', function() {
+            let currentVal = parseInt(ratingInput.value);
+            stars.forEach(s => {
+                s.classList.remove('hover');
+                if(parseInt(s.getAttribute('data-val')) <= currentVal) { s.classList.remove('fa-regular'); s.classList.add('fa-solid'); }
+                else { s.classList.add('fa-regular'); s.classList.remove('fa-solid'); }
+            });
+        });
+
+        star.addEventListener('click', function() {
+            let val = parseInt(this.getAttribute('data-val'));
+            ratingInput.value = val;
+            starText.innerText = textDesc[val];
+            stars.forEach(s => {
+                if(parseInt(s.getAttribute('data-val')) <= val) { s.classList.remove('fa-regular'); s.classList.add('fa-solid', 'active'); }
+                else { s.classList.add('fa-regular'); s.classList.remove('fa-solid', 'active'); }
+            });
+        });
+    });
+
+    // Submit form đánh giá
+    document.getElementById('submitReviewBtn').addEventListener('click', function() {
+        const productId = document.getElementById('rev_product_id').value;
+        const rating = document.getElementById('rev_rating').value;
+        const comment = document.getElementById('rev_comment').value.trim();
+
+        if (rating == 0) {
+            showToast("Vui lòng chọn số sao đánh giá!", "warning");
+            return;
+        }
+
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'ĐANG GỬI...';
+        btn.style.pointerEvents = 'none';
+
+        // Đổi đường dẫn phù hợp với Controller bạn đang dùng nhé
+        fetch('/lego_shop_php/checkout/submitReviewAjax', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId, rating: rating, comment: comment })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerHTML = originalText;
+            btn.style.pointerEvents = 'auto';
+
+            if(data.success) {
+                showToast("Đã gửi đánh giá! Vui lòng chờ QTV kiểm duyệt.", "success");
+                document.getElementById('reviewModal').classList.remove('show');
+            } else {
+                showToast(data.message || 'Có lỗi xảy ra khi gửi đánh giá!', 'error');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            btn.innerHTML = originalText;
+            btn.style.pointerEvents = 'auto';
+            showToast("Lỗi kết nối máy chủ!", "error");
+        });
+    });
 });
-</script>
+
+// Hàm mở Modal và FETCH dữ liệu cũ (nếu có)
+function openReviewModal(productId, productName) {
+    document.getElementById('rev_product_id').value = productId;
+    document.getElementById('reviewProductName').innerText = productName;
+    
+    // Đặt lại mặc định
+    document.getElementById('rev_rating').value = 0;
+    document.getElementById('rev_comment').value = '';
+    document.getElementById('starText').innerText = '';
+    document.querySelectorAll('.star-rating-box .stars i').forEach(s => {
+        s.classList.add('fa-regular');
+        s.classList.remove('fa-solid', 'active');
+    });
+    const submitBtn = document.getElementById('submitReviewBtn');
+    submitBtn.innerText = 'ĐANG TẢI...';
+    submitBtn.style.pointerEvents = 'none';
+
+    // Mở popup ngay cho cảm giác nhanh
+    document.getElementById('reviewModal').classList.add('show');
+
+    // Lấy đánh giá cũ
+    fetch(`/lego_shop_php/checkout/getReviewAjax?product_id=${productId}`)
+    .then(res => res.json())
+    .then(data => {
+        submitBtn.style.pointerEvents = 'auto';
+        if (data.success && data.review) {
+            // Có đánh giá cũ -> Đổ vào form
+            const rating = data.review.rating;
+            document.getElementById('rev_rating').value = rating;
+            document.getElementById('rev_comment').value = data.review.comment;
+            
+            const textDesc = ["", "Rất tệ", "Tệ", "Bình thường", "Tốt", "Tuyệt vời"];
+            document.getElementById('starText').innerText = textDesc[rating];
+
+            document.querySelectorAll('.star-rating-box .stars i').forEach(s => {
+                if(parseInt(s.getAttribute('data-val')) <= rating) {
+                    s.classList.remove('fa-regular');
+                    s.classList.add('fa-solid', 'active');
+                }
+            });
+
+            submitBtn.innerText = 'CẬP NHẬT ĐÁNH GIÁ';
+            if(data.review.status === 'pending') {
+                showToast("Đánh giá này đang chờ duyệt. Bạn có thể sửa lại.", "info");
+            }
+        } else {
+            submitBtn.innerText = 'GỬI ĐÁNH GIÁ';
+        }
+    })
+    .catch(err => {
+        submitBtn.innerText = 'GỬI ĐÁNH GIÁ';
+        submitBtn.style.pointerEvents = 'auto';
+    });
+}
+</script>  

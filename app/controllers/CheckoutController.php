@@ -185,5 +185,59 @@ class CheckoutController extends Controller {
         }
         exit;
     }
+
+    // API Lấy dữ liệu đánh giá cũ
+    public function getReviewAjax() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || empty($_GET['product_id'])) {
+            echo json_encode(['success' => false]);
+            exit;
+        }
+
+        $prodModel = $this->model('ProductModel');
+        $review = $prodModel->getReviewByUserAndProduct($_SESSION['user_id'], intval($_GET['product_id']));
+
+        if ($review) {
+            echo json_encode(['success' => true, 'review' => $review]);
+        } else {
+            echo json_encode(['success' => false]);
+        }
+        exit;
+    }
+
+    // API Gửi/Cập nhật đánh giá
+    public function submitReviewAjax() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập để đánh giá!']);
+            exit;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $user_id = $_SESSION['user_id'];
+        $product_id = intval($input['product_id'] ?? 0);
+        $rating = intval($input['rating'] ?? 0);
+        $comment = trim($input['comment'] ?? '');
+
+        if ($product_id == 0 || $rating < 1 || $rating > 5) {
+            echo json_encode(['success' => false, 'message' => 'Dữ liệu không hợp lệ!']);
+            exit;
+        }
+
+        $prodModel = $this->model('ProductModel');
+        // Gọi hàm mới (Tự động Update nếu đã có, Insert nếu chưa)
+        $result = $prodModel->saveProductReview($user_id, $product_id, $rating, $comment);
+
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Lưu đánh giá thành công!']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Lỗi hệ thống, không thể lưu đánh giá!']);
+        }
+        exit;
+    }
     
 }
