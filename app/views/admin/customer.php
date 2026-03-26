@@ -1,6 +1,4 @@
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
     :root {
         --primary: #3182ce;
         --success: #38a169;
@@ -12,54 +10,125 @@
 
     body { background-color: var(--bg-body); font-family: 'Inter', sans-serif; color: var(--text-main); }
 
-    /* Header đồng bộ */
-    .header-custom { 
-        background: #fff; padding: 25px; border-radius: 12px; 
-        box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 25px;
-        display: flex; justify-content: space-between; align-items: center;
+    /* --- HEADER ĐỒNG BỘ VỚI CATEGORY --- */
+    .header-sync { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: flex-end; 
+        margin-bottom: 25px; 
+        gap: 20px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
     }
-    .header-left h2 { margin: 0; font-size: 24px; font-weight: 700; color: #1a202c; }
 
-    /* Card & Table */
-    .table-container { 
-        background: #fff; border-radius: 12px; 
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden;
-    }
-    .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-    .custom-table th { 
-        background: #f8fafc; padding: 15px; text-align: left; 
-        color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
-        border-bottom: 2px solid #e2e8f0; 
-    }
-    .custom-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-size: 14px; }
+    .header-left-group { flex-grow: 1; }
+    .header-left-group h2 { margin: 0; color: #1a202c; font-size: 24px; font-weight: 700; }
 
-    /* Badge Style */
-    .badge-custom { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; }
-    .role-admin { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
-    .role-user { background: #f7fafc; color: #4a5568; border: 1px solid #e2e8f0; }
+    .filter-form-sync { display: flex; gap: 10px; margin-top: 15px; align-items: center; }
     
+    .search-wrapper-sync { position: relative; flex: 2; }
+    .search-wrapper-sync i { position: absolute; left: 12px; top: 12px; color: #a0aec0; }
+
+    .form-control-sync { 
+        width: 100%; 
+        padding: 10px 10px 10px 35px; /* Padding left lớn để trừ hao cho icon */
+        border: 1px solid #e2e8f0; 
+        border-radius: 8px; 
+        outline: none; 
+        font-size: 14px;
+        height: 40px;
+    }
+    .form-control-sync:focus { border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
+
+    .btn-refresh-sync {
+        background: #edf2f7; color: #4a5568; text-decoration: none; padding: 0 20px; 
+        border-radius: 8px; font-weight: 600; display: flex; align-items: center; 
+        gap: 8px; white-space: nowrap; transition: 0.2s; height: 40px;
+        border: 1px solid #e2e8f0;
+    }
+    .btn-refresh-sync:hover { background: #e2e8f0; color: #1a202c; }
+
+    /* --- TABLE & BADGES --- */
+    .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden; }
+    .custom-table { width: 100%; border-collapse: collapse; }
+    .custom-table th { background: #f8fafc; padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
+    .custom-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+
+    .badge-custom { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
     .status-active { background: #f0fff4; color: #2f855a; border: 1px solid #9ae6b4; }
     .status-locked { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+    
+    .role-admin { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+    .role-user { background: #f7fafc; color: #4a5568; border: 1px solid #e2e8f0; }
 
-    /* Action Buttons */
-    .btn-action { 
-        text-decoration: none; padding: 6px 12px; border-radius: 6px; 
-        font-size: 13px; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px;
-    }
+    .btn-action { text-decoration: none; font-weight: 600; font-size: 13px; margin: 0 5px; }
     .btn-edit { color: var(--primary); }
-    .btn-edit:hover { background: #ebf8ff; }
     .btn-lock { color: var(--danger); }
-    .btn-lock:hover { background: #fff5f5; }
 
-    /* Alert Toast tương tự Product */
-    #status-alert-container { position: fixed; top: 20px; right: 20px; z-index: 9999; width: 320px; }
-    .alert-box { 
-        padding: 15px 20px; border-radius: 10px; color: #fff; margin-bottom: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px;
-        animation: slideIn 0.4s ease-out;
-    }
-    .alert-success { background: linear-gradient(135deg, #48bb78, #38a169); }
-    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    /* Stats right */
+    .stats-right { text-align: right; min-width: 120px; }
+    .stats-label { color: #718096; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .stats-value { color: var(--primary); font-size: 24px; font-weight: 800; line-height: 1; }
+
+
+
+    .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.page-link {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #4a5568;
+    background: #fff;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.page-link:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+}
+
+.page-link.active {
+    background: #3182ce;
+    color: #fff;
+    border-color: #3182ce;
+}
+
+.page-link.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    background: #f7fafc;
+}
+
+.btn-add {
+    background: #3182ce; 
+    color: white; 
+    text-decoration: none; 
+    padding: 12px 25px; 
+    border-radius: 8px; 
+    font-weight: 600; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.btn-add:hover {
+    background: #2b6cb0;
+    transform: translateY(-1px);
+}
+
 </style>
 
 <?php if ($msg = get_flash_message('success')): ?>
@@ -71,16 +140,33 @@
     </div>
 <?php endif; ?>
 
-<div class="container-fluid px-4 mt-4">
-    <div class="header-custom">
-        <div class="header-left">
+<div class="header-sync">
+        <div class="header-left-group">
             <h2>Quản lý Người dùng</h2>
+            
+            <form action="/lego_shop_php/admincustomer/index" method="GET" class="filter-form-sync">
+                <div class="search-wrapper-sync">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" name="search" class="form-control-sync" 
+                           placeholder="Tìm tên, email hoặc số điện thoại..." 
+                           value="<?= htmlspecialchars($search ?? '') ?>">
+                </div>
+
+                <select name="status" class="form-control-sync" onchange="this.form.submit()" style="flex: 1; cursor: pointer; padding-left: 12px;">
+                    <option value="">-- Tất cả trạng thái --</option>
+                    <option value="active" <?= ($status ?? '') === 'active' ? 'selected' : '' ?>>Đang hoạt động</option>
+                    <option value="locked" <?= ($status ?? '') === 'locked' ? 'selected' : '' ?>>Đã khóa</option>
+                </select>
+            </form>
         </div>
-        <div class="text-end">
-            <div class="text-muted small fw-bold">TỔNG CỘNG</div>
-            <div class="h4 mb-0 fw-bold text-primary"><?= count($customers) ?></div>
-        </div>
+
+        <?php if(!isset($is_form) || $is_form === false): ?>
+            <a href="/lego_shop_php/" class="btn-add">
+                <i class="fa-solid fa-plus"></i> Thêm người dùng
+            </a>
+        <?php endif; ?>
     </div>
+    
 
     <div class="table-container">
         <table class="custom-table">
@@ -92,7 +178,7 @@
                     <th>Quyền hạn</th>
                     <th>Trạng thái</th>
                     <th>Ngày tham gia</th>
-                    <th class="text-center">Thao tác</th>
+                    <th style="text-align: center;">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -155,6 +241,27 @@
             </tbody>
         </table>
     </div>
+
+    <?php if (isset($totalPages) && $totalPages > 1): ?>
+    <div class="pagination">
+        <a href="?search=<?= urlencode($search) ?>&status=<?= $status ?>&page=<?= $currentPage - 1 ?>" 
+           class="page-link <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+
+        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <a href="?search=<?= urlencode($search) ?>&status=<?= $status ?>&page=<?= $i ?>" 
+               class="page-link <?= ($currentPage == $i) ? 'active' : '' ?>">
+                <?= $i ?>
+            </a>
+        <?php endfor; ?>
+
+        <a href="?search=<?= urlencode($search) ?>&status=<?= $status ?>&page=<?= $currentPage + 1 ?>" 
+           class="page-link <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+    </div>
+<?php endif; ?>
 </div>
 
 <script>
