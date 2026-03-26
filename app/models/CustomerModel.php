@@ -1,30 +1,15 @@
 <?php
 class CustomerModel extends Database {
     
-    public function getAllCustomers($search = '', $status = '', $limit = null, $offset = null) {
+    // Lấy danh sách tất cả khách hàng
+    public function getAllCustomers() {
         $db = $this->getConnection();
-        $sql = "SELECT a.id, a.phone, a.email, a.status, a.role, a.created_at, u.fullname 
+        $sql = "SELECT a.id, a.phone, a.email, a.status, a.created_at, u.fullname 
                 FROM accounts a 
                 JOIN users u ON a.id = u.account_id 
-                WHERE 1=1";
-
-        if (!empty($search)) {
-            $search = $db->real_escape_string($search);
-            $sql .= " AND (u.fullname LIKE '%$search%' OR a.email LIKE '%$search%' OR a.phone LIKE '%$search%')";
-        }
-
-        if (!empty($status)) {
-            $status = $db->real_escape_string($status);
-            $sql .= " AND a.status = '$status'";
-        }
-
-        $sql .= " ORDER BY a.created_at DESC";
+                WHERE a.role = 'customer' 
+                ORDER BY a.created_at DESC";
         
-        // Thêm phân trang nếu có tham số
-        if ($limit !== null && $offset !== null) {
-            $sql .= " LIMIT $offset, $limit";
-        }
-
         $result = $db->query($sql);
         $customers = [];
         if ($result && $result->num_rows > 0) {
@@ -35,40 +20,25 @@ class CustomerModel extends Database {
         return $customers;
     }
 
-    // Thêm hàm mới để đếm tổng số khách hàng (phục vụ tính số trang)
-    public function countAllCustomers($search = '', $status = '') {
-        $db = $this->getConnection();
-        $sql = "SELECT COUNT(*) as total FROM accounts a JOIN users u ON a.id = u.account_id WHERE 1=1";
-
-        if (!empty($search)) {
-            $search = $db->real_escape_string($search);
-            $sql .= " AND (u.fullname LIKE '%$search%' OR a.email LIKE '%$search%' OR a.phone LIKE '%$search%')";
-        }
-
-        if (!empty($status)) {
-            $status = $db->real_escape_string($status);
-            $sql .= " AND a.status = '$status'";
-        }
-
-        $result = $db->query($sql);
-        $row = $result->fetch_assoc();
-        return $row['total'];
-    }
-
+    // Cập nhật trạng thái tài khoản theo ID
     public function updateStatus($id, $newStatus) {
         $db = $this->getConnection();
         $id = intval($id);
-        $newStatus = $db->real_escape_string($newStatus);
+        $newStatus = $db->real_escape_string($newStatus); // 'active' hoặc 'locked'
 
-        $sql = "UPDATE accounts SET status = '$newStatus' WHERE id = $id";
+        $sql = "UPDATE accounts SET status = '$newStatus' WHERE id = $id AND role = 'customer'";
         return $db->query($sql);
     }
 
-    public function getAccountById($id) {
+    // Lấy trạng thái hiện tại của tài khoản
+    public function getStatus($id) {
         $db = $this->getConnection();
         $id = intval($id);
-        $sql = "SELECT status, role FROM accounts WHERE id = $id";
+        $sql = "SELECT status FROM accounts WHERE id = $id";
         $result = $db->query($sql);
-        return $result->fetch_assoc();
+        if ($result && $row = $result->fetch_assoc()) {
+            return $row['status'];
+        }
+        return null;
     }
 }
