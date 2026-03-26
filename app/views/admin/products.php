@@ -1,4 +1,57 @@
 <style>
+    /* --- CSS HEADER ĐỒNG BỘ --- */
+.header { 
+    background: #fff; 
+    padding: 25px; 
+    border-radius: 12px; 
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05); 
+    margin-bottom: 25px;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-end; 
+    gap: 20px;
+    flex-wrap: wrap; /* Giúp header tự xuống dòng nếu màn hình nhỏ */
+    width: 100%;
+    box-sizing: border-box; /* Đảm bảo padding không làm tràn width */
+}
+
+.header-left { 
+    flex: 1; 
+    min-width: 300px; 
+}
+
+.header-left h2 { 
+    margin: 0 0 15px 0; 
+    color: #1a202c; 
+    font-size: 24px; 
+    font-weight: 700; 
+}
+
+.search-form { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center; 
+    flex-wrap: wrap; 
+}
+
+.btn-add-product {
+    background: #3182ce; 
+    color: white; 
+    text-decoration: none; 
+    padding: 12px 25px; 
+    border-radius: 8px; 
+    font-weight: 600; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.btn-add-product:hover {
+    background: #2b6cb0;
+    transform: translateY(-1px);
+}
 .table-container { 
         background: #fff; 
         border-radius: 12px; 
@@ -54,57 +107,123 @@
     .page-link.active { background: #3182ce; color: white; border-color: #3182ce; font-weight: bold; }
     .page-link.disabled { color: #cbd5e0; pointer-events: none; background: #f8fafc; }
     .stock-empty { background: #fff5f5; color: #c53030; border: 1px solid #63171b; }
+    /* --- CSS THÔNG BÁO GÓC TRÊN BÊN PHẢI --- */
+#status-alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999; /* Luôn nằm trên cùng */
+    width: 350px;  /* Độ rộng cố định cho thông báo */
+    pointer-events: none; /* Tránh cản trở việc click chuột khi đang ẩn */
+}
+
+.alert-box {
+    pointer-events: auto; /* Cho phép click vào thông báo nếu cần */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    font-weight: 600;
+    color: #fff;
+    animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-left: 6px solid rgba(0,0,0,0.2);
+}
+
+.success-js {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.error-js {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+}
+
+.alert-box i {
+    font-size: 22px;
+}
+
+@keyframes slideInRight {
+    from { 
+        opacity: 0; 
+        transform: translateX(100%); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+}
+
+.fade-out {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.5s ease;
+}
 </style>
 
-<?php if(isset($_GET['msg']) || isset($_GET['error'])): ?>
+<?php 
+$session_msg = get_flash_message('msg');
+$session_error = get_flash_message('error');
+?>
+
+<?php if($session_msg || $session_error): ?>
     <div id="status-alert-container" style="margin-bottom: 20px;">
-        <?php if(isset($_GET['msg'])): ?>
-            <div class="alert-box success-js" style="padding: 15px; border-radius: 8px; background: #f0fff4; color: #2f855a; border: 1px solid #c6f6d5; display: flex; align-items: center; gap: 10px;">
+        
+        <?php if($session_msg): ?>
+            <div class="alert-box success-js">
                 <i class="fa-solid fa-circle-check"></i>
                 <span>
                     <?php
-                        if($_GET['msg'] == 'success') echo "Thêm sản phẩm thành công!";
-                        elseif($_GET['msg'] == 'updated') echo "Đã cập nhật thông tin sản phẩm!";
-                        elseif($_GET['msg'] == 'show') echo "Đã mở khóa sản phẩm!";
-                        elseif($_GET['msg'] == 'hidden') echo "Đã khóa sản phẩm khỏi cửa hàng!";
-                        elseif($_GET['msg'] == 'deleted') echo "Đã xóa sản phẩm thành công!";
+                        switch($session_msg) {
+                            case 'success': echo "Thêm sản phẩm thành công!"; break;
+                            case 'updated': echo "Đã cập nhật thông tin sản phẩm!"; break;
+                            case 'show':    echo "Đã mở khóa sản phẩm!"; break;
+                            case 'hidden':  echo "Đã khóa sản phẩm khỏi cửa hàng!"; break;
+                            case 'deleted': echo "Đã xóa sản phẩm thành công!"; break;
+                            default:        echo "Thao tác thành công!"; break;
+                        }
                     ?>
                 </span>
             </div>
         <?php endif; ?>
 
-        <?php if(isset($_GET['error'])): ?>
-            <div class="alert-box error-js" style="padding: 15px; border-radius: 8px; background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; display: flex; align-items: center; gap: 10px;">
+        <?php if($session_error): ?>
+            <div class="alert-box error-js">
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span>
                     <?php
-                        if($_GET['error'] == 'empty') echo "Vui lòng điền đầy đủ các trường bắt buộc!";
-                        elseif($_GET['error'] == 'db') echo "Lỗi hệ thống: Không thể xử lý dữ liệu.";
-                        elseif($_GET['error'] == 'sku_exists') echo "Lỗi: Mã SKU này đã tồn tại!";
-                        elseif($_GET['error'] == 'already_hidden') echo "Sản phẩm này đã bị khóa!";
-                        elseif($_GET['error'] == 'already_shown') echo "Sản phẩm này hiện đang được mở bán!";
-                        else echo "Có lỗi xảy ra, vui lòng thử lại.";
+                        switch($session_error) {
+                            case 'empty':          echo "Vui lòng điền đầy đủ các trường bắt buộc!"; break;
+                            case 'db':             echo "Lỗi hệ thống: Không thể xử lý dữ liệu."; break;
+                            case 'sku_exists':     echo "Lỗi: Mã SKU này đã tồn tại!"; break;
+                            case 'already_hidden': echo "Sản phẩm này đã bị khóa!"; break;
+                            case 'already_shown':  echo "Sản phẩm này hiện đang được mở bán!"; break;
+                            case 'notfound':       echo "Không tìm thấy sản phẩm yêu cầu!"; break;
+                            default:               echo "Có lỗi xảy ra, vui lòng thử lại."; break;
+                        }
                     ?>
                 </span>
             </div>
         <?php endif; ?>
+        
     </div>
 <?php endif; ?>
 
-<div class="admin-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; gap: 20px;">
-    <div style="flex-grow: 1;">
-        <h2 style="margin:0; color: #1a202c;">📦 Quản lý Kho LEGO</h2>
+<div class="header">
+    <div class="header-left">
+        <h2>📦 Quản lý Kho LEGO</h2>
         
-        <form action="/lego_shop_php/adminproduct" method="GET" style="display: flex; gap: 10px; margin-top: 15px; align-items: center;">
-            <div style="position: relative; flex: 2;">
+        <form action="/lego_shop_php/adminproduct" method="GET" class="search-form">
+            <div style="position: relative; flex: 2; min-width: 200px;">
                 <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: #a0aec0;"></i>
                 <input type="text" name="keyword" class="form-control" 
-                       placeholder="Tìm tên sản phẩm" 
+                       placeholder="Tìm tên sản phẩm..." 
                        value="<?= $_GET['keyword'] ?? '' ?>"
                        style="padding-left: 35px; border-radius: 8px;">
             </div>
 
-            <select name="category" class="form-control" onchange="this.form.submit()" style="flex: 1; border-radius: 8px; cursor: pointer;">
+            <select name="category" class="form-control" onchange="this.form.submit()" style="flex: 1; min-width: 150px; cursor: pointer;">
                 <option value="all">-- Tất cả danh mục --</option>
                 <?php foreach($categories as $cat): ?>
                     <option value="<?= $cat['id'] ?>" <?= (isset($_GET['category']) && $_GET['category'] == $cat['id']) ? 'selected' : '' ?>>
@@ -113,7 +232,7 @@
                 <?php endforeach; ?>
             </select>
 
-            <select name="status" class="form-control" onchange="this.form.submit()" style="flex: 1; border-radius: 8px; cursor: pointer;">
+            <select name="status" class="form-control" onchange="this.form.submit()" style="flex: 1; min-width: 150px; cursor: pointer;">
                 <option value="1,2" <?= (!isset($_GET['status']) || $_GET['status'] == '1,2') ? 'selected' : '' ?>>Tất cả trạng thái</option>
                 <option value="1" <?= (isset($_GET['status']) && $_GET['status'] == '1') ? 'selected' : '' ?>>Đang bán</option>
                 <option value="2" <?= (isset($_GET['status']) && $_GET['status'] == '2') ? 'selected' : '' ?>>Tạm khóa</option>
@@ -122,7 +241,7 @@
     </div>
 
     <?php if(!isset($is_form) || $is_form === false): ?>
-        <a href="/lego_shop_php/adminproduct/add" style="background: #3182ce; color: white; text-decoration: none; padding: 12px 25px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+        <a href="/lego_shop_php/adminproduct/add" class="btn-add-product">
             <i class="fa-solid fa-plus"></i> Thêm sản phẩm
         </a>
     <?php endif; ?>
