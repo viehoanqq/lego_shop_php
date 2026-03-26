@@ -112,4 +112,15 @@ class CartModel extends Database {
         $sql = "DELETE ci FROM cart_items ci JOIN carts c ON ci.cart_id = c.id WHERE ci.id = $cart_item_id AND c.user_id = $user_id";
         return $db->query($sql);
     }
+    public function clearCart($user_id) {
+        $db = $this->getConnection();
+        
+        // Tên bảng giỏ hàng của bạn có thể là 'cart' hoặc 'carts'. Hãy đổi lại nếu tên bảng khác nhé.
+        $sql = "DELETE FROM carts WHERE user_id = ?";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        
+        return $stmt->execute();
+    }
 }

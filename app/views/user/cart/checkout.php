@@ -8,7 +8,7 @@
             <p style="color: #666;">Vui lòng kiểm tra lại thông tin trước khi xác nhận.</p>
         </div>
 
-        <form action="/lego_shop_php/order/create" method="POST" id="checkoutForm">
+        <form action="/lego_shop_php/checkout/process" method="POST" id="checkoutForm">
             <div class="checkout-layout">
                 
                 <div class="checkout-left">
