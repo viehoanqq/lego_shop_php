@@ -293,7 +293,86 @@ class ProductModel extends Database {
         $result = $stmt->get_result();
         return ($result && $result->num_rows > 0) ? $result->fetch_assoc() : null;
     }
+    public function insertProduct($data) {
+        $db = $this->getConnection();
+        $db->begin_transaction();
+        try {
+            // 1. Insert bảng products
+            $sql = "INSERT INTO products (name, sku, category_id, selling_price, stock_quantity, description, status) 
+                    VALUES (?, ?, ?, ?, 0, ?, 1)";
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param("ssiis", $data['name'], $data['sku'], $data['category_id'], $data['selling_price'], $data['description']);
+            $stmt->execute();
+            $product_id = $db->insert_id;
 
+            // 2. Insert bảng product_details
+            $sqlDetails = "INSERT INTO product_details (product_id, pieces, age_range) VALUES (?, ?, '12+')";
+            $stmtDetails = $db->prepare($sqlDetails);
+            $stmtDetails->bind_param("ii", $product_id, $data['pieces']);
+            $stmtDetails->execute();
+
+            // 3. Xử lý ảnh nếu có
+            if (!empty($data['main_image'])) {
+                $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
+                $stmtImg = $db->prepare($sqlImg);
+                $stmtImg->bind_param("is", $product_id, $data['main_image']);
+                $stmtImg->execute();
+            }
+
+            $db->commit();
+            return true;
+        } catch (Exception $e) {
+            $db->rollback();
+            return false;
+        }
+    }
+
+    // Cập nhật sản phẩm
+    public function updateProduct($id, $data) {
+        $db = $this->getConnection();
+        $db->begin_transaction();
+        try {
+            $id = intval($id);
+            // 1. Update products
+            $sql = "UPDATE products SET name=?, sku=?, selling_price=?, category_id=? WHERE id=?";
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param("ssiii", $data['name'], $data['sku'], $data['selling_price'], $data['category_id'], $id);
+            $stmt->execute();
+
+            // 2. Update product_details
+            $sqlDetails = "UPDATE product_details SET pieces=? WHERE product_id=?";
+            $stmtDetails = $db->prepare($sqlDetails);
+            $stmtDetails->bind_param("ii", $data['pieces'], $id);
+            $stmtDetails->execute();
+
+            // 3. Update Image nếu có ảnh mới
+            if (!empty($data['main_image'])) {
+                $db->query("UPDATE product_images SET is_main = 0 WHERE product_id = $id");
+                $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
+                $stmtImg = $db->prepare($sqlImg);
+                $stmtImg->bind_param("is", $id, $data['main_image']);
+                $stmtImg->execute();
+            }
+
+            $db->commit();
+            return true;
+        } catch (Exception $e) {
+            $db->rollback();
+            return false;
+        }
+    }
+
+    // Kiểm tra SKU tồn tại
+    public function isSkuExists($sku, $exclude_id = null) {
+        $db = $this->getConnection();
+        $sku = $db->real_escape_string($sku);
+        $sql = "SELECT id FROM products WHERE sku = '$sku'";
+        if ($exclude_id) $sql .= " AND id != " . intval($exclude_id);
+        $result = $db->query($sql);
+        return ($result && $result->num_rows > 0);
+    }
+
+    // Thay đổi trạng thái (Dùng cho cả Ẩn và Xóa mềm)
     // Lưu hoặc Sửa đánh giá (Luôn set status = pending)
     public function saveProductReview($user_id, $product_id, $rating, $comment) {
         $db = $this->getConnection();
