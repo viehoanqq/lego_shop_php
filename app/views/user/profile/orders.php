@@ -1,169 +1,185 @@
-<div class="main-content" style="width: 100%; max-width: 1200px; margin: 30px auto; background-color: #f9f9f9;">
-    <div class="profile-container">
+<?php
+class CheckoutController extends Controller {
+    
+    public function __construct() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        // Bắt buộc đăng nhập mới được vào trang Checkout
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /lego_shop_php/account/login");
+            exit;
+        }
+    }
+
+    // 1. Hiển thị trang Thanh toán (Bước 2)
+    public function index() {
+        $cartModel = $this->model('CartModel');
+        $userModel = $this->model('UserModel');
+
+        $cart_items = $cartModel->getCartItems($_SESSION['user_id']);
+        if (empty($cart_items)) {
+            header("Location: /lego_shop_php/cart");
+            exit;
+        }
+
+        $addresses = $userModel->getUserAddresses($_SESSION['user_id']);
         
-        <?php require __DIR__ . '/../../components/profile_sidebar.php'; ?>
+        $total_price = 0;
+        foreach ($cart_items as $item) {
+            $total_price += ($item['selling_price'] * $item['quantity']);
+        }
 
-        <section class="profile-main">
-            <div class="profile-form-box">
-                <div class="address-header">
-                    <h2 class="section-title" style="margin: 0;">Lịch sử mua hàng</h2>
-                </div>
-                <p class="section-desc" style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">Quản lý và theo dõi trạng thái các đơn hàng của bạn</p>
-
-                <div class="order-list">
-                    <?php if (empty($orders)): ?>
-                        <div style="text-align: center; padding: 40px; color: #888;">
-                            <i class="fa-solid fa-box-open" style="font-size: 45px; margin-bottom: 15px; color: #ddd;"></i>
-                            <p style="font-size: 16px;">Bạn chưa có đơn hàng nào.</p>
-                            <a href="/lego_shop_php/home" class="btn-submit-modal" style="display: inline-block; margin-top: 15px; text-decoration: none;">Mua sắm ngay</a>
-                        </div>
-                    <?php else: ?>
-                        <?php 
-                            // Từ điển dịch trạng thái ENUM trong DB sang tiếng Việt & CSS Class
-                            $status_map = [
-                                'pending' => ['label' => 'Chờ xử lý', 'class' => 'badge-pending'],
-                                'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'badge-confirmed'],
-                                'delivered' => ['label' => 'Giao thành công', 'class' => 'badge-delivered'],
-                                'cancelled' => ['label' => 'Đã hủy', 'class' => 'badge-cancelled']
-                            ];
-                        ?>
-
-                        <?php foreach($orders as $order): 
-                            $st = $order['status'] ?? 'pending';
-                            $status_label = $status_map[$st]['label'] ?? 'Không xác định';
-                            $status_class = $status_map[$st]['class'] ?? 'badge-pending';
-                        ?>
-                            <div class="order-card">
-                                <div class="order-header">
-                                    <div class="order-id-date">
-                                        <span class="order-id">Mã đơn: #<?= htmlspecialchars($order['id']) ?></span>
-                                        <span class="order-date"><i class="fa-regular fa-clock"></i> <?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></span>
-                                    </div>
-                                    <div class="order-status-badge <?= $status_class ?>">
-                                        <?= $status_label ?>
-                                    </div>
-                                </div>
-                                
-                                <div class="order-body">
-                                    <div class="order-info">
-                                        <p><strong>Người nhận:</strong> <?= htmlspecialchars($order['shipping_fullname']) ?> - <?= htmlspecialchars($order['shipping_phone']) ?></p>
-                                        <p><strong>Địa chỉ:</strong> <?= htmlspecialchars($order['shipping_street']) ?>, <?= htmlspecialchars($order['shipping_ward']) ?>, <?= htmlspecialchars($order['shipping_district']) ?>, <?= htmlspecialchars($order['shipping_city']) ?></p>
-                                        <p><strong>Thanh toán:</strong> 
-                                            <?php 
-                                                if($order['payment_method'] == 'cash') echo 'Thanh toán khi nhận hàng (COD)';
-                                                elseif($order['payment_method'] == 'transfer') echo 'Chuyển khoản ngân hàng';
-                                                else echo 'Thanh toán trực tuyến';
-                                            ?>
-                                        </p>
-                                    </div>
-                                    <div class="order-price-wrap">
-                                        <span class="price-label">Tổng tiền</span>
-                                        <span class="price-value"><?= number_format($order['total_amount'], 0, ',', '.') ?>đ</span>
-                                    </div>
-                                </div>
-
-                                <div class="order-footer">
-                                    <a href="/lego_shop_php/checkout/view_order?order_id=<?= $order['id'] ?>" class="btn-outline-red">Xem chi tiết</a>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-
-            </div>
-        </section>
-
-    </div>
-</div>
-
-<style>
-    /* CSS RIÊNG CHO LỊCH SỬ ĐƠN HÀNG */
-    .order-list { display: flex; flex-direction: column; gap: 20px; }
-    
-    .order-card {
-        background: #fff;
-        border: 1px solid #eee;
-        border-radius: 10px;
-        padding: 20px;
-        transition: all 0.3s ease;
-    }
-    .order-card:hover {
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        border-color: #ddd;
+        $this->view('/user/cart/checkout', [
+            'title' => 'Thanh toán đơn hàng',
+            'cart_items' => $cart_items,
+            'addresses' => $addresses,
+            'total_price' => $total_price
+        ]);
     }
 
-    /* Header của Card */
-    .order-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px dashed #eee;
-        padding-bottom: 15px;
-        margin-bottom: 15px;
-    }
-    .order-id { font-weight: 800; color: #333; font-size: 16px; margin-right: 15px; }
-    .order-date { color: #888; font-size: 14px; }
-    
-    /* Nhãn trạng thái */
-    .order-status-badge {
-        padding: 6px 14px;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 700;
-    }
-    .badge-pending { background: #fff3cd; color: #f08c00; border: 1px solid #ffe066; }
-    .badge-confirmed { background: #e7f5ff; color: #1971c2; border: 1px solid #a5d8ff; }
-    .badge-delivered { background: #ebfbee; color: #2f9e44; border: 1px solid #b2f2bb; }
-    .badge-cancelled { background: #fff5f5; color: #e03131; border: 1px solid #ffc9c9; }
+    // 2. Xử lý lưu đơn hàng vào Database (Bước đệm)
+    public function process() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $user_id = $_SESSION['user_id'];
+            $address_id = $_POST['address_id'] ?? null;
 
-    /* Body của Card */
-    .order-body {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 20px;
-    }
-    .order-info { flex: 1; padding-right: 20px; }
-    .order-info p { margin: 5px 0; color: #555; font-size: 14.5px; line-height: 1.5; }
-    
-    .order-price-wrap {
-        text-align: right;
-        min-width: 150px;
-    }
-    .price-label { display: block; color: #888; font-size: 13px; margin-bottom: 3px; }
-    .price-value { font-size: 20px; font-weight: 800; color: #e03131; }
+            // Kiểm tra xem khách đã chọn địa chỉ chưa
+            if (empty($address_id) || $address_id === 'new') {
+                echo "<script>alert('Vui lòng chọn hoặc lưu địa chỉ giao hàng!'); history.back();</script>";
+                exit;
+            }
 
-    /* Footer của Card (Nút bấm) */
-    .order-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-    .btn-outline-red {
-        display: inline-block;
-        padding: 8px 20px;
-        border: 1px solid #e03131;
-        color: #e03131;
-        background: transparent;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-    .btn-outline-red:hover {
-        background: #fff5f5;
-    }
-    
-    /* Tái sử dụng class nút đỏ từ giao diện trước */
-    .btn-submit-modal { 
-        background: #a4161a; color: white; border: none; padding: 10px 24px; 
-        border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; 
-    }
-    .btn-submit-modal:hover { background: #800f13; }
+            // Lấy Giỏ hàng
+            $cartModel = $this->model('CartModel');
+            $cart_items = $cartModel->getCartItems($user_id);
+            if (empty($cart_items)) {
+                header("Location: /lego_shop_php/cart");
+                exit;
+            }
 
-    @media (max-width: 768px) {
-        .order-body { flex-direction: column; align-items: flex-start; gap: 15px; }
-        .order-price-wrap { text-align: left; }
+            // Tính tổng tiền
+            $total_amount = 0;
+            foreach ($cart_items as $item) {
+                $total_amount += ($item['selling_price'] * $item['quantity']);
+            }
+
+            // Lấy thông tin địa chỉ chi tiết
+            $userModel = $this->model('UserModel');
+            $address = $userModel->getAddressById($address_id, $user_id);
+            
+            if (!$address) {
+                echo "<script>alert('Địa chỉ không hợp lệ!'); history.back();</script>";
+                exit;
+            }
+
+            // ========================================================
+            // PHIÊN DỊCH DỮ LIỆU ĐỂ KHỚP VỚI BẢNG ENUM TRONG DATABASE
+            // ========================================================
+            $status = 'pending'; // Mặc định đơn mới là chờ xử lý (pending)
+
+            $raw_payment = $_POST['payment_method'] ?? 'cod'; 
+            if ($raw_payment === 'banking') {
+                $payment_method = 'transfer'; // Chuyển khoản
+            } elseif ($raw_payment === 'online') {
+                $payment_method = 'online';   // Trực tuyến
+            } else {
+                $payment_method = 'cash';     // COD (Tiền mặt)
+            }
+
+            // Gọi OrderModel để lưu
+            $orderModel = $this->model('OrderModel');
+            
+            $order_id = $orderModel->createOrder(
+                $user_id, 
+                $status, 
+                $payment_method, 
+                $total_amount, 
+                $address['receiver_name'], 
+                $address['receiver_phone'], 
+                $address['street'], 
+                $address['ward'], 
+                $address['district'], 
+                $address['city']
+            );
+
+            if ($order_id) {
+                // Lưu chi tiết sản phẩm
+                foreach ($cart_items as $item) {
+                    $orderModel->addOrderItem($order_id, $item['product_id'], $item['quantity'], $item['selling_price']);
+                }
+
+                // Xóa giỏ hàng sau khi đặt thành công
+                $cartModel->clearCart($user_id);
+
+                // Chuyển hướng dựa trên phương thức thanh toán
+                if ($payment_method === 'transfer') {
+                    header("Location: /lego_shop_php/checkout/payment?order_id=" . $order_id);
+                } else {
+                    header("Location: /lego_shop_php/checkout/success?order_id=" . $order_id);
+                }
+                exit;
+            } else {
+                echo "<script>alert('Lỗi hệ thống khi tạo đơn hàng!'); history.back();</script>";
+            }
+        }
     }
-</style>
+
+    // 3. Hiển thị trang Quét mã QR (Bước 3)
+    public function payment() {
+        $order_id = $_GET['order_id'] ?? 0;
+        
+        // Gọi DB để lấy thông tin số tiền cần chuyển
+        $orderModel = $this->model('OrderModel');
+        $order = $orderModel->getOrderById($order_id); 
+        
+        // Bảo mật: Nếu không có đơn hàng hoặc đơn hàng không phải của user này
+        if (!$order || $order['user_id'] != $_SESSION['user_id']) {
+            header("Location: /lego_shop_php/home");
+            exit;
+        }
+
+        $total_price = $order ? $order['total_amount'] : 0;
+
+        $this->view('/user/cart/payment', [
+            'title' => 'Thanh toán chuyển khoản',
+            'order_id' => $order_id,
+            'total_price' => $total_price
+        ]);
+    }
+
+    // 4. Hiển thị trang Thành công (Bước 4)
+    public function success() {
+        $order_id = $_GET['order_id'] ?? 0;
+        $this->view('/user/cart/success', [
+            'title' => 'Đặt hàng thành công',
+            'order_id' => $order_id
+        ]);
+    }
+
+    // 5. Hiển thị chi tiết đơn hàng sau khi đặt (Bước 5)
+    public function view_order() {
+        $order_id = $_GET['order_id'] ?? 0;
+        
+        if (!$order_id) {
+            header("Location: /lego_shop_php/home");
+            exit;
+        }
+
+        $orderModel = $this->model('OrderModel');
+        $order = $orderModel->getOrderById($order_id);
+        
+        // BẢO MẬT: Kiểm tra xem đơn hàng có tồn tại và có đúng là của user đang đăng nhập không
+        if (!$order || $order['user_id'] != $_SESSION['user_id']) {
+            echo "<script>alert('Bạn không có quyền xem đơn hàng này!'); window.location.href='/lego_shop_php/home';</script>";
+            exit;
+        }
+
+        // Lấy danh sách sản phẩm
+        $order_items = $orderModel->getOrderItems($order_id);
+
+        $this->view('/user/cart/view_order', [
+            'title' => 'Chi tiết đơn hàng #' . $order_id,
+            'order' => $order,
+            'order_items' => $order_items
+        ]);
+    }
+}
