@@ -120,6 +120,18 @@ class CartModel extends Database {
         }
         return false;
     }
+    public function countCartItems($user_id) {
+    $db = $this->getConnection();
+    $user_id = intval($user_id);
+    // Tính tổng số lượng (quantity) hoặc số món (count id) tùy bạn. Ở đây đếm số món:
+    $sql = "SELECT SUM(quantity) as total FROM cart_items ci JOIN carts c ON ci.cart_id = c.id WHERE c.user_id = $user_id";
+    $result = $db->query($sql);
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return $row['total'] ?? 0;
+    }
+    return 0;
+}
 
     // [MỚI] - Xóa sản phẩm khỏi giỏ
     public function removeCartItem($cart_item_id, $user_id) {
