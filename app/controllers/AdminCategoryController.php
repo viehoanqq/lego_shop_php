@@ -1,26 +1,55 @@
 <?php
 class AdminCategoryController extends Controller {
+
     private $categoryModel;
+    private $limit = 8; // Đặt limit chung
 
     public function __construct() {
         $this->categoryModel = $this->model('CategoryModel');
     }
 
+    // Hàm helper để lấy dữ liệu phân trang
+    private function getPaginationData($filters) {
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $offset = ($page - 1) * $this->limit;
+
+        // Gọi hàm Model với offset và limit
+        $categories = $this->categoryModel->getAdminCategoriesWithCount($filters['keyword'], $filters['status'], $this->limit, $offset);
+        $totalItems = $this->categoryModel->countAdminCategories($filters['keyword'], $filters['status']);
+        
+        $totalPages = ceil($totalItems / $this->limit);
+
+        return [
+            'categories' => $categories,
+            'totalItems' => $totalItems,
+            'totalPages' => $totalPages,
+            'currentPage' => $page
+        ];
+    }
+
     public function index() {
-    $categories = $this->categoryModel->getCategoriesWithCount(); 
-    $this->view('admin/categories', [
-        'categories' => $categories,
-        'is_form' => false 
-    ]);
-}
+        // Lấy dữ liệu lọc từ URL
+        $filters = [
+            'keyword' => $_GET['keyword'] ?? '',
+            'status'  => $_GET['status'] ?? 'all'
+        ];
+        // Lấy dữ liệu phân trang
+        $pageData = $this->getPaginationData($filters);
+
+        $this->view('admin/categories', array_merge($pageData, [
+            'is_form' => false,
+            'filters' => $filters
+        ]));
+    }
 
     public function add() {
-        echo "Đang chạy hàm ADD rồi nè!"; // Thêm dòng này
-        $categories = $this->categoryModel->getCategoriesWithCount(); 
-        $this->view('admin/categories', [
-            'categories' => $categories,
-            'is_form' => true
-        ]);
+        $filters = ['keyword' => '', 'status' => 'all'];
+        $pageData = $this->getPaginationData($filters);
+
+        $this->view('admin/categories', array_merge($pageData, [
+            'is_form' => true,
+            'filters' => $filters
+        ]));
     }
 
 
@@ -34,23 +63,30 @@ class AdminCategoryController extends Controller {
             ];
             
             if ($this->categoryModel->insert($data)) {
-                header('Location: /lego_shop_php/admincategory?msg=success');
+                set_flash_message('msg', 'success'); 
             } else {
-                header('Location: /lego_shop_php/admincategory?error=db');
+                set_flash_message('error', 'db');
             }
+            header('Location: /lego_shop_php/admincategory');
             exit();
         }
     }
 
     public function edit($id) {
-        $categories = $this->categoryModel->getCategoriesWithCount();
         $category = $this->categoryModel->getCategoryById($id);
-        
-        $this->view('admin/categories', [
-            'categories' => $categories,
+        if (!$category) {
+            header('Location: /lego_shop_php/admincategory');
+            exit();
+        }
+
+        $filters = ['keyword' => '', 'status' => 'all'];
+        $pageData = $this->getPaginationData($filters);
+
+        $this->view('admin/categories', array_merge($pageData, [
             'category' => $category,
-            'is_form' => true
-        ]);
+            'is_form'  => true,
+            'filters'  => $filters
+        ]));
     }
 
     public function update($id) {
@@ -65,21 +101,32 @@ class AdminCategoryController extends Controller {
             ];
 
             if ($this->categoryModel->update($id, $data)) {
-                header('Location: /lego_shop_php/admincategory?msg=updated');
+                set_flash_message('msg', 'updated'); 
             } else {
-                header('Location: /lego_shop_php/admincategory?error=db');
+                set_flash_message('error', 'db');
             }
+            header('Location: /lego_shop_php/admincategory');
             exit();
         }
     }
 
-    public function delete($id) {
-        $db = $this->categoryModel->getConnection();
-        $id = intval($id);
-        $sql = "UPDATE categories SET status = 'locked' WHERE id = $id";
-        if ($db->query($sql)) {
-            header('Location: /lego_shop_php/admincategory?msg=hidden');
+    public function unlock($id) {
+        if ($this->categoryModel->updateStatus($id, 'active')) {
+            set_flash_message('msg', 'unlocked'); // Lưu vào session
+        } else {
+            set_flash_message('error', 'db');
         }
+        header('Location: /lego_shop_php/admincategory');
+        exit();
+    }
+
+    public function delete($id) {
+        if ($this->categoryModel->updateStatus($id, 'locked')) {
+            set_flash_message('msg', 'hidden');
+        } else {
+            set_flash_message('error', 'db');
+        }
+        header('Location: /lego_shop_php/admincategory');
         exit();
     }
 

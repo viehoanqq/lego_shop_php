@@ -63,4 +63,46 @@ class CategoryModel extends Database {
         $sql = "UPDATE categories SET name='$name', description='$desc', image_url='$img' WHERE id=$id";
         return $db->query($sql);
     }
+
+    public function updateStatus($id, $status) {
+        $db = $this->getConnection();
+        $id = intval($id);
+        $status = $db->real_escape_string($status);
+        $sql = "UPDATE categories SET status = '$status' WHERE id = $id";
+        return $db->query($sql);
+    }
+
+    // Lấy tất cả danh mục cho trang Admin (Bao gồm cả active và locked)
+    // Thêm tham số $limit và $offset vào cuối
+    public function getAdminCategoriesWithCount($keyword = '', $status = 'all', $limit = 6, $offset = 0) {
+        $db = $this->getConnection();
+        $sql = "SELECT c.*, COUNT(p.id) as product_count 
+                FROM categories c 
+                LEFT JOIN products p ON c.id = p.category_id 
+                WHERE 1=1";
+
+        if (!empty($keyword)) {
+            $keyword = $db->real_escape_string($keyword);
+            $sql .= " AND c.name LIKE '%$keyword%'";
+        }
+        if ($status !== 'all') {
+            $status = $db->real_escape_string($status);
+            $sql .= " AND c.status = '$status'";
+        }
+
+        $sql .= " GROUP BY c.id ORDER BY c.id DESC LIMIT $offset, $limit";
+        $result = $db->query($sql);
+        return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    // Hàm đếm tổng số bản ghi
+    public function countAdminCategories($keyword = '', $status = 'all') {
+        $db = $this->getConnection();
+        $sql = "SELECT COUNT(*) as total FROM categories WHERE 1=1";
+        // ... Thêm các điều kiện lọc giống hệt hàm trên ...
+        $result = $db->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'] ?? 0;
+    }
+    
 }

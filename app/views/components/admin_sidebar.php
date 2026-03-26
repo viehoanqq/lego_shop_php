@@ -38,7 +38,7 @@
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admin/customers" class="<?= isActive('customers', $current_page) ?>">
+                <a href="/lego_shop_php/admincustomer" class="<?= isActive('customer', $current_page) ?>">
                     <i class="fa-solid fa-user-group"></i>Khách hàng
                 </a>
             </li>
