@@ -91,7 +91,7 @@ class CheckoutController extends Controller {
                 $cartModel->clearCart($user_id);
 
                 // Chuyển hướng
-                if ($payment_method === 'banking') {
+                if ($payment_method === 'transfer') {
                     header("Location: /lego_shop_php/checkout/payment?order_id=" . $order_id);
                 } else {
                     header("Location: /lego_shop_php/checkout/success?order_id=" . $order_id);
@@ -156,4 +156,34 @@ class CheckoutController extends Controller {
             'order_items' => $order_items
         ]);
     }
+    public function cancel_order() {
+        $order_id = $_GET['order_id'] ?? 0;
+        
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        if (!$order_id || !isset($_SESSION['user_id'])) {
+            header("Location: /lego_shop_php/home");
+            exit;
+        }
+
+        $orderModel = $this->model('OrderModel');
+        $order = $orderModel->getOrderById($order_id);
+
+        // Bảo mật: Đảm bảo đơn hàng tồn tại và thuộc về user đang đăng nhập
+        if ($order && $order['user_id'] == $_SESSION['user_id']) {
+            // Chỉ cho hủy nếu trạng thái hợp lệ
+            if (in_array($order['status'], ['pending', 'confirmed'])) {
+                if ($orderModel->updateOrderStatus($order_id, 'cancelled')) {
+                    echo "<script>alert('Đã hủy đơn hàng thành công!'); window.location.href='/lego_shop_php/checkout/view_order?order_id=$order_id';</script>";
+                } else {
+                    echo "<script>alert('Lỗi hệ thống, không thể hủy đơn!'); window.history.back();</script>";
+                }
+            } else {
+                echo "<script>alert('Đơn hàng ở trạng thái này không thể hủy!'); window.location.href='/lego_shop_php/checkout/view_order?order_id=$order_id';</script>";
+            }
+        } else {
+            echo "<script>alert('Lỗi quyền truy cập!'); window.location.href='/lego_shop_php/home';</script>";
+        }
+        exit;
+    }
+    
 }

@@ -88,5 +88,37 @@ class CartController extends Controller {
             }
         }
     }
+
+    // Thêm vào giỏ hàng ngầm qua AJAX
+    public function addAjax() {
+        header('Content-Type: application/json');
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Bạn cần đăng nhập']);
+            exit;
+        }
+
+        $user_id = $_SESSION['user_id'];
+        $product_id = $_POST['product_id'] ?? 0;
+        $quantity = $_POST['quantity'] ?? 1;
+
+        if ($product_id) {
+            $cartModel = $this->model('CartModel');
+            // Hàm addToCart của bạn: Kiểm tra nếu có rồi thì cộng dồn số lượng, chưa có thì insert mới
+            $result = $cartModel->addToCart($user_id, $product_id, $quantity);
+            
+            if ($result) {
+                // Lấy tổng số loại sp trong giỏ để cập nhật Badge (Tuỳ chọn)
+                $count = $cartModel->countCartItems($user_id);
+                echo json_encode(['success' => true, 'cart_count' => $count]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Lỗi DB khi thêm!']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Lỗi ID sản phẩm!']);
+        }
+        exit;
+    }
     
 }

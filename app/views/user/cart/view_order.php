@@ -31,6 +31,9 @@
     .btn-continue:hover { background: #c92a2a; transform: translateY(-2px); }
 
     @media (max-width: 768px) { .info-grid { grid-template-columns: 1fr; } .total-section { width: 100%; } }
+    .btn-cancel-order { display: inline-block; padding: 13px 25px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none; transition: 0.3s; border: 2px solid #e03131; color: #e03131; background: #fff; cursor: pointer; margin-right: 15px; }
+    .btn-cancel-order:hover:not(:disabled) { background: #fff5f5; }
+    .btn-cancel-order:disabled, .btn-cancel-order.disabled { border-color: #ccc; color: #999; background: #f5f5f5; cursor: not-allowed; }
 </style>
 
 <div class="checkout-page-wrapper">
@@ -40,7 +43,16 @@
         <div class="order-detail-box">
             <div class="order-header">
                 <h2>Chi tiết đơn hàng #<?= htmlspecialchars($order['id']) ?></h2>
-                <div class="order-status"><?= htmlspecialchars($order['status']) ?></div>
+                <div class="order-status">
+                    <?php 
+                                if($order['status'] == 'pending') echo 'Đang chờ xử lý';
+                                elseif($order['status'] == 'confirmed') echo 'Đã xác nhận';
+                                elseif($order['status'] == 'delivered') echo 'Đã giao hàng';
+                                elseif($order['status'] == 'cancelled') echo 'Đã hủy';
+                                else echo 'Không xác định';
+                            ?>
+                </div>
+                
             </div>
 
             <div class="info-grid">
@@ -111,6 +123,15 @@
             </div>
             
             <div class="btn-wrap">
+                <?php if (in_array($order['status'], ['pending', 'confirmed'])): ?>
+                    <a href="/lego_shop_php/checkout/cancel_order?order_id=<?= $order['id'] ?>" class="btn-cancel-order" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');">
+                        <i class="fa-solid fa-xmark"></i> Hủy đơn hàng
+                    </a>
+                <?php elseif (in_array($order['status'], ['shipping', 'delivered'])): ?>
+                    <button class="btn-cancel-order disabled" disabled title="Đơn hàng đang được giao, không thể hủy">
+                        <i class="fa-solid fa-xmark"></i> Hủy đơn hàng
+                    </button>
+                <?php endif; ?>
                 <a href="/lego_shop_php/home" class="btn-continue"><i class="fa-solid fa-cart-shopping"></i> Tiếp tục mua sắm</a>
             </div>
         </div>

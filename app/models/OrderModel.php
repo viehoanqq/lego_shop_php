@@ -51,19 +51,16 @@ class OrderModel extends Database {
         return $result->fetch_assoc(); // Trả về 1 mảng chứa dữ liệu đơn hàng
     }
     public function getOrdersByUserId($user_id) {
-        $db = $this->getConnection();
-        $sql = "SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC";
-        $stmt = $db->prepare($sql);
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        
-        $result = $stmt->get_result();
-        $orders = [];
-        while ($row = $result->fetch_assoc()) {
-            $orders[] = $row;
-        }
-        return $orders;
-    }
+    $db = $this->getConnection();
+    $sql = "SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC";
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $orders = [];
+    while ($row = $result->fetch_assoc()) { $orders[] = $row; }
+    return $orders;
+}
     // Lấy chi tiết các sản phẩm trong 1 đơn hàng
     public function getOrderItems($order_id) {
         $db = $this->getConnection();
@@ -84,5 +81,16 @@ class OrderModel extends Database {
             $items[] = $row;
         }
         return $items;
+    }
+    public function updateOrderStatus($order_id, $status) {
+        $db = $this->getConnection();
+        
+        $sql = "UPDATE orders SET status = ? WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        
+        // s: string (status), i: integer (id)
+        $stmt->bind_param("si", $status, $order_id);
+        
+        return $stmt->execute();
     }
 }
