@@ -76,10 +76,10 @@
     </a>
 </li>
             <li>
-                <a href="/lego_shop_php/admin/reports" class="<?= isActive('reports', $current_page) ?>">
-                    <i class="fa-solid fa-chart-line"></i>Thống kê báo cáo
-                </a>
-            </li>
+    <a href="/lego_shop_php/adminreport" class="<?= isActive('adminreport', $current_page) ?>">
+        <i class="fa-solid fa-chart-line"></i>Báo cáo Nhập Xuất Tồn
+    </a>
+</li>
         </ul>
 
         <ul class="support">

@@ -14,14 +14,51 @@ class ImportModel extends Database {
     }
 
     // 2. Lấy danh sách Lịch sử phiếu nhập
-    public function getAllImports() {
+    // --- Lấy danh sách Lịch sử phiếu nhập (CÓ TÌM KIẾM & LỌC) ---
+    public function getAllImports($filters = []) {
         $db = $this->getConnection();
-        $sql = "SELECT r.*, u.fullname as admin_name, s.name as supplier_name 
+        
+        // Mặc định luôn đúng để dễ nối chuỗi AND
+        $where = ["1=1"];
+
+        // Lọc theo Nhà cung cấp
+        if (!empty($filters['supplier_id'])) {
+            $where[] = "r.supplier_id = " . intval($filters['supplier_id']);
+        }
+        // Lọc theo Trạng thái (draft / completed)
+        if (!empty($filters['status'])) {
+            $where[] = "r.status = '" . $db->real_escape_string($filters['status']) . "'";
+        }
+        // Lọc Từ ngày (Bắt đầu từ 00:00:00 của ngày đó)
+        if (!empty($filters['start_date'])) {
+            $where[] = "r.created_at >= '" . $db->real_escape_string($filters['start_date']) . " 00:00:00'";
+        }
+        // Lọc Đến ngày (Kết thúc vào 23:59:59 của ngày đó)
+        if (!empty($filters['end_date'])) {
+            $where[] = "r.created_at <= '" . $db->real_escape_string($filters['end_date']) . " 23:59:59'";
+        }
+        // TÌM KIẾM: Theo Mã phiếu nhập
+        if (!empty($filters['keyword'])) {
+            $keyword = $db->real_escape_string($filters['keyword']);
+            // Tách lấy phần số (Ví dụ gõ "PN-12" hoặc "#12" thì chỉ lấy số 12)
+            $clean_id = preg_replace('/[^0-9]/', '', $keyword);
+            if (!empty($clean_id)) {
+                $where[] = "r.id = " . intval($clean_id);
+            }
+        }
+
+        $whereSql = implode(' AND ', $where);
+
+        $sql = "SELECT r.*, 
+                       COALESCE(NULLIF(u.fullname, ''), acc.email, 'Quản trị viên') as admin_name, 
+                       s.name as supplier_name 
                 FROM import_receipts r
                 LEFT JOIN accounts acc ON r.admin_id = acc.id
                 LEFT JOIN users u ON acc.id = u.account_id
                 LEFT JOIN suppliers s ON r.supplier_id = s.id
+                WHERE $whereSql
                 ORDER BY r.created_at DESC";
+
         $result = $db->query($sql);
         $data = [];
         if ($result && $result->num_rows > 0) {

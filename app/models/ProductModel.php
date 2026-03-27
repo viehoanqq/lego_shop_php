@@ -137,14 +137,30 @@ class ProductModel extends Database {
     }
     // --- Cập nhật Giá bán và Tỉ lệ lợi nhuận ---
    // --- Lấy danh sách sản phẩm để quản lý giá ---
-    public function getAllProductsWithPrices() {
+    // --- Lấy danh sách sản phẩm để quản lý giá (CÓ TÌM KIẾM & LỌC) ---
+    public function getAllProductsWithPrices($filters = []) {
         $db = $this->getConnection();
         
-       
+        // Điều kiện gốc: Chỉ lấy sản phẩm đang bán hoặc tạm ẩn
+        $where = ["p.status IN ('1', '2')"];
+
+        // Xử lý tìm kiếm bằng từ khóa (Tên hoặc SKU)
+        if (!empty($filters['keyword'])) {
+            $keyword = $db->real_escape_string($filters['keyword']);
+            $where[] = "(p.name LIKE '%$keyword%' OR p.sku LIKE '%$keyword%')";
+        }
+
+        // Xử lý lọc theo Danh mục
+        if (!empty($filters['category_id'])) {
+            $where[] = "p.category_id = " . intval($filters['category_id']);
+        }
+
+        $whereSql = implode(' AND ', $where);
+
         $sql = "SELECT p.*, 
                        (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
                 FROM products p 
-                WHERE p.status IN ('1', '2') 
+                WHERE $whereSql 
                 ORDER BY p.created_at DESC";
         
         $result = $db->query($sql);
