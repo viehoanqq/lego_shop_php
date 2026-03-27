@@ -275,6 +275,79 @@
     color: #fff; 
 }
 
+/* ===== FORM ===== */
+.form-container {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 6px;
+}
+
+/* input + textarea */
+.form-control {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.form-control:focus {
+    border-color: #3182ce;
+    box-shadow: 0 0 0 2px rgba(49,130,206,0.1);
+    outline: none;
+}
+
+/* textarea */
+textarea.form-control {
+    resize: vertical;
+}
+
+/* button submit */
+.btn-submit {
+    background: #38a169;
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-submit:hover {
+    background: #2f855a;
+    transform: translateY(-1px);
+}
+
+.error-text {
+    color: #e53e3e;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.input-error {
+    border-color: #e53e3e ;
+}
+
+.input-success {
+    border-color: #38a169 ;
+}
+
 </style>
 
 <?php 
@@ -377,12 +450,14 @@ $session_error = get_flash_message('error');
                 <div>
                     <div class="form-group">
                         <label>Tên sản phẩm LEGO</label>
-                        <input type="text" name="name" class="form-control" value="<?= $product['name'] ?? '' ?>" required>
+                        <input type="text" id="name" name="name" class="form-control" value="<?= $product['name'] ?? '' ?>" required>
+                        <small class="error-text"></small>
                     </div>
                     <div style="display: flex; gap: 15px;">
                         <div class="form-group" style="flex: 1;">
                             <label>Mã SKU</label>
-                            <input type="text" name="sku" class="form-control" value="<?= $product['sku'] ?? '' ?>" required>
+                            <input type="text" id="sku" name="sku" class="form-control" value="<?= $product['sku'] ?? '' ?>" required>
+                            <small class="error-text"></small>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>Dòng LEGO</label>
@@ -406,7 +481,8 @@ $session_error = get_flash_message('error');
                     </div>
                     <div class="form-group">
                         <label>Số mảnh ghép (Pieces)</label>
-                        <input type="number" name="pieces" class="form-control" value="<?= $product['pieces'] ?? '' ?>">
+                        <input type="number" id="pieces" name="pieces" class="form-control" value="<?= $product['pieces'] ?? '' ?>">
+                        <small class="error-text"></small>
                     </div>
                     <div class="form-group">
                         <label>Hình ảnh</label>
@@ -564,13 +640,89 @@ $session_error = get_flash_message('error');
 <?php endif; ?>
 
 <script>
-// Tự động ẩn thông báo sau 5 giây
-setTimeout(function() {
-    let alerts = document.querySelectorAll('.alert-box');
-    alerts.forEach(el => {
-        el.style.transition = "opacity 0.5s ease";
-        el.style.opacity = "0";
-        setTimeout(() => el.style.display = 'none', 500);
+    const form = document.querySelector("form");
+    const nameInput = document.getElementById("name");
+    const skuInput = document.getElementById("sku");
+    const piecesInput = document.getElementById("pieces");
+
+    // ===== VALIDATE FUNCTIONS =====
+    function showError(input, message) {
+        input.classList.add("input-error");
+        input.classList.remove("input-success");
+        input.nextElementSibling.innerText = message;
+    }
+
+    function showSuccess(input) {
+        input.classList.remove("input-error");
+        input.classList.add("input-success");
+        input.nextElementSibling.innerText = "";
+    }
+
+    // ===== RULES =====
+    function validateName() {
+        const value = nameInput.value.trim();
+        if (value === "") {
+            showError(nameInput, "Không được để trống");
+            return false;
+        }
+        if (value.length < 3) {
+            showError(nameInput, "Tối thiểu 3 ký tự");
+            return false;
+        }
+        showSuccess(nameInput);
+        return true;
+    }
+
+    function validateSku() {
+        const value = skuInput.value.trim();
+        const regex = /^[A-Z0-9\-]+$/;
+
+        if (value === "") {
+            showError(skuInput, "Không được để trống");
+            return false;
+        }
+        if (!regex.test(value)) {
+            showError(skuInput, "Chỉ gồm chữ IN HOA, số, dấu -");
+            return false;
+        }
+        showSuccess(skuInput);
+        return true;
+    }
+
+    function validatePieces() {
+        const value = parseInt(piecesInput.value);
+
+        if (isNaN(value) || value <= 0) {
+            showError(piecesInput, "Phải > 0");
+            return false;
+        }
+        showSuccess(piecesInput);
+        return true;
+    }
+
+    // ===== REALTIME =====
+    nameInput.addEventListener("input", validateName);
+    skuInput.addEventListener("input", validateSku);
+    piecesInput.addEventListener("input", validatePieces);
+
+    // ===== SUBMIT =====
+    form.addEventListener("submit", function(e) {
+        const isValid =
+            validateName() &
+            validateSku() &
+            validatePieces();
+
+        if (!isValid) {
+            e.preventDefault();
+        }
     });
-}, 5000);
+    // Tự động ẩn thông báo sau 5 giây
+    setTimeout(function() {
+        let alerts = document.querySelectorAll('.alert-box');
+        alerts.forEach(el => {
+            el.style.transition = "opacity 0.5s ease";
+            el.style.opacity = "0";
+            setTimeout(() => el.style.display = 'none', 500);
+        });
+    }, 5000);
 </script>

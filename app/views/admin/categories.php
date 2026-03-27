@@ -104,7 +104,6 @@
     padding: 30px;
     border-radius: 15px;
     margin-bottom: 35px;
-    border-left: 5px solid #ffcf00;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 
@@ -126,7 +125,6 @@
 }
 
 .form-input:focus {
-    border-color: #ffcf00;
     background: #fffdf5;
     outline: none;
 }
@@ -182,7 +180,6 @@
     border-radius: 20px;
     font-size: 11px;
     font-weight: 800;
-    background: #ffcf00;
 }
 
 .cat-badge.locked {
@@ -288,6 +285,20 @@
     pointer-events: none;
 }
 
+.error-text {
+    color: #e53e3e;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.input-error {
+    border-color: #e53e3e;
+}
+
+.input-success {
+    border-color: #38a169;
+}
+
 </style>
 
 
@@ -376,9 +387,10 @@ $session_error = get_flash_message('error');
                 <div>
                     <div class="form-group">
                         <label>Tên danh mục <span style="color:red">*</span></label>
-                        <input type="text" name="name" class="form-input" 
+                        <input type="text" id="name" name="name" class="form-input" 
                                placeholder="Ví dụ: LEGO Technic..."
                                value="<?= $category['name'] ?? '' ?>" required>
+                        <small class="error-text"></small>
                     </div>
 
                     <div class="form-group">
@@ -476,13 +488,79 @@ $session_error = get_flash_message('error');
 <?php endif; ?>
 
 <script>
-// Tự động ẩn thông báo sau 5 giây
-setTimeout(function() {
-    let alerts = document.querySelectorAll('.alert-box');
-    alerts.forEach(el => {
-        el.style.transition = "opacity 0.5s ease";
-        el.style.opacity = "0";
-        setTimeout(() => el.style.display = 'none', 500);
+    const form = document.querySelector(".form-container form");
+    const nameInput = document.getElementById("name");
+    const descInput = document.getElementById("description");
+
+    // ===== UI =====
+    function showError(input, message) {
+        input.classList.add("input-error");
+        input.classList.remove("input-success");
+        input.nextElementSibling.innerText = message;
+    }
+
+    function showSuccess(input) {
+        input.classList.remove("input-error");
+        input.classList.add("input-success");
+        input.nextElementSibling.innerText = "";
+    }
+
+    // ===== VALIDATE =====
+    function validateName() {
+        const value = nameInput.value.trim();
+
+        if (value === "") {
+            showError(nameInput, "Không được để trống");
+            return false;
+        }
+
+        if (value.length < 3) {
+            showError(nameInput, "Tối thiểu 3 ký tự");
+            return false;
+        }
+
+        if (value.length > 100) {
+            showError(nameInput, "Tối đa 100 ký tự");
+            return false;
+        }
+
+        showSuccess(nameInput);
+        return true;
+    }
+
+    function validateDescription() {
+        const value = descInput.value.trim();
+
+        if (value.length > 255) {
+            showError(descInput, "Tối đa 255 ký tự");
+            return false;
+        }
+
+        showSuccess(descInput);
+        return true;
+    }
+
+    // ===== REALTIME =====
+    nameInput.addEventListener("input", validateName);
+    descInput.addEventListener("input", validateDescription);
+
+    // ===== SUBMIT =====
+    form.addEventListener("submit", function(e) {
+        const isValid =
+            validateName() &
+            validateDescription();
+
+        if (!isValid) {
+            e.preventDefault();
+        }
     });
-}, 5000);
+    // Tự động ẩn thông báo sau 5 giây
+    setTimeout(function() {
+        let alerts = document.querySelectorAll('.alert-box');
+        alerts.forEach(el => {
+            el.style.transition = "opacity 0.5s ease";
+            el.style.opacity = "0";
+            setTimeout(() => el.style.display = 'none', 500);
+        });
+    }, 5000);
 </script>
