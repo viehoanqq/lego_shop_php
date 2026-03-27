@@ -180,6 +180,7 @@
     border-radius: 20px;
     font-size: 11px;
     font-weight: 800;
+    background: #ffcf00;
 }
 
 .cat-badge.locked {
@@ -341,7 +342,7 @@ $session_error = get_flash_message('error');
 
 <div class="header">
     <div class="header-left-group">
-        <h2>📁 Quản lý Danh mục</h2>
+        <h2>Quản lý Danh mục</h2>
         
         <form action="/lego_shop_php/admincategory" method="GET" class="filter-form">
             <div class="search-wrapper">

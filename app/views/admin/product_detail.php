@@ -121,6 +121,20 @@
         font-size: 12px;
         font-weight: 600;
     }
+
+    .input-error {
+        border-color: #e53e3e;
+    }
+
+    .input-success {
+        border-color: #38a169 ;
+    }
+
+    .error-text {
+        color: #e53e3e;
+        font-size: 12px;
+        margin-top: 4px;
+    }
 </style>
 <?php if(isset($_GET['msg']) || isset($_GET['error'])): ?>
     <div id="status-alert-container" style="margin-bottom: 20px;">
@@ -178,46 +192,53 @@
                 <div class="grid-form">
                     <div class="form-group">
                         <label>Nhà sản xuất</label>
-                        <input type="text" name="manufacturer" class="form-control" 
+                        <input type="text" id="manufacturer" name="manufacturer" class="form-control" 
                                value="<?= $product['manufacturer'] ?? 'Tập đoàn LEGO' ?>">
+                        <small class="error-text"></small>
                     </div>
 
                     <div class="form-group">
                         <label>Xuất xứ</label>
-                        <input type="text" name="country_of_origin" class="form-control" 
+                        <input type="text" id="country_of_origin" name="country_of_origin" class="form-control" 
                                value="<?= $product['country_of_origin'] ?? 'Đan Mạch' ?>">
+                        <small class="error-text"></small>
                     </div>
 
                     <div class="form-group">
                         <label>Chất liệu</label>
-                        <input type="text" name="material" class="form-control" 
+                        <input type="text" id="material" name="material" class="form-control" 
                                value="<?= $product['material'] ?? 'Nhựa ABS an toàn' ?>">
+                        <small class="error-text"></small>
                     </div>
 
                     <div class="form-group">
                         <label>Kích thước hộp (cm)</label>
-                        <input type="text" name="dimensions" class="form-control" 
+                        <input type="text" id="dimensions" name="dimensions" class="form-control" 
                                placeholder="VD: 48 x 37.8 x 9.4 cm"
                                value="<?= $product['dimensions'] ?? '' ?>">
+                        <small class="error-text"></small>
                     </div>
 
                     <div class="form-group">
                         <label>Độ tuổi khuyến nghị</label>
-                        <input type="text" name="age_range" class="form-control" 
+                        <input type="text" id="age_range" name="age_range" class="form-control" 
                                placeholder="VD: 18+, 9-12..."
                                value="<?= $product['age_range'] ?? '' ?>">
+                        <small class="error-text"></small>
                     </div>
 
                     <div class="form-group">
                         <label>Số mảnh ghép (Pieces)</label>
-                        <input type="number" name="pieces" class="form-control" 
+                        <input type="number" id="pieces" name="pieces" class="form-control" 
                                value="<?= $product['pieces'] ?? 0 ?>">
+                        <small class="error-text"></small>
                     </div>
 
                     <div class="form-group">
                         <label>Năm phát hành</label>
-                        <input type="number" name="release_year" class="form-control" 
+                        <input type="number" id="release_year" name="release_year" class="form-control" 
                                value="<?= $product['release_year'] ?? date('Y') ?>">
+                        <small class="error-text"></small>
                     </div>
 
                     <div class="form-group full-width">
@@ -236,14 +257,142 @@
         </div>
     </div>
 </div>
+
 <script>
-// Tự động ẩn thông báo sau 5 giây
-setTimeout(function() {
-    let alerts = document.querySelectorAll('.alert-box');
-    alerts.forEach(el => {
-        el.style.transition = "opacity 0.5s ease";
-        el.style.opacity = "0";
-        setTimeout(() => el.style.display = 'none', 500);
+    const form = document.querySelector("form");
+
+    // ===== INPUTS =====
+    const manufacturer = document.getElementById("manufacturer");
+    const country = document.getElementById("country_of_origin");
+    const material = document.getElementById("material");
+    const dimensions = document.querySelector("input[name='dimensions']");
+    const age = document.querySelector("input[name='age_range']");
+    const pieces = document.querySelector("input[name='pieces']");
+    const year = document.querySelector("input[name='release_year']");
+    const story = document.querySelector("textarea[name='theme_story']");
+
+    // ===== HELPER =====
+    function showError(input, message) {
+        input.classList.add("input-error");
+        input.classList.remove("input-success");
+        input.nextElementSibling.innerText = message;
+    }
+
+    function showSuccess(input) {
+        input.classList.remove("input-error");
+        input.classList.add("input-success");
+        input.nextElementSibling.innerText = "";
+    }
+
+    // ===== VALIDATE =====
+    function validateRequired(input) {
+        if (input.value.trim() === "") {
+            showError(input, "Không được để trống");
+            return false;
+        }
+        showSuccess(input);
+        return true;
+    }
+
+    function validateDimensions() {
+        const value = dimensions.value.trim();
+        const regex = /^\d+\s*x\s*\d+(\.\d+)?\s*x\s*\d+(\.\d+)?$/i;
+
+        if (value === "") {
+            showError(dimensions, "Không được để trống");
+            return false;
+        }
+        if (!regex.test(value)) {
+            showError(dimensions, "Format: 48 x 37 x 9");
+            return false;
+        }
+        showSuccess(dimensions);
+        return true;
+    }
+
+    function validateAge() {
+        const value = age.value.trim();
+        const regex = /^(\d+\+|\d+-\d+)$/;
+
+        if (value === "") {
+            showError(age, "Không được để trống");
+            return false;
+        }
+        if (!regex.test(value)) {
+            showError(age, "VD: 18+ hoặc 9-12");
+            return false;
+        }
+        showSuccess(age);
+        return true;
+    }
+
+    function validatePieces() {
+        const value = parseInt(pieces.value);
+
+        if (isNaN(value) || value <= 0) {
+            showError(pieces, "Phải > 0");
+            return false;
+        }
+        showSuccess(pieces);
+        return true;
+    }
+
+    function validateYear() {
+        const value = parseInt(year.value);
+        const current = new Date().getFullYear();
+
+        if (isNaN(value) || value < 1950 || value > current) {
+            showError(year, `Từ 1950 - ${current}`);
+            return false;
+        }
+        showSuccess(year);
+        return true;
+    }
+
+    function validateStory() {
+        if (story.value.length > 500) {
+            showError(story, "Tối đa 500 ký tự");
+            return false;
+        }
+        showSuccess(story);
+        return true;
+    }
+
+    // ===== REALTIME =====
+    manufacturer.addEventListener("input", () => validateRequired(manufacturer));
+    country.addEventListener("input", () => validateRequired(country));
+    material.addEventListener("input", () => validateRequired(material));
+    dimensions.addEventListener("input", validateDimensions);
+    age.addEventListener("input", validateAge);
+    pieces.addEventListener("input", validatePieces);
+    year.addEventListener("input", validateYear);
+    story.addEventListener("input", validateStory);
+
+    // ===== SUBMIT =====
+    form.addEventListener("submit", function(e) {
+        const isValid =
+            validateRequired(manufacturer) &
+            validateRequired(country) &
+            validateRequired(material) &
+            validateDimensions() &
+            validateAge() &
+            validatePieces() &
+            validateYear() &
+            validateStory();
+
+        if (!isValid) {
+            e.preventDefault();
+        }
     });
-}, 5000);
+
+
+    // Tự động ẩn thông báo sau 5 giây
+    setTimeout(function() {
+        let alerts = document.querySelectorAll('.alert-box');
+        alerts.forEach(el => {
+            el.style.transition = "opacity 0.5s ease";
+            el.style.opacity = "0";
+            setTimeout(() => el.style.display = 'none', 500);
+        });
+    }, 5000);
 </script>
