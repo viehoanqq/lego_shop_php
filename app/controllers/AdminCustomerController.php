@@ -15,15 +15,29 @@ class AdminCustomerController extends Controller {
 
     // Hiển thị danh sách khách hàng
     public function index() {
-        // Lấy dữ liệu từ Model
-        $customers = $this->customerModel->getAllCustomers();
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $status = isset($_GET['status']) ? trim($_GET['status']) : '';
         
-        // Gọi view admin/customer.php
-        // Lưu ý: Tên biến truyền vào mảng ['customers' => $customers] 
-        // sẽ trở thành biến $customers trong file view nhờ hàm extract($data)
+        // Xử lý phân trang
+        $limit = 2; // Số bản ghi mỗi trang
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $offset = ($page - 1) * $limit;
+
+        // Lấy tổng số bản ghi để tính số trang
+        $totalRecords = $this->customerModel->countAllCustomers($search, $status);
+        $totalPages = ceil($totalRecords / $limit);
+
+        // Lấy dữ liệu theo trang hiện tại
+        $customers = $this->customerModel->getAllCustomers($search, $status, $limit, $offset);
+        
         $this->view('admin/customer', [
-            'customers' => $customers,
-            'title' => 'Quản lý khách hàng'
+            'customers'   => $customers,
+            'title'       => 'Quản lý người dùng',
+            'search'      => $search,
+            'status'      => $status,
+            'currentPage' => $page,
+            'totalPages'  => $totalPages,
+            'totalRecords'=> $totalRecords
         ]);
     }
 
