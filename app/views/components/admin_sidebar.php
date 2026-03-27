@@ -1,20 +1,21 @@
 <aside class="side-bar">
     <div class="logo">
-        <h2><a href="/lego_shop_php/admin/dashboard">LEGO ADMIN</a></h2>
+        <h2><a href="/lego_shop_php/admindashboard">LEGO ADMIN</a></h2>
     </div>
     <nav class="menu">
         <?php 
             $current_page = $_GET['url'] ?? ''; 
             // Hàm hỗ trợ kiểm tra active menu
             function isActive($path, $current) {
-                return strpos($current, $path) !== false ? 'active' : '';
-            }
+    // Loại bỏ các dấu gạch chéo dư thừa để so sánh cho chuẩn
+    return trim($current, '/') === trim($path, '/') ? 'active' : '';
+}
         ?>
 
         <ul class="system">
             <li class="menu-label">Hệ thống</li>
             <li>
-                <a href="/lego_shop_php/admin/dashboard" class="<?= isActive('dashboard', $current_page) ?>">
+                <a href="/lego_shop_php/admindashboard" class="<?= isActive('admindashboard', $current_page) ?>">
                     <i class="fa-solid fa-gauge-high"></i>Tổng quan
                 </a>
             </li>
@@ -24,7 +25,7 @@
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/adminreview" class="<?= isActive('review', $current_page) ?>">
+                <a href="/lego_shop_php/adminreview" class="<?= isActive('adminreview', $current_page) ?>">
                     <i class="fa-solid fa-star"></i>Đánh giá
                 </a>
             </li>
@@ -33,12 +34,12 @@
         <ul class="system">
             <li class="menu-label">Kinh doanh</li>
             <li>
-                <a href="/lego_shop_php/adminorder" class="<?= isActive('orders', $current_page) ?>">
+                <a href="/lego_shop_php/adminorder" class="<?= isActive('adminorder', $current_page) ?>">
                     <i class="fa-solid fa-cart-shopping"></i>Quản lý đơn hàng
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admincustomer" class="<?= isActive('customer', $current_page) ?>">
+                <a href="/lego_shop_php/admincustomer" class="<?= isActive('admincustomer', $current_page) ?>">
                     <i class="fa-solid fa-user-group"></i>Khách hàng
                 </a>
             </li>
@@ -66,7 +67,7 @@
         <ul class="system">
             <li class="menu-label">Kho hàng</li>
             <li>
-                <a href="/lego_shop_php/adminsupplier" class="<?= isActive('suppliers', $current_page) ?>">
+                <a href="/lego_shop_php/adminsupplier" class="<?= isActive('adminsupplier', $current_page) ?>">
                     <i class="fa-solid fa-handshake"></i>Nhà cung cấp
                 </a>
             </li>
@@ -76,14 +77,16 @@
     </a>
 </li>
             <li>
-    <a href="/lego_shop_php/adminreport" class="<?= isActive('adminreport', $current_page) ?>">
-        <i class="fa-solid fa-chart-line"></i>Báo cáo Nhập Xuất Tồn
-    </a>
-</li>
+                <a href="/lego_shop_php/adminreport" class="<?= isActive('adminreport', $current_page) ?>">
+                    <i class="fa-solid fa-chart-line"></i>Thống kê báo cáo
+                </a>
+            </li>
         </ul>
 
         <ul class="support">
-            <li><a href="/lego_shop_php/adminsetting"><i class="fa-solid fa-gear"></i>Cài đặt hệt thống</a></li>
+            <li><a href="/lego_shop_php/adminsetting" class="<?= isActive('adminsetting', $current_page) ?>">
+                <i class="fa-solid fa-gear"></i>Cài đặt hệ thống
+            </a></li>
             <li><a href="/lego_shop_php/admin/logout"><i class="fa-solid fa-power-off"></i>Đăng xuất</a></li>
         </ul>
     </nav>
@@ -102,4 +105,5 @@
     .side-bar .menu ul {
         margin-bottom: 15px;
     }
+    
 </style>

@@ -156,7 +156,7 @@ $payment_map = [
                     ?>
                     <tr>
                         <td style="text-align: center;">
-                            <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" target="_blank" style="background: #f1f5f9; color: #3182ce; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-family: monospace; border: 1px solid #e2e8f0; text-decoration: none; display: inline-block; transition: 0.2s;">
+                            <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" style="background: #f1f5f9; color: #3182ce; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-family: monospace; border: 1px solid #e2e8f0; text-decoration: none; display: inline-block; transition: 0.2s;">
                                 #<?= $item['id'] ?>
                             </a>
                         </td>
@@ -187,7 +187,7 @@ $payment_map = [
                         </td>
                         
                         <td style="text-align: center;">
-                            <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" class="btn-action" target="_blank" title="Xem chi tiết đơn hàng này">
+                            <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" class="btn-action" title="Xem chi tiết đơn hàng này">
                                 <i class="fa-solid fa-eye"></i> Chi tiết
                             </a>
                         </td>

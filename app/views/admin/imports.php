@@ -1,3 +1,6 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <style>
     /* CSS dùng chung với trang quản lý sản phẩm */
     .table-container { 
@@ -35,6 +38,22 @@
     .btn-submit { color: white; padding: 10px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
     .btn-action { text-decoration: none; padding: 6px 12px; border-radius: 6px; transition: 0.2s; font-weight: 600; }
     .btn-action:hover { background: #f1f5f9; }
+
+    /* --- CSS làm đẹp cho thanh tìm kiếm Select2 --- */
+    .select2-container .select2-selection--single {
+        height: 40px !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 6px !important;
+        display: flex;
+        align-items: center;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 38px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #475569 !important;
+        font-weight: 500;
+    }
 </style>
 
 <?php if(isset($_GET['msg']) || isset($_GET['error'])): ?>
@@ -125,7 +144,11 @@
 
 <?php if(isset($is_form) && $is_form === true): ?>
     <div class="form-container">
-        <h3 style="margin-top:0; color: #2d3748;"><i class="fa-solid fa-cart-plus"></i> Lập phiếu nhập kho mới</h3>
+        <h3 style="margin-top:0; color: #2d3748;">
+            <i class="fa-solid <?= isset($receipt) ? 'fa-pen-to-square' : 'fa-cart-plus' ?>"></i> 
+            <?= isset($receipt) ? 'Tiếp tục lập Phiếu nhập nháp (#PN-' . $receipt['id'] . ')' : 'Lập phiếu nhập kho mới' ?>
+        </h3>
+
         <form id="importForm" style="margin-top: 20px;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 20px; background: #f7fafc; padding: 15px; border-radius: 8px;">
                 <div class="form-group" style="margin: 0;">
@@ -133,7 +156,9 @@
                     <select id="supplier_id" class="form-control" required>
                         <option value="">-- Chọn nhà cung cấp --</option>
                         <?php foreach($suppliers as $s): ?>
-                            <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name']) ?></option>
+                            <option value="<?= $s['id'] ?>" <?= (isset($receipt) && $receipt['supplier_id'] == $s['id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($s['name']) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -143,18 +168,43 @@
                 </div>
             </div>
 
-            <table class="lego-table" id="importTable" style="margin-bottom: 20px;">
+            <<table class="lego-table" id="importTable" style="margin-bottom: 20px;">
                 <thead>
                     <tr>
-                        <th style="width: 45%;">Sản phẩm nhập</th>
+                        <th style="width: 5%; text-align: center;">STT</th>
+                        <th style="width: 40%;">Sản phẩm nhập</th>
                         <th style="width: 15%; text-align: center;">Số lượng</th>
                         <th style="width: 20%; text-align: right;">Giá nhập (đ)</th>
                         <th style="width: 15%; text-align: right;">Thành tiền</th>
                         <th style="width: 5%; text-align: center;"></th>
                     </tr>
                 </thead>
-                <tbody>
-                    </tbody>
+                <tbody id="import-body">
+                    <?php if(isset($receipt_details) && !empty($receipt_details)): ?>
+                        <?php $stt = 1; foreach($receipt_details as $index => $item): ?>
+                            <?php $rowId = 'row_old_' . $index; ?>
+                            <tr id="<?= $rowId ?>" class="product-row"> <td class="row-number" style="text-align: center; font-weight: bold; color: #64748b; vertical-align: middle;"><?= $stt++ ?></td>
+                                
+                                <td>
+                                <input type="text" class="form-control display-product-input" list="product-suggestions" 
+                                       placeholder="Gõ tên sản phẩm..." 
+                                       value="<?= htmlspecialchars($item['product_name']) ?> (Tồn: <?= $item['current_stock'] ?>)" 
+                                       onchange="handleProductSelect(this)" required>
+                                
+                                <input type="hidden" class="real-product-id" value="<?= $item['product_id'] ?>">
+                            </td>
+                                <td><input type="number" class="form-control qty-input" value="<?= $item['quantity'] ?>" min="1" oninput="calculateRow('<?= $rowId ?>')" style="text-align:center;"></td>
+                                <td><input type="number" class="form-control price-input" value="<?= $item['price'] ?>" min="0" oninput="calculateRow('<?= $rowId ?>')" style="text-align:right;"></td>
+                                <td style="text-align: right; font-weight: 700; color: #2d3748; vertical-align: middle;" class="row-total"><?= number_format($item['quantity'] * $item['price'], 0, ',', '.') ?>đ</td>
+                                <td style="text-align: center; vertical-align: middle;">
+                                    <button type="button" onclick="removeRow('<?= $rowId ?>')" style="color: #e53e3e; border:none; background:none; cursor:pointer; font-size: 16px;">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
             </table>
 
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px dashed #e2e8f0; padding-top: 20px;">
@@ -181,32 +231,62 @@
 
     <script>
         const productsData = <?= json_encode($products ?? []) ?>;
+        
+        // --- XÁC ĐỊNH TRẠNG THÁI: LÀ SỬA HAY TẠO MỚI ---
+        const isEdit = <?= isset($receipt) ? 'true' : 'false' ?>;
+        const receiptId = <?= $receipt['id'] ?? 'null' ?>;
 
-        function addRow() {
+        // Hàm thêm dòng
+function addRow() {
             const tbody = document.querySelector('#importTable tbody');
             const rowId = 'row_' + Date.now();
-            let options = productsData.map(p => `<option value="${p.id}">${p.name} (Tồn: ${p.stock_quantity})</option>`).join('');
 
             const rowHtml = `
-                <tr id="${rowId}">
+                <tr id="${rowId}" class="product-row">
+                    <td class="row-number" style="text-align: center; font-weight: bold; color: #64748b; vertical-align: middle;"></td>
                     <td>
-                        <select class="form-control" style="width:100%" required>
-                            <option value="">-- Chọn sản phẩm --</option>
-                            ${options}
-                        </select>
+                        <input type="text" class="form-control display-product-input" list="product-suggestions" 
+                               placeholder="Gõ tên hoặc mã SKU..." onchange="handleProductSelect(this)" required>
+                        <input type="hidden" class="real-product-id" required>
                     </td>
                     <td><input type="number" class="form-control qty-input" value="1" min="1" oninput="calculateRow('${rowId}')" style="text-align:center;"></td>
                     <td><input type="number" class="form-control price-input" placeholder="0" min="0" oninput="calculateRow('${rowId}')" style="text-align:right;"></td>
-                    <td style="text-align: right; font-weight: 700; color: #2d3748;" class="row-total">0đ</td>
-                    <td style="text-align: center;">
-                        <button type="button" onclick="document.getElementById('${rowId}').remove(); updateGrandTotal();" style="color: #e53e3e; border:none; background:none; cursor:pointer;">
+                    <td style="text-align: right; font-weight: 700; color: #2d3748; vertical-align: middle;" class="row-total">0đ</td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        <button type="button" onclick="removeRow('${rowId}')" style="color: #e53e3e; border:none; background:none; cursor:pointer; font-size: 16px;">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
                 </tr>`;
+            
             tbody.insertAdjacentHTML('beforeend', rowHtml);
+            updateRowNumbers();
         }
 
+        // Hàm xóa dòng và cập nhật lại mọi thứ
+        function removeRow(rowId) {
+            document.getElementById(rowId).remove();
+            updateGrandTotal();
+            updateRowNumbers(); // Đánh lại số thứ tự sau khi xóa
+        }
+
+        // Hàm TỰ ĐỘNG CẬP NHẬT SỐ THỨ TỰ (1, 2, 3...)
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('#importTable tbody .product-row');
+            rows.forEach((row, index) => {
+                row.querySelector('.row-number').innerText = index + 1;
+            });
+        }
+
+        // Khởi tạo thanh tìm kiếm (Đã tắt dấu x)
+        function initSelect2() {
+            $('.product-select').select2({
+                placeholder: "🔍 Gõ mã SKU hoặc tên LEGO để tìm...",
+                allowClear: false, // <-- TẮT DẤU "x" Ở ĐÂY
+                width: '100%',
+                language: { noResults: function() { return "Không tìm thấy sản phẩm nào!"; } }
+            });
+        }
         function calculateRow(rowId) {
             const row = document.getElementById(rowId);
             const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
@@ -230,23 +310,27 @@
             const rows = document.querySelectorAll('#importTable tbody tr');
             if (rows.length === 0) return alert("Vui lòng thêm ít nhất một sản phẩm!");
 
-            // Xác nhận nếu chọn "Hoàn tất"
             if(status === 'completed') {
                 if(!confirm("Hành động này sẽ tính lại giá và cập nhật thẳng vào kho. Bạn không thể sửa phiếu sau khi hoàn tất. Tiếp tục?")) return;
             }
 
             const formData = {
                 supplier_id: document.getElementById('supplier_id').value,
-                status: status, // Truyền trạng thái (draft/completed)
+                status: status,
                 products: Array.from(rows).map(row => ({
-                    product_id: row.querySelector('select').value,
+                    product_id: row.querySelector('.real-product-id').value,
                     quantity: row.querySelector('.qty-input').value,
                     price: row.querySelector('.price-input').value
                 }))
             };
 
+            // --- CHỌN URL TÙY THEO TRẠNG THÁI ---
+            const targetUrl = isEdit 
+                ? '/lego_shop_php/adminimport/updateDraft/' + receiptId 
+                : '/lego_shop_php/adminimport/store';
+
             try {
-                const response = await fetch('/lego_shop_php/adminimport/store', {
+                const response = await fetch(targetUrl, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(formData)
@@ -261,11 +345,52 @@
                 window.location.href = '/lego_shop_php/adminimport?error=1';
             }
         }
+        
+        function initSelect2() {
+            $('.product-select').select2({
+                placeholder: "🔍 Gõ mã SKU hoặc tên LEGO để tìm...",
+                allowClear: true,
+                width: '100%',
+                language: { noResults: function() { return "Không tìm thấy sản phẩm nào!"; } }
+            });
+        }
 
-        window.onload = addRow;
+        function handleProductSelect(input) {
+            const val = input.value;
+            const datalist = document.getElementById('product-suggestions');
+            const options = datalist.options;
+            let foundId = "";
+            
+            // Dò tìm ID thực sự của sản phẩm dựa trên đoạn text vừa gõ
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value === val) {
+                    foundId = options[i].getAttribute('data-id');
+                    break;
+                }
+            }
+
+            // Gắn ID vào ô ẩn
+            const hiddenInput = input.parentElement.querySelector('.real-product-id');
+            hiddenInput.value = foundId;
+
+            // Bắt lỗi: Nếu gõ linh tinh không có trong danh sách
+            if (!foundId && val.trim() !== "") {
+                alert("Sản phẩm không hợp lệ! Vui lòng click chọn từ danh sách gợi ý.");
+                input.value = "";
+            }
+        }
+
+        $(document).ready(function() {
+            initSelect2();
+            updateGrandTotal(); // Cập nhật tổng tiền ngay khi load trang
+            
+            // Chỉ đẻ ra dòng mới nếu là TẠO MỚI (không có dữ liệu cũ)
+            <?php if(!isset($receipt_details) || empty($receipt_details)): ?>
+                addRow();
+            <?php endif; ?>
+        });
     </script>
 <?php endif; ?>
-
 <div class="table-container">
     <table class="lego-table">
         <thead>
@@ -335,4 +460,10 @@ setTimeout(function() {
         setTimeout(() => el.style.display = 'none', 500);
     });
 }, 5000);
+
 </script>
+<datalist id="product-suggestions">
+        <?php foreach($products as $p): ?>
+            <option data-id="<?= $p['id'] ?>" value="<?= htmlspecialchars($p['name']) ?> (Tồn: <?= $p['stock_quantity'] ?>)"></option>
+        <?php endforeach; ?>
+    </datalist>

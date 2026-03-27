@@ -107,4 +107,86 @@ class AdminImportController extends Controller {
         }
         exit;
     }
+
+    // --- MỞ TRANG IN PHIẾU NHẬP (TAB MỚI) ---
+    public function print($id) {
+        $importModel = $this->model('ImportModel');
+        
+        $receipt = $importModel->getImportById($id);
+        if (!$receipt || $receipt['status'] !== 'completed') {
+            echo "<script>alert('Lỗi: Chỉ có thể in phiếu nhập đã hoàn tất!'); window.close();</script>";
+            exit;
+        }
+
+        $data['receipt'] = $receipt;
+        $data['receipt_details'] = $importModel->getImportDetails($id);
+        
+        
+        // 1. Giải nén mảng $data thành các biến độc lập ($receipt, $receipt_details)
+        extract($data); 
+        
+        // 2. Gọi thẳng file View HTML thuần túy (Bypass toàn bộ Sidebar/Header)
+        // (Lưu ý: Nếu hệ thống báo lỗi không tìm thấy file, hãy thử đổi thành '../app/views/admin/import_print.php')
+        require_once 'app/views/admin/import_print.php'; 
+        
+        // 3. Ngắt luôn PHP tại đây để hệ thống không tự động nạp thêm Footer
+        exit; 
+    }
+
+    // ==================================================
+    // 1. HIỂN THỊ FORM SỬA BẢN NHÁP
+    // ==================================================
+    public function edit($id) {
+        $importModel = $this->model('ImportModel');
+        $productModel = $this->model('ProductModel');
+        
+        $receipt = $importModel->getImportById($id);
+        // Chặn nếu không tìm thấy phiếu, hoặc phiếu KHÔNG PHẢI BẢN NHÁP
+        if (!$receipt || $receipt['status'] !== 'draft') {
+            header("Location: /lego_shop_php/adminimport");
+            exit;
+        }
+
+        $data['receipt'] = $receipt;
+        $data['receipt_details'] = $importModel->getImportDetails($id); 
+        $data['suppliers'] = $importModel->getAllSuppliers();
+        $data['products'] = $productModel->getFilteredProducts(['status' => '1,2'], 0, 1000); 
+        
+        $data['title'] = "Tiếp tục lập phiếu nhập (#PN-" . $id . ")";
+        $data['is_form'] = true; 
+        
+        // Gọi ra file View tạo phiếu nhập để load lại dữ liệu cũ
+        $this->view('admin/imports', $data); 
+    }
+
+    // ==================================================
+    // 2. API NHẬN DỮ LIỆU CẬP NHẬT TỪ AJAX (KHI BẤM LƯU)
+    // ==================================================
+    public function updateDraft($id) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ob_clean();
+            header('Content-Type: application/json');
+            
+            try {
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!$data || empty($data['products'])) throw new Exception("Dữ liệu không hợp lệ");
+
+                $supplier_id = intval($data['supplier_id']);
+                $products = $data['products'];
+
+                $importModel = $this->model('ImportModel');
+                // Gọi hàm Update Draft trong Model
+                $success = $importModel->updateDraftTransaction($id, $supplier_id, $products);
+
+                if ($success) {
+                    echo json_encode(['success' => true]);
+                } else {
+                    throw new Exception("Lỗi cập nhật CSDL");
+                }
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+            exit;
+        }
+    }
 }

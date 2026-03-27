@@ -136,8 +136,6 @@ class ProductModel extends Database {
         return $products;
     }
     // --- Cập nhật Giá bán và Tỉ lệ lợi nhuận ---
-   // --- Lấy danh sách sản phẩm để quản lý giá ---
-   // --- Cập nhật Giá bán và Tỉ lệ lợi nhuận ---
     public function updatePriceAndMargin($product_id, $selling_price, $profit_margin) {
         $db = $this->getConnection();
         
@@ -478,6 +476,13 @@ class ProductModel extends Database {
         $result = $db->query($sql);
         $row = $result->fetch_assoc();
         return $row['total'] ?? 0;
+    }
+
+    public function updateAllMinStock($min_stock) {
+        $db = $this->getConnection();
+
+        $sql = "UPDATE products SET min_stock_level = " . intval($min_stock);
+        return $db->query($sql);
     }
 
 

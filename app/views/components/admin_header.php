@@ -9,19 +9,7 @@
     </div>
 
     <div class="header-right">
-        <a href="/lego_shop_php/admin/alerts" class="action-item" title="Thông báo hệ thống">
-            <div class="icon-badge">
-                <i class="fa-solid fa-bell"></i>
-                <span class="badge">3</span>
-            </div>
-        </a>
-
-        <a href="/lego_shop_php/admin/notes" class="action-item" title="Ghi chú công việc">
-            <div class="icon-badge note-icon">
-                <i class="fa-solid fa-pen-to-square"></i>
-                <span class="badge yellow">5</span>
-            </div>
-        </a>
+        
 
         <div class="divider"></div>
 

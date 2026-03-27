@@ -10,13 +10,16 @@ class Database {
     public function getConnection() {
         $this->conn = null;
         try {
-            // Truyền thêm $this->port vào vị trí thứ 5
             $this->conn = new mysqli($this->host, $this->username, $this->password, $this->db_name, $this->port);
             $this->conn->set_charset("utf8");
+
+            // --- CHỈNH Ở ĐÂY ---
+            // Ép MySQL luôn chạy múi giờ Việt Nam (+07:00)
+            $this->conn->query("SET time_zone = '+07:00'");
+            
         } catch(Exception $e) {
             echo "Lỗi kết nối: " . $e->getMessage();
         }
         return $this->conn;
     }
 }
-//hello world

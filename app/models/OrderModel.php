@@ -2,33 +2,7 @@
 class OrderModel extends Database {
     
     // Lưu thông tin chung của đơn hàng
-    public function createOrder($user_id, $status, $payment_method, $total_amount, $fullname, $phone, $street, $ward, $district, $city) {
-        $db = $this->getConnection();
-        
-        // Dùng mysqli_real_escape_string để chống Hack SQL Injection thay cho bind_param
-        $user_id = (int)$user_id;
-        $total_amount = (float)$total_amount; // Ép kiểu để không bao giờ lỗi
-        $status = $db->real_escape_string($status);
-        $payment_method = $db->real_escape_string($payment_method);
-        $fullname = $db->real_escape_string($fullname);
-        $phone = $db->real_escape_string($phone);
-        $street = $db->real_escape_string($street);
-        $ward = $db->real_escape_string($ward);
-        $district = $db->real_escape_string($district);
-        $city = $db->real_escape_string($city);
-
-        // Viết thẳng biến vào SQL. Cách này nhìn phát biết ngay biến nào vào cột nào
-        $sql = "INSERT INTO orders (user_id, status, payment_method, total_amount, shipping_fullname, shipping_phone, shipping_street, shipping_ward, shipping_district, shipping_city) 
-                VALUES ($user_id, '$status', '$payment_method', $total_amount, '$fullname', '$phone', '$street', '$ward', '$district', '$city')";
-                
-        if ($db->query($sql) === TRUE) {
-            return $db->insert_id; 
-        }
-        
-        // Nếu lỗi, in thẳng câu lệnh SQL ra màn hình để biết tại sao
-        echo "Lỗi SQL: " . $db->error . "<br>Câu lệnh: " . $sql;
-        exit;
-    }
+    
 
     // Lưu chi tiết từng món hàng
     public function addOrderItem($order_id, $product_id, $quantity, $price) {
@@ -263,5 +237,35 @@ class OrderModel extends Database {
             $reviews[] = $row; 
         }
         return $reviews;
+    }
+
+    // Lưu thông tin chung của đơn hàng
+    public function createOrder($user_id, $status, $payment_method, $total_amount, $fullname, $phone, $street, $ward, $district, $city, $created_at) {
+        $db = $this->getConnection();
+        
+        $user_id = (int)$user_id;
+        $total_amount = (float)$total_amount; 
+        $status = $db->real_escape_string($status);
+        $payment_method = $db->real_escape_string($payment_method);
+        $fullname = $db->real_escape_string($fullname);
+        $phone = $db->real_escape_string($phone);
+        $street = $db->real_escape_string($street);
+        $ward = $db->real_escape_string($ward);
+        $district = $db->real_escape_string($district);
+        $city = $db->real_escape_string($city);
+        
+        // Chống lỗi SQL Injection cho ngày giờ
+        $created_at = $db->real_escape_string($created_at);
+
+        // THÊM CỘT created_at VÀO SQL
+        $sql = "INSERT INTO orders (user_id, status, payment_method, total_amount, shipping_fullname, shipping_phone, shipping_street, shipping_ward, shipping_district, shipping_city, created_at) 
+                VALUES ($user_id, '$status', '$payment_method', $total_amount, '$fullname', '$phone', '$street', '$ward', '$district', '$city', '$created_at')";
+                
+        if ($db->query($sql) === TRUE) {
+            return $db->insert_id; 
+        }
+        
+        echo "Lỗi SQL: " . $db->error . "<br>Câu lệnh: " . $sql;
+        exit;
     }
 }
