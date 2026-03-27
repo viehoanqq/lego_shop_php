@@ -1,5 +1,5 @@
 <?php
-class AdminPriceController extends Controller {
+class AdminpriceController extends Controller {
     
     public function __construct() {
         if (!isset($_SESSION['admin_id'])) { 
@@ -11,9 +11,18 @@ class AdminPriceController extends Controller {
     // Hiển thị giao diện Quản lý giá
     public function index() {
         $productModel = $this->model('ProductModel');
+        $categoryModel = $this->model('CategoryModel'); // Lấy thêm CategoryModel
         
-        // Lấy danh sách tất cả sản phẩm đang bán
-        $data['products'] = $productModel->getFilteredProducts(['status' => '1,2'], 0, 1000); 
+        // 1. Nhận dữ liệu lọc từ URL
+        $filters = [
+            'keyword'     => $_GET['keyword'] ?? '',
+            'category_id' => $_GET['category_id'] ?? ''
+        ];
+
+        // 2. Truyền ra view
+        $data['filters'] = $filters;
+        $data['categories'] = $categoryModel->getAllCategories(); // Trả danh mục ra View
+        $data['products'] = $productModel->getAllProductsWithPrices($filters); 
         $data['title'] = "Cập nhật Giá Bán & Lợi nhuận";
         
         $this->view('admin/prices', $data);

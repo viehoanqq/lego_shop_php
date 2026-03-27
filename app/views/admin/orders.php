@@ -73,6 +73,8 @@
             <option value="date_asc" <?= (isset($filters['sort']) && $filters['sort'] == 'date_asc') ? 'selected' : '' ?>>Cũ nhất trước</option>
             <option value="price_desc" <?= (isset($filters['sort']) && $filters['sort'] == 'price_desc') ? 'selected' : '' ?>>Giá cao xuống thấp</option>
             <option value="price_asc" <?= (isset($filters['sort']) && $filters['sort'] == 'price_asc') ? 'selected' : '' ?>>Giá thấp lên cao</option>
+            
+            <option value="ward_asc" <?= (isset($filters['sort']) && $filters['sort'] == 'ward_asc') ? 'selected' : '' ?>>Khu vực giao hàng (A-Z)</option>
         </select>
     </div>
 
@@ -82,83 +84,128 @@
     </div>
 </form>
 
-<div class="table-container">
-    <table class="lego-table">
-        <thead>
+<?php 
+// =========================================================
+// LOGIC GOM NHÓM DỮ LIỆU THEO TỈNH THÀNH > QUẬN > PHƯỜNG
+// =========================================================
+$is_grouped_by_ward = (isset($filters['sort']) && $filters['sort'] == 'ward_asc');
+$grouped_orders = [];
+
+if ($is_grouped_by_ward && !empty($orders)) {
+    foreach ($orders as $item) {
+        // Gom theo 3 cấp độ để giải quyết triệt để vấn đề trùng tên Phường ở các Thành phố khác nhau
+        $city = !empty($item['shipping_city']) ? $item['shipping_city'] : 'Chưa rõ TP';
+        $district = !empty($item['shipping_district']) ? $item['shipping_district'] : 'Chưa rõ Quận';
+        $ward = !empty($item['shipping_ward']) ? $item['shipping_ward'] : 'Chưa rõ Phường';
+        
+        $full_location = $city . ' > ' . $district . ' > ' . $ward;
+        $grouped_orders[$full_location][] = $item;
+    }
+} else {
+    // Nếu không chọn sắp xếp theo Phường, gom tất cả vào 1 mảng duy nhất để in ra 1 bảng như bình thường
+    $grouped_orders['Tất cả đơn hàng'] = $orders;
+}
+
+// Cấu hình hiển thị trạng thái
+$status_map = [
+    'pending'   => ['label' => 'Chờ xử lý', 'bg' => '#fef3c7', 'color' => '#d97706', 'icon' => 'fa-hourglass-half'],
+    'confirmed' => ['label' => 'Đã xác nhận', 'bg' => '#e0e7ff', 'color' => '#3182ce', 'icon' => 'fa-box'],
+    'shipping'  => ['label' => 'Đang giao', 'bg' => '#e0e7ff', 'color' => '#3182ce', 'icon' => 'fa-truck-fast'],
+    'delivered' => ['label' => 'Thành công', 'bg' => '#d1fae5', 'color' => '#059669', 'icon' => 'fa-check-double'],
+    'cancelled' => ['label' => 'Đã hủy', 'bg' => '#fee2e2', 'color' => '#e53e3e', 'icon' => 'fa-ban']
+];
+$payment_map = [
+    'cash'     => 'COD',
+    'transfer' => 'Chuyển khoản',
+    'online'   => 'Thanh toán Online'
+];
+?>
+
+<?php if (!empty($orders)): ?>
+    <?php foreach ($grouped_orders as $location_name => $ward_orders): ?>
+        
+        <?php if ($is_grouped_by_ward): ?>
+            <h3 style="margin-top: 30px; margin-bottom: 10px; color: #2d3748; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <span><i class="fa-solid fa-map-location-dot" style="color: #e53e3e; margin-right: 8px;"></i> <?= htmlspecialchars($location_name) ?></span>
+                <span style="font-size: 14px; background: #edf2f7; padding: 4px 12px; border-radius: 20px; color: #4a5568; font-weight: 600;">
+                    <?= count($ward_orders) ?> đơn
+                </span>
+            </h3>
+        <?php endif; ?>
+
+        <div class="table-container" style="margin-bottom: 30px;">
+            <table class="lego-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: center; width: 100px;">Mã Đơn</th>
+                        <th>Thời gian</th>
+                        <th>Khách hàng</th>
+                        <th>Thanh toán</th>
+                        <th style="text-align: center;">Trạng thái</th>
+                        <th style="text-align: right;">Tổng tiền</th>
+                        <th style="text-align: center;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($ward_orders as $item): 
+                        $st = $item['status'] ?? 'pending';
+                        $st_lbl = $status_map[$st]['label'] ?? 'Không xác định';
+                        $st_bg = $status_map[$st]['bg'] ?? '#f1f5f9';
+                        $st_color = $status_map[$st]['color'] ?? '#64748b';
+                        $st_icon = $status_map[$st]['icon'] ?? 'fa-circle-question';
+                    ?>
+                    <tr>
+                        <td style="text-align: center;">
+                            <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" style="background: #f1f5f9; color: #3182ce; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-family: monospace; border: 1px solid #e2e8f0; text-decoration: none; display: inline-block; transition: 0.2s;">
+                                #<?= $item['id'] ?>
+                            </a>
+                        </td>
+                        <td style="color: #64748b; font-size: 13px;">
+                            <div style="font-weight: 600; color: #334155;"><?= date('d/m/Y', strtotime($item['created_at'])) ?></div>
+                            <div><?= date('H:i', strtotime($item['created_at'])) ?></div>
+                        </td>
+                        <td style="font-weight: 700; color: #1e293b;">
+                            <?= htmlspecialchars($item['shipping_fullname']) ?>
+                            <?php if (!$is_grouped_by_ward && !empty($item['shipping_city'])): ?>
+                                <div style="font-size: 12px; color: #718096; font-weight: normal; margin-top: 4px;">
+                                    <i class="fa-solid fa-location-dot" style="font-size: 10px;"></i> <?= htmlspecialchars($item['shipping_district'] . ', ' . $item['shipping_city']) ?>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <span style="font-size: 13px; font-weight: 600; color: #475569;">
+                                <i class="fa-solid fa-credit-card" style="font-size: 11px; opacity: 0.5;"></i> <?= $payment_map[$item['payment_method']] ?? $item['payment_method'] ?>
+                            </span>
+                        </td>
+                        <td style="text-align: center;">
+                            <span style="background: <?= $st_bg ?>; color: <?= $st_color ?>; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(0,0,0,0.05);">
+                                <i class="fa-solid <?= $st_icon ?>"></i> <?= $st_lbl ?>
+                            </span>
+                        </td>
+                        <td style="text-align: right; font-weight: 800; color: #e53e3e; font-size: 15px;">
+                            <?= number_format($item['total_amount'], 0, ',', '.') ?>đ
+                        </td>
+                        
+                        <td style="text-align: center;">
+                            <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" class="btn-action" title="Xem chi tiết đơn hàng này">
+                                <i class="fa-solid fa-eye"></i> Chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endforeach; ?>
+<?php else: ?>
+    <div class="table-container">
+        <table class="lego-table">
             <tr>
-                <th style="text-align: center; width: 100px;">Mã Đơn</th>
-                <th>Thời gian</th>
-                <th>Khách hàng</th>
-                <th>Thanh toán</th>
-                <th style="text-align: center;">Trạng thái</th>
-                <th style="text-align: right;">Tổng tiền</th>
-                <th style="text-align: center;">Thao tác</th>
+                <td style="text-align: center; padding: 80px 20px; color: #94a3b8;">
+                    <i class="fa-solid fa-box-open" style="font-size: 50px; color: #e2e8f0; margin-bottom: 15px;"></i><br>
+                    <span style="font-size: 16px; font-weight: 600;">Không tìm thấy đơn hàng nào khớp với điều kiện lọc!</span>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($orders)): ?>
-                <?php 
-                    $status_map = [
-                        'pending'   => ['label' => 'Chờ xử lý', 'bg' => '#fef3c7', 'color' => '#d97706', 'icon' => 'fa-hourglass-half'],
-                        'confirmed' => ['label' => 'Đã xác nhận', 'bg' => '#e0e7ff', 'color' => '#3182ce', 'icon' => 'fa-box'],
-                        'shipping'  => ['label' => 'Đang giao', 'bg' => '#e0e7ff', 'color' => '#3182ce', 'icon' => 'fa-truck-fast'],
-                        'delivered' => ['label' => 'Thành công', 'bg' => '#d1fae5', 'color' => '#059669', 'icon' => 'fa-check-double'],
-                        'cancelled' => ['label' => 'Đã hủy', 'bg' => '#fee2e2', 'color' => '#e53e3e', 'icon' => 'fa-ban']
-                    ];
-                    $payment_map = [
-                        'cash'     => 'COD (Tiền mặt)',
-                        'transfer' => 'Chuyển khoản',
-                        'online'   => 'Thanh toán Online'
-                    ];
-                ?>
-                <?php foreach ($orders as $item): 
-                    $st = $item['status'] ?? 'pending';
-                    $st_lbl = $status_map[$st]['label'] ?? 'Không xác định';
-                    $st_bg = $status_map[$st]['bg'] ?? '#f1f5f9';
-                    $st_color = $status_map[$st]['color'] ?? '#64748b';
-                    $st_icon = $status_map[$st]['icon'] ?? 'fa-circle-question';
-                ?>
-                <tr>
-                    <td style="text-align: center;">
-                        <span style="background: #f1f5f9; color: #1e293b; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-family: monospace; border: 1px solid #e2e8f0;">
-                            #<?= $item['id'] ?>
-                        </span>
-                    </td>
-                    <td style="color: #64748b; font-size: 13px;">
-                        <div style="font-weight: 600; color: #334155;"><?= date('d/m/Y', strtotime($item['created_at'])) ?></div>
-                        <div><?= date('H:i', strtotime($item['created_at'])) ?></div>
-                    </td>
-                    <td style="font-weight: 700; color: #1e293b;">
-                        <?= htmlspecialchars($item['shipping_fullname']) ?>
-                    </td>
-                    <td>
-                        <span style="font-size: 13px; font-weight: 600; color: #475569;">
-                            <i class="fa-solid fa-credit-card" style="font-size: 11px; opacity: 0.5;"></i> <?= $payment_map[$item['payment_method']] ?? $item['payment_method'] ?>
-                        </span>
-                    </td>
-                    <td style="text-align: center;">
-                        <span style="background: <?= $st_bg ?>; color: <?= $st_color ?>; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(0,0,0,0.05);">
-                            <i class="fa-solid <?= $st_icon ?>"></i> <?= $st_lbl ?>
-                        </span>
-                    </td>
-                    <td style="text-align: right; font-weight: 800; color: #e53e3e; font-size: 15px;">
-                        <?= number_format($item['total_amount'], 0, ',', '.') ?>đ
-                    </td>
-                    <td style="text-align: center;">
-                        <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" class="btn-action">
-                            <i class="fa-solid fa-eye"></i> Chi tiết
-                        </a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 80px 20px; color: #94a3b8;">
-                        <i class="fa-solid fa-box-open" style="font-size: 50px; color: #e2e8f0; margin-bottom: 15px;"></i><br>
-                        <span style="font-size: 16px; font-weight: 600;">Không tìm thấy đơn hàng nào!</span>
-                    </td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-</div>
+        </table>
+    </div>
+<?php endif; ?>
