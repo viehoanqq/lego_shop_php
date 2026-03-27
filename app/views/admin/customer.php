@@ -27,8 +27,56 @@
 
     .filter-form-sync { display: flex; gap: 10px; margin-top: 15px; align-items: center; }
     
-    .search-wrapper-sync { position: relative; flex: 2; }
-    .search-wrapper-sync i { position: absolute; left: 12px; top: 12px; color: #a0aec0; }
+/* Container giữ vị trí tương đối */
+.search-wrapper-sync {
+    position: relative;
+    flex: 2; /* Để thanh search dài hơn */
+}
+
+.search-wrapper-sync i.fa-magnifying-glass {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 1;
+}
+
+.form-control-sync { 
+    width: 100%; 
+    padding: 10px 100px 10px 35px ; /* Trừa chỗ cho nút tìm kiếm bên phải */
+    box-sizing: border-box;
+}
+
+/* Style cho nút bấm bên trong */
+.btn-search-inside {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-search-inside:hover {
+    background: #2b6cb0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Nếu bạn muốn dùng icon thay vì chữ "Tìm kiếm" */
+.btn-search-inside i {
+    font-size: 14px;
+}
 
     .form-control-sync { 
         width: 100%; 
@@ -364,6 +412,7 @@
 .btn-status-toggle.is-unlocking {
     background: #f0fff4;
     color: #38a169 ;
+    border: 1px solid #9ae6b4;
 }
 .btn-status-toggle.is-unlocking:hover {
     background: #38a169;
@@ -375,6 +424,34 @@
     font-size: 12px;
 }
 
+.btn-search-inside {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-search-inside:hover {
+    background: #2b6cb0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Nếu bạn muốn dùng icon thay vì chữ "Tìm kiếm" */
+.btn-search-inside i {
+    font-size: 14px;
+}
 
 </style>
 
@@ -424,6 +501,7 @@ $session_error = get_flash_message('error');
                     <input type="text" name="search" class="form-control-sync" 
                            placeholder="Tìm tên, email hoặc số điện thoại..." 
                            value="<?= htmlspecialchars($search ?? '') ?>">
+                    <button type="submit" class="btn-search-inside"> Tìm kiếm </button>
                 </div>
 
                 <select name="status" class="form-control-sync" onchange="this.form.submit()" style="flex: 1; cursor: pointer; padding-left: 12px;">

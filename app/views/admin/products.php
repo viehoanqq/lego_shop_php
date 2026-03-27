@@ -1,32 +1,38 @@
 <style>
-    /* --- CSS HEADER ĐỒNG BỘ --- */
+
+/* ===== RESET NHẸ ===== */
+* {
+    box-sizing: border-box;
+}
+
+/* ===== HEADER ===== */
 .header { 
     background: #fff; 
-    padding: 25px; 
+    padding: 20px; 
     border-radius: 12px; 
     box-shadow: 0 2px 12px rgba(0,0,0,0.05); 
     margin-bottom: 25px;
+
     display: flex; 
     justify-content: space-between; 
     align-items: flex-end; 
     gap: 20px;
-    flex-wrap: wrap; /* Giúp header tự xuống dòng nếu màn hình nhỏ */
-    width: 100%;
-    box-sizing: border-box; /* Đảm bảo padding không làm tràn width */
+    flex-wrap: wrap;
 }
 
 .header-left { 
     flex: 1; 
-    min-width: 300px; 
+    min-width: 280px; 
 }
 
 .header-left h2 { 
-    margin: 0 0 15px 0; 
+    margin-bottom: 15px; 
     color: #1a202c; 
-    font-size: 24px; 
+    font-size: 22px; 
     font-weight: 700; 
 }
 
+/* ===== SEARCH ===== */
 .search-form { 
     display: flex; 
     gap: 10px; 
@@ -34,17 +40,80 @@
     flex-wrap: wrap; 
 }
 
+.search-box {
+    position: relative;
+    flex: 2;
+    min-width: 220px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 100px 10px 35px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.search-box input:focus {
+    border-color: #3182ce;
+    box-shadow: 0 0 0 2px rgba(49,130,206,0.1);
+}
+
+/* icon */
+.search-box i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0aec0;
+}
+
+/* button trong input */
+.btn-search-inside {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    
+    background: #3182ce;
+    color: #fff;
+    border: none;
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-search-inside:hover {
+    background: #2b6cb0;
+}
+
+/* select */
+.form-control {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ===== BUTTON ADD ===== */
 .btn-add-product {
     background: #3182ce; 
-    color: white; 
+    color: #fff; 
     text-decoration: none; 
-    padding: 12px 25px; 
+    padding: 10px 20px; 
     border-radius: 8px; 
     font-weight: 600; 
     display: flex; 
     align-items: center; 
-    gap: 8px; 
-    white-space: nowrap;
+    gap: 8px;
     transition: 0.2s;
 }
 
@@ -52,115 +121,159 @@
     background: #2b6cb0;
     transform: translateY(-1px);
 }
+
+/* ===== TABLE ===== */
 .table-container { 
-        background: #fff; 
-        border-radius: 12px; 
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08); 
-        margin-top: 10px;
+    background: #fff; 
+    border-radius: 12px; 
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08); 
+    max-height: 70vh;
+    overflow-y: auto; 
+}
 
-        max-height: 70vh; /* Chiều cao bằng 70% màn hình */
-        overflow-y: auto; 
-    }
+.lego-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
 
-    .lego-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+/* header table */
+.lego-table th { 
+    position: sticky; 
+    top: 0; 
+    z-index: 10;
 
-    .lego-table th { 
-        position: sticky; 
-        top: 0; 
-        z-index: 10;
-        background: #f8fafc; 
-        padding: 15px; 
-        text-align: left; 
-        color: #64748b; 
-        font-size: 13px; 
-        text-transform: uppercase; 
-        border-bottom: 2px solid #e2e8f0; 
-    }
+    background: #f8fafc; 
+    padding: 14px; 
+    text-align: left; 
+    font-size: 12px; 
+    text-transform: uppercase; 
+    color: #64748b;
 
-    .lego-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-    
-    .table-container::-webkit-scrollbar { width: 6px; }
-    .table-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
-    .product-cell { display: flex; align-items: center; gap: 15px; }
-    .img-product { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0; background: #f7fafc; }
-    .price-tag { color: #2b6cb0; font-weight: 700; font-size: 15px; white-space: nowrap; }
-    .stock-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-    .stock-low { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
-    .stock-ok { background: #f0fff4; color: #2f855a; border: 1px solid #9ae6b4; }
-    .status-pill { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-    .btn-action { text-decoration: none; padding: 6px; border-radius: 6px; transition: 0.2s; }
-    .btn-action:hover { background: #f1f5f9; }
+    border-bottom: 2px solid #e2e8f0; 
+}
 
-    .form-container { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 30px; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; }
-    .form-control { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; outline: none; }
-    .form-control:focus { border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
-    .btn-submit { background: #3182ce; color: white; padding: 10px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+/* body */
+.lego-table td { 
+    padding: 14px; 
+    border-bottom: 1px solid #f1f5f9; 
+    vertical-align: middle; 
+}
 
-    .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; padding-bottom: 30px; }
-    .page-link { 
-        padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 6px; 
-        text-decoration: none; color: #4a5568; background: #fff; transition: 0.2s;
-    }
-    .page-link:hover { background: #edf2f7; border-color: #cbd5e0; }
-    .page-link.active { background: #3182ce; color: white; border-color: #3182ce; font-weight: bold; }
-    .page-link.disabled { color: #cbd5e0; pointer-events: none; background: #f8fafc; }
-    .stock-empty { background: #fff5f5; color: #c53030; border: 1px solid #63171b; }
-    /* --- CSS THÔNG BÁO GÓC TRÊN BÊN PHẢI --- */
+/* scrollbar */
+.table-container::-webkit-scrollbar { width: 6px; }
+.table-container::-webkit-scrollbar-thumb { 
+    background: #cbd5e0; 
+    border-radius: 10px; 
+}
+
+/* ===== PRODUCT CELL ===== */
+.product-cell { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+}
+
+.img-product { 
+    width: 55px; 
+    height: 55px; 
+    border-radius: 8px; 
+    object-fit: cover; 
+    border: 1px solid #e2e8f0; 
+}
+
+/* ===== TEXT STYLE ===== */
+.price-tag { 
+    color: #2b6cb0; 
+    font-weight: 700; 
+}
+
+.status-pill { 
+    width: 8px; 
+    height: 8px; 
+    border-radius: 50%; 
+    display: inline-block; 
+    margin-right: 6px; 
+}
+
+/* ===== STOCK ===== */
+.stock-badge { 
+    padding: 4px 10px; 
+    border-radius: 20px; 
+    font-size: 11px; 
+    font-weight: 700; 
+}
+
+.stock-low { 
+    background: #fff5f5; 
+    color: #c53030; 
+}
+
+.stock-ok { 
+    background: #f0fff4; 
+    color: #2f855a; 
+}
+
+.stock-empty { 
+    background: #fff5f5; 
+    color: #c53030; 
+}
+
+/* ===== ACTION ===== */
+.btn-action { 
+    text-decoration: none; 
+    padding: 6px; 
+    border-radius: 6px; 
+    transition: 0.2s; 
+}
+
+.btn-action:hover { 
+    background: #f1f5f9; 
+}
+
+/* ===== ALERT ===== */
 #status-alert-container {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 9999; /* Luôn nằm trên cùng */
-    width: 350px;  /* Độ rộng cố định cho thông báo */
-    pointer-events: none; /* Tránh cản trở việc click chuột khi đang ẩn */
+    z-index: 9999;
+    width: 320px;
 }
 
 .alert-box {
-    pointer-events: auto; /* Cho phép click vào thông báo nếu cần */
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 16px 20px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    font-weight: 600;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
     color: #fff;
-    animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    border-left: 6px solid rgba(0,0,0,0.2);
+    font-weight: 600;
 }
 
-.success-js {
-    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+.success-js { background: #38a169; }
+.error-js { background: #e53e3e; }
+
+/* ===== PAGINATION ===== */
+.pagination { 
+    display: flex; 
+    justify-content: center; 
+    gap: 5px; 
+    margin-top: 20px; 
 }
 
-.error-js {
-    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+.page-link { 
+    padding: 8px 14px; 
+    border: 1px solid #e2e8f0; 
+    border-radius: 6px; 
+    text-decoration: none; 
+    color: #4a5568; 
 }
 
-.alert-box i {
-    font-size: 22px;
+.page-link.active { 
+    background: #3182ce; 
+    color: #fff; 
 }
-
-@keyframes slideInRight {
-    from { 
-        opacity: 0; 
-        transform: translateX(100%); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateX(0); 
-    }
-}
-
-.fade-out {
-    opacity: 0;
-    transform: translateX(50px);
-    transition: all 0.5s ease;
-}
-
 
 </style>
 
@@ -220,12 +333,16 @@ $session_error = get_flash_message('error');
         <h2>📦 Quản lý Kho LEGO</h2>
         
         <form action="/lego_shop_php/adminproduct" method="GET" class="search-form">
-            <div style="position: relative; flex: 2; min-width: 200px;">
-                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: #a0aec0;"></i>
-                <input type="text" name="keyword" class="form-control" 
-                       placeholder="Tìm tên sản phẩm..." 
-                       value="<?= $_GET['keyword'] ?? '' ?>"
-                       style="padding-left: 35px; border-radius: 8px;">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input type="text" name="keyword"
+                    placeholder="Tìm tên sản phẩm..."
+                    value="<?= $_GET['keyword'] ?? '' ?>">
+
+                <button type="submit" class="btn-search-inside">
+                    Tìm kiếm
+                </button>
             </div>
 
             <select name="category" class="form-control" onchange="this.form.submit()" style="flex: 1; min-width: 150px; cursor: pointer;">
@@ -390,7 +507,7 @@ $session_error = get_flash_message('error');
                                 </span>
                             </a>
 
-                            <?php if($p['status'] != 0): ?>
+                            <!-- <?php if($p['status'] != 0): ?>
                                 <a href="/lego_shop_php/adminproduct/hide/<?= $p['id'] ?>" 
                                 class="btn-action" 
                                 style="color: #e53e3e;" 
@@ -405,7 +522,7 @@ $session_error = get_flash_message('error');
                                 title="Hiện lại">
                                     <i class="fa-solid fa-eye"></i> Hiện
                                 </a>
-                            <?php endif; ?>
+                            <?php endif; ?> -->
 
                             <a href="/lego_shop_php/adminproduct/delete/<?= $p['id'] ?>" class="btn-action" style="color: #e53e3e;" onclick="return confirm('Xóa vĩnh viễn sản phẩm?')">
                                 <i class="fa-solid fa-trash"></i> Xóa
@@ -441,7 +558,7 @@ $session_error = get_flash_message('error');
             <i class="fa-solid fa-chevron-right"></i>
         </a>
     </div>
-    <div style="text-align: center; color: #718096; font-size: 13px; margin-top: -10px;">
+    <div style="text-align: center; color: #718096; font-size: 13px; margin-top: 10px;">
         Hiển thị trang <?= $currentPage ?> / <?= $totalPages ?> (Tổng <?= $totalItems ?> sản phẩm)
     </div>
 <?php endif; ?>

@@ -352,4 +352,18 @@ class AdminProductController extends Controller {
             'keyword'     => $keyword // Truyền ngược lại để hiển thị trong ô input
         ]);
     }
+
+    public function updateGlobalMinStock() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $min_stock = intval($_POST['min_stock_level']);
+
+        if ($min_stock < 0) {
+            echo "error";
+            return;
+        }
+
+        $this->productModel->updateAllMinStock($min_stock);
+        echo "success";
+    }
+}
 }
