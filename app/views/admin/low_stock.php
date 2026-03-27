@@ -231,7 +231,7 @@
                     <td><span style="background: #edf2f7; padding: 3px 8px; border-radius: 4px;"><?= $p['category_name'] ?></span></td>
                     
                     <td>
-                        <b style="color: #e53e3e; text-align: center; font-size: 16px;"><?= $p['stock_quantity'] ?></b> mảnh/hộp
+                        <b style="color: #e53e3e; text-align: center; font-size: 16px;"><?= $p['stock_quantity'] ?></b> Sản phẩm
                     </td>
                     
                     <td><span style="color: #718096;">≤ <?= $p['min_stock_level'] ?></span></td>

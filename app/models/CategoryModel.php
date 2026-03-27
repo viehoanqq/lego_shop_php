@@ -104,5 +104,32 @@ class CategoryModel extends Database {
         $row = $result->fetch_assoc();
         return $row['total'] ?? 0;
     }
+
+    // Cập nhật trạng thái danh mục và ẨN/HIỆN toàn bộ sản phẩm thuộc danh mục đó
+    public function updateStatusAdmin($id, $status) {
+        $db = $this->getConnection();
+        $id = intval($id);
+        
+        $db->begin_transaction();
+        try {
+            // 1. Luôn cập nhật trạng thái của Danh mục
+            $catStatus = ($status == 'active') ? 'active' : 'locked';
+            $sqlCat = "UPDATE categories SET status = '$catStatus' WHERE id = $id";
+            $db->query($sqlCat);
+
+            // 2. Chỉ khi KHÓA (locked) thì mới cập nhật sản phẩm thành 0 (Ẩn)
+            // Nếu là 'active', chúng ta KHÔNG làm gì bảng products cả
+            if ($status == 'locked') {
+                $sqlProd = "UPDATE products SET status = 2 WHERE category_id = $id";
+                $db->query($sqlProd);
+            }
+
+            $db->commit();
+            return true;
+        } catch (Exception $e) {
+            $db->rollback();
+            return false;
+        }
+    }
     
 }

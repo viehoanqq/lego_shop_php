@@ -449,4 +449,67 @@ class ProductModel extends Database {
         $row = $result->fetch_assoc();
         return $row['total'] ?? 0;
     }
+
+
+    // Hàm check xóa
+    public function canDeleteProduct($id) {
+        $db = $this->getConnection(); // Lấy kết nối giống các hàm trên
+        $id = intval($id);
+
+        // 1. Kiểm tra trong chi tiết phiếu nhập
+        $sqlImport = "SELECT COUNT(*) as total FROM import_receipt_details WHERE product_id = $id";
+        $resImport = $db->query($sqlImport);
+        $importCheck = $resImport->fetch_assoc();
+
+        // 2. Kiểm tra thêm trong chi tiết đơn hàng
+        $sqlOrder = "SELECT COUNT(*) as total FROM order_details WHERE product_id = $id";
+        $resOrder = $db->query($sqlOrder);
+        $orderCheck = $resOrder->fetch_assoc();
+
+        // Trả về true nếu cả 2 bảng đều không có dữ liệu
+        return ($importCheck['total'] == 0 && $orderCheck['total'] == 0);
+    }
+
+    public function deleteProduct($id) {
+        $db = $this->getConnection();
+        $id = intval($id);
+        
+        // Vì CSDL của bạn có ON DELETE CASCADE nên nó sẽ tự xóa các bảng liên quan
+        $sql = "DELETE FROM products WHERE id = $id";
+        return $db->query($sql);
+    }
+
+    
+    //Cập nhật trạng thái sản phẩm có kiểm tra trạng thái Danh mục
+    public function updateStatusWithTaskCheck($id, $status) {
+        $db = $this->getConnection();
+        $id = intval($id);
+        $status = intval($status);
+
+        // 1. Lấy thông tin sản phẩm để biết nó thuộc danh mục nào
+        $product = $this->getProductById($id);
+        if (!$product) return 'notfound';
+
+        // 2. Nếu muốn MỞ sản phẩm (status = 1 hoặc 2), phải kiểm tra Danh mục
+        if ($status > 0) {
+            $catId = intval($product['category_id']);
+            $sqlCat = "SELECT status FROM categories WHERE id = $catId";
+            $resCat = $db->query($sqlCat);
+            $category = $resCat->fetch_assoc();
+
+            // Kiểm tra nếu danh mục đang bị khóa
+            if ($category && strtolower(trim($category['status'])) === 'locked') {
+                return 'cat_locked'; // Trả về mã lỗi riêng
+            }
+        }
+
+        // 3. Nếu kiểm tra ổn hoặc là hành động KHÓA (status = 0) thì tiến hành Update
+        $sqlUpdate = "UPDATE products SET status = $status WHERE id = $id";
+        if ($db->query($sqlUpdate)) {
+            return 'success';
+        }
+
+        return 'error';
+    }
+
 }
