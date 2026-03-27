@@ -277,13 +277,13 @@ document.addEventListener("DOMContentLoaded", function() {
                     // 1. LÔ GIC THANH TOÁN (ĐÃ FIX)
                     // ==========================================
                     const payStatusBox = document.getElementById('md_payment_status');
-                    let isPaid = (order.payment_status === 'paid'); 
+                    let isPaid = (order.payment_status == 'paid'); 
                     
                     if (order.payment_method === 'cash' || order.payment_method === 'online') {
                         let textTT = order.payment_method === 'cash' ? 'Khi nhận hàng (COD)' : 'Đã thanh toán Online';
                         payStatusBox.innerHTML = `<span style="color: #2f9e44; font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Thanh toán: ${textTT}</span>`;
                     } else if (order.payment_method === 'transfer') {
-                        if (isPaid || order.status === 'delivered') { 
+                        if (isPaid) { 
                             payStatusBox.innerHTML = '<span style="color: #2f9e44; font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Xác nhận chuyển khoản thành công</span>';
                         } else {
                             payStatusBox.innerHTML = '<span style="color: #d97706; font-weight: bold;"><i class="fa-solid fa-hourglass-half"></i> Đang xác nhận chuyển khoản</span>';

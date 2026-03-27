@@ -33,7 +33,7 @@
         <ul class="system">
             <li class="menu-label">Kinh doanh</li>
             <li>
-                <a href="/lego_shop_php/admin/orders" class="<?= isActive('orders', $current_page) ?>">
+                <a href="/lego_shop_php/adminorder" class="<?= isActive('orders', $current_page) ?>">
                     <i class="fa-solid fa-cart-shopping"></i>Quản lý đơn hàng
                 </a>
             </li>
@@ -66,7 +66,7 @@
         <ul class="system">
             <li class="menu-label">Kho hàng</li>
             <li>
-                <a href="/lego_shop_php/admin/suppliers" class="<?= isActive('suppliers', $current_page) ?>">
+                <a href="/lego_shop_php/adminsupplier" class="<?= isActive('suppliers', $current_page) ?>">
                     <i class="fa-solid fa-handshake"></i>Nhà cung cấp
                 </a>
             </li>
@@ -76,7 +76,7 @@
     </a>
 </li>
             <li>
-                <a href="/lego_shop_php/admin/reports" class="<?= isActive('reports', $current_page) ?>">
+                <a href="/lego_shop_php/adminreport" class="<?= isActive('reports', $current_page) ?>">
                     <i class="fa-solid fa-chart-line"></i>Thống kê báo cáo
                 </a>
             </li>

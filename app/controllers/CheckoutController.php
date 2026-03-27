@@ -32,6 +32,7 @@ class CheckoutController extends Controller {
             'total_price' => $total_price
         ]);
     }
+
     public function process() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $user_id = $_SESSION['user_id'];
@@ -49,6 +50,23 @@ class CheckoutController extends Controller {
                 header("Location: /lego_shop_php/cart");
                 exit;
             }
+
+            // =========================================================
+            // 1. TRẠM GÁC: KIỂM TRA TỒN KHO TRƯỚC KHI TẠO ĐƠN
+            // =========================================================
+            $productModel = $this->model('ProductModel');
+            foreach ($cart_items as $item) {
+                $product = $productModel->getProductById($item['product_id']);
+                
+                // Nếu sản phẩm không tồn tại hoặc số lượng khách mua lớn hơn số lượng kho
+                if (!$product || $product['stock_quantity'] < $item['quantity']) {
+                    $p_name = $product ? $product['name'] : 'Sản phẩm';
+                    // Đá về trang giỏ hàng và báo lỗi hết hàng
+                    echo "<script>alert('LỖI: Sản phẩm \"{$p_name}\" không đủ số lượng trong kho!'); window.location.href='/lego_shop_php/cart';</script>";
+                    exit;
+                }
+            }
+            // =========================================================
 
             $total_amount = 0;
             foreach ($cart_items as $item) {
@@ -82,9 +100,19 @@ class CheckoutController extends Controller {
             );
 
             if ($order_id) {
+                $db = $orderModel->getConnection(); // Lấy DB Connection để chạy trừ kho
+
                 // Lưu chi tiết sản phẩm
                 foreach ($cart_items as $item) {
                     $orderModel->addOrderItem($order_id, $item['product_id'], $item['quantity'], $item['selling_price']);
+                    
+                    // =========================================================
+                    // 2. TRỪ KHO NGAY SAU KHI LƯU CHI TIẾT ĐƠN THÀNH CÔNG
+                    // =========================================================
+                    $qty = (int)$item['quantity'];
+                    $p_id = (int)$item['product_id'];
+                    $db->query("UPDATE products SET stock_quantity = stock_quantity - $qty WHERE id = $p_id");
+                    // =========================================================
                 }
 
                 // Xóa giỏ hàng
@@ -112,12 +140,11 @@ class CheckoutController extends Controller {
             'order_id' => $order_id
         ]);
     }
+
     public function payment() {
         $order_id = $_GET['order_id'] ?? 0;
         
-        // Cần gọi DB để lấy thông tin đơn hàng (để biết phải chuyển bao nhiêu tiền)
         $orderModel = $this->model('OrderModel');
-        // Giả sử bạn có hàm getOrderById, nếu chưa có thì bạn tự viết thêm 1 hàm SELECT * FROM orders WHERE id = ? nhé
         $order = $orderModel->getOrderById($order_id); 
         
         $total_price = $order ? $order['total_amount'] : 0;
@@ -141,13 +168,11 @@ class CheckoutController extends Controller {
         $orderModel = $this->model('OrderModel');
         $order = $orderModel->getOrderById($order_id);
         
-        // BẢO MẬT: Kiểm tra xem đơn hàng có tồn tại và có đúng là của user đang đăng nhập không
         if (!$order || $order['user_id'] != $_SESSION['user_id']) {
             echo "<script>alert('Bạn không có quyền xem đơn hàng này!'); window.location.href='/lego_shop_php/home';</script>";
             exit;
         }
 
-        // Lấy danh sách sản phẩm
         $order_items = $orderModel->getOrderItems($order_id);
 
         $this->view('/user/cart/view_order', [
@@ -156,12 +181,27 @@ class CheckoutController extends Controller {
             'order_items' => $order_items
         ]);
     }
-    public function cancel_order() {
-        $order_id = $_GET['order_id'] ?? 0;
-        
+
+    // ========================================================================
+    // Đã đổi tên hàm thành cancelOrderAjax để phù hợp với JS View đang gọi lên
+    // Có kèm Logic HOÀN KHO và GHI LỊCH SỬ
+    // ========================================================================
+    public function cancelOrderAjax() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
-        if (!$order_id || !isset($_SESSION['user_id'])) {
-            header("Location: /lego_shop_php/home");
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Bạn chưa đăng nhập!']);
+            exit;
+        }
+
+        // Đọc dữ liệu JSON gửi lên
+        $input = json_decode(file_get_contents('php://input'), true);
+        $order_id = $input['order_id'] ?? 0;
+        $reason = $input['reason'] ?? 'Khách hàng tự hủy'; // Lấy reason nếu có
+
+        if (!$order_id) {
+            echo json_encode(['success' => false, 'message' => 'Thiếu thông tin đơn hàng!']);
             exit;
         }
 
@@ -170,21 +210,51 @@ class CheckoutController extends Controller {
 
         // Bảo mật: Đảm bảo đơn hàng tồn tại và thuộc về user đang đăng nhập
         if ($order && $order['user_id'] == $_SESSION['user_id']) {
+            
             // Chỉ cho hủy nếu trạng thái hợp lệ
             if (in_array($order['status'], ['pending', 'confirmed'])) {
-                if ($orderModel->updateOrderStatus($order_id, 'cancelled')) {
-                    echo "<script>alert('Đã hủy đơn hàng thành công!'); window.location.href='/lego_shop_php/checkout/view_order?order_id=$order_id';</script>";
-                } else {
-                    echo "<script>alert('Lỗi hệ thống, không thể hủy đơn!'); window.history.back();</script>";
+                
+                // Mở transaction để đảm bảo an toàn dữ liệu
+                $db = $orderModel->getConnection();
+                $db->begin_transaction();
+
+                try {
+                    // 1. Đổi trạng thái thành cancelled
+                    $stmt1 = $db->prepare("UPDATE orders SET status = 'cancelled' WHERE id = ?");
+                    $stmt1->bind_param("i", $order_id);
+                    $stmt1->execute();
+
+                    // 2. Ghi lịch sử hủy đơn
+                    $stmt2 = $db->prepare("INSERT INTO order_history (order_id, status, note) VALUES (?, 'cancelled', ?)");
+                    $stmt2->bind_param("is", $order_id, $reason);
+                    $stmt2->execute();
+
+                    // 3. HOÀN KHO: Lấy danh sách sản phẩm và cộng lại kho
+                    $items = $orderModel->getOrderItems($order_id);
+                    foreach ($items as $item) {
+                        $qty = (int)$item['quantity'];
+                        $p_id = (int)$item['product_id'];
+                        $db->query("UPDATE products SET stock_quantity = stock_quantity + $qty WHERE id = $p_id");
+                    }
+
+                    // Chốt giao dịch
+                    $db->commit();
+                    echo json_encode(['success' => true, 'message' => 'Hủy đơn thành công']);
+
+                } catch (Exception $e) {
+                    $db->rollback();
+                    echo json_encode(['success' => false, 'message' => 'Lỗi hệ thống khi hủy đơn!']);
                 }
+
             } else {
-                echo "<script>alert('Đơn hàng ở trạng thái này không thể hủy!'); window.location.href='/lego_shop_php/checkout/view_order?order_id=$order_id';</script>";
+                echo json_encode(['success' => false, 'message' => 'Đơn hàng ở trạng thái này không thể hủy!']);
             }
         } else {
-            echo "<script>alert('Lỗi quyền truy cập!'); window.location.href='/lego_shop_php/home';</script>";
+            echo json_encode(['success' => false, 'message' => 'Bạn không có quyền hủy đơn này!']);
         }
         exit;
     }
+
 
     // API Lấy dữ liệu đánh giá cũ
     public function getReviewAjax() {
@@ -239,5 +309,4 @@ class CheckoutController extends Controller {
         }
         exit;
     }
-    
 }

@@ -179,15 +179,46 @@ class OrderModel extends Database {
         $db->begin_transaction();
 
         try {
-            // Cập nhật trạng thái ở bảng orders
+            // 1. Lấy trạng thái CŨ của đơn hàng để so sánh
+            $stmt_check = $db->prepare("SELECT status FROM orders WHERE id = ?");
+            $stmt_check->bind_param("i", $order_id);
+            $stmt_check->execute();
+            $old_status = $stmt_check->get_result()->fetch_assoc()['status'];
+
+            // 2. Cập nhật trạng thái mới
             $stmt1 = $db->prepare("UPDATE orders SET status = ? WHERE id = ?");
             $stmt1->bind_param("si", $status, $order_id);
             $stmt1->execute();
 
-            // Ghi log vào bảng order_history
+            // 3. Ghi log lịch sử
             $stmt2 = $db->prepare("INSERT INTO order_history (order_id, status, note) VALUES (?, ?, ?)");
             $stmt2->bind_param("iss", $order_id, $status, $note);
             $stmt2->execute();
+
+            // ==========================================
+            // 4. LOGIC HOÀN KHO (TỰ ĐỘNG CỘNG LẠI)
+            // ==========================================
+            // CHỈ hoàn kho khi: Trạng thái mới là 'cancelled' VÀ trạng thái cũ KHÁC 'cancelled'
+            if ($status === 'cancelled' && $old_status !== 'cancelled') {
+                // Lấy danh sách sản phẩm trong đơn này
+                $items = $this->getOrderItems($order_id);
+                foreach ($items as $item) {
+                    $qty = (int)$item['quantity'];
+                    $p_id = (int)$item['product_id'];
+                    // Cộng lại vào kho
+                    $db->query("UPDATE products SET stock_quantity = stock_quantity + $qty WHERE id = $p_id");
+                }
+            }
+            // Mở rộng: Nếu Admin đổi từ Cancelled quay ngược lại Pending (Cứu đơn) -> Phải trừ kho lại
+            else if ($old_status === 'cancelled' && $status !== 'cancelled') {
+                $items = $this->getOrderItems($order_id);
+                foreach ($items as $item) {
+                    $qty = (int)$item['quantity'];
+                    $p_id = (int)$item['product_id'];
+                    // Trừ kho đi
+                    $db->query("UPDATE products SET stock_quantity = stock_quantity - $qty WHERE id = $p_id");
+                }
+            }
 
             $db->commit();
             return true;
