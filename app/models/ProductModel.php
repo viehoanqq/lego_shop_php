@@ -563,5 +563,14 @@ class ProductModel extends Database {
 
         return 'error';
     }
-
+    // Hàm lấy danh sách sản phẩm phục vụ cho Combo Box cài đặt mức cảnh báo
+    public function getAllProductsForDropdown() {
+        $db = $this->getConnection();
+        $sql = "SELECT p.id, p.name, p.sku, p.stock_quantity, p.min_stock_level, 
+               (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as image_url 
+               FROM products p WHERE p.status IN (1, 2)";
+               
+        $result = $db->query($sql);
+        return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
 }

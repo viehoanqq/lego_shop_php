@@ -420,10 +420,9 @@ class AdminProductController extends Controller {
 
 
     public function lowstock() {
-
         // 1. Lấy keyword và type từ URL
         $type = $_GET['type'] ?? 'all';
-        $keyword = $_GET['keyword'] ?? ''; // Thêm dòng này
+        $keyword = $_GET['keyword'] ?? ''; 
         
         $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
         $offset = ($page - 1) * $this->limit;
@@ -434,14 +433,43 @@ class AdminProductController extends Controller {
         
         $totalPages = ceil($totalItems / $this->limit);
 
+        // LẤY DANH SÁCH TẤT CẢ SẢN PHẨM ĐỂ TRUYỀN XUỐNG JAVASCRIPT (Làm Combo box)
+        $all_products = $this->productModel->getAllProductsForDropdown();
+
         $this->view('admin/low_stock', [
-            'products'    => $products,
-            'totalItems'  => $totalItems,
-            'totalPages'  => $totalPages,
-            'currentPage' => $page,
-            'currentType' => $type,
-            'keyword'     => $keyword // Truyền ngược lại để hiển thị trong ô input
+            'products'     => $products,
+            'all_products' => $all_products, // Đưa dữ liệu này xuống view
+            'totalItems'   => $totalItems,
+            'totalPages'   => $totalPages,
+            'currentPage'  => $page,
+            'currentType'  => $type,
+            'keyword'      => $keyword 
         ]);
+    }
+    public function updateBulkMinStock() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            header('Content-Type: application/json');
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            if (!$data || empty($data['items'])) {
+                echo json_encode(['success' => false, 'message' => 'Dữ liệu rỗng']);
+                return;
+            }
+            
+            try {
+                foreach ($data['items'] as $item) {
+                    $id = intval($item['product_id']);
+                    $min = intval($item['min_stock']);
+                    if($id > 0 && $min >= 0) {
+                        $this->productModel->updateSingleMinStock($id, $min);
+                    }
+                }
+                echo json_encode(['success' => true]);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'message' => 'Lỗi CSDL']);
+            }
+            exit;
+        }
     }
 
     public function updateGlobalMinStock() {
