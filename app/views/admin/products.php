@@ -279,7 +279,8 @@ $session_error = get_flash_message('error');
                 <div>
                     <div class="form-group">
                         <label>Giá bán (VNĐ)</label>
-                        <input type="number" name="selling_price" class="form-control" value="<?= $product['selling_price'] ?? '' ?>" style="font-weight: bold; color: #2b6cb0;">
+                        <input type="number" name="selling_price" class="form-control" value="<?= $product['selling_price'] ?? '' ?>" style="font-weight: bold; color: #2b6cb0;"
+                        readonly>
                     </div>
                     <div class="form-group">
                         <label>Số mảnh ghép (Pieces)</label>

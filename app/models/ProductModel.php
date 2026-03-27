@@ -256,7 +256,6 @@ class ProductModel extends Database {
     
     }
 
-    // Nếu bạn có dùng hàm updateProductDetails ở Controller thì cũng nên thêm vào đây:
     public function updateProductDetail($id, $data) {
         $db = $this->getConnection();
         $sql = "UPDATE product_details SET 
@@ -283,6 +282,7 @@ class ProductModel extends Database {
         
         return $stmt->execute();
     }
+
     // Lấy đánh giá cũ của user cho 1 sản phẩm
     public function getReviewByUserAndProduct($user_id, $product_id) {
         $db = $this->getConnection();
@@ -293,6 +293,7 @@ class ProductModel extends Database {
         $result = $stmt->get_result();
         return ($result && $result->num_rows > 0) ? $result->fetch_assoc() : null;
     }
+
     public function insertProduct($data) {
         $db = $this->getConnection();
         $db->begin_transaction();
