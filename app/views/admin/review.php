@@ -176,7 +176,84 @@
     background-color: #3182ce;
     color: white;
 }
+
+/* ===== DELETE BUTTON ===== */
+.btn-delete {
+    background-color: #fff5f5;
+    color: #e53e3e;
+    transition: all 0.2s ease;
+}
+
+.btn-delete:hover {
+    background-color: #e53e3e;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+#status-alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    width: 320px;
+}
+
+.alert-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.success-js { background: #38a169; }
+.error-js { background: #e53e3e; }
+
 </style>
+
+<?php 
+$session_msg = get_flash_message('msg');
+$session_error = get_flash_message('error');
+?>
+
+<?php if($session_msg || $session_error): ?>
+<div id="status-alert-container">
+
+    <?php if($session_msg): ?>
+        <div class="alert-box success-js">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>
+                <?php
+                    switch($session_msg) {
+                        case 'deleted':  echo "Đã xóa thành công!"; break;
+                        case 'updated':  echo "Cập nhật thành công!"; break;
+                        default:         echo "Thao tác thành công!";
+                    }
+                ?>
+            </span>
+        </div>
+    <?php endif; ?>
+
+    <?php if($session_error): ?>
+        <div class="alert-box error-js">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>
+                <?php
+                    switch($session_error) {
+                        case 'notfound': echo "Không tìm thấy dữ liệu!"; break;
+                        case 'db':       echo "Lỗi hệ thống!"; break;
+                        default:         echo "Có lỗi xảy ra!";
+                    }
+                ?>
+            </span>
+        </div>
+    <?php endif; ?>
+
+</div>
+<?php endif; ?>
 
 <div class="review-management-container">
     <div class="header">
@@ -265,6 +342,12 @@
                                class="action-btn btn-toggle">
                                 <i class="fa-solid <?= $r['status']=='approved'?'fa-eye-slash':'fa-eye' ?>"></i>
                             </a>
+                            <a href="/lego_shop_php/adminreview/delete/<?= $r['id'] ?>" 
+                                class="action-btn btn-delete"
+                                onclick="return confirm('Bạn có chắc muốn xóa đánh giá này không?')"
+                                title="Xóa">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -277,3 +360,15 @@
         </table>
     </div>
 </div>
+
+<script>
+setTimeout(function() {
+    let alerts = document.querySelectorAll('.alert-box');
+    alerts.forEach(el => {
+        el.style.transition = "0.5s";
+        el.style.opacity = "0";
+        el.style.transform = "translateX(100px)";
+        setTimeout(() => el.remove(), 500);
+    });
+}, 4000);
+</script>
