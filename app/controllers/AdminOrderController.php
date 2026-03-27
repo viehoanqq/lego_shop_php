@@ -55,12 +55,40 @@ class AdminOrderController extends Controller {
     // Xử lý Cập nhật trạng thái Đơn hàng (Kèm Note)
     public function update_status($id) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $status = $_POST['status'] ?? '';
-            $note = $_POST['note'] ?? ''; // LẤY GHI CHÚ TỪ FORM
+            $new_status = $_POST['status'] ?? '';
+            $note = $_POST['note'] ?? ''; 
             
             $orderModel = $this->model('OrderModel');
+            $order = $orderModel->getOrderById($id);
             
-            if ($orderModel->updateOrderStatusAdmin($id, $status, $note)) {
+            if (!$order) {
+                header("Location: /lego_shop_php/adminorder?error=notfound");
+                exit;
+            }
+
+            $current_status = $order['status'];
+
+            // ==========================================
+            // BẢO VỆ LOGIC: Máy trạng thái (State Machine)
+            // ==========================================
+            $is_valid = false;
+            
+            if ($current_status === 'pending' && in_array($new_status, ['pending', 'confirmed', 'cancelled'])) {
+                $is_valid = true;
+            } elseif ($current_status === 'confirmed' && in_array($new_status, ['confirmed', 'shipping', 'cancelled'])) {
+                $is_valid = true;
+            } elseif ($current_status === 'shipping' && in_array($new_status, ['shipping', 'delivered', 'cancelled'])) {
+                $is_valid = true;
+            }
+            
+            // Nếu đơn đã hoàn tất/hủy hoặc chọn trạng thái linh tinh -> Đuổi về
+            if (!$is_valid || $current_status === 'delivered' || $current_status === 'cancelled') {
+                echo "<script>alert('Lỗi: Cập nhật trạng thái không hợp lệ theo quy trình!'); history.back();</script>";
+                exit;
+            }
+            // ==========================================
+
+            if ($orderModel->updateOrderStatusAdmin($id, $new_status, $note)) {
                 header("Location: /lego_shop_php/adminorder/detail/$id?msg=status_success");
             } else {
                 header("Location: /lego_shop_php/adminorder/detail/$id?error=1");
