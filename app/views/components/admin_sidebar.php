@@ -19,12 +19,12 @@
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admin/alerts" class="<?= isActive('alerts', $current_page) ?>">
-                    <i class="fa-solid fa-bell-slash"></i>Cảnh báo hết hàng
+                <a href="/lego_shop_php/adminproduct/lowstock" class="<?= isActive('adminproduct/lowstock', $current_page) ?>">
+                    <i class="fa-solid fa-triangle-exclamation"></i>Cảnh báo hết hàng
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admin/messages" class="<?= isActive('messages', $current_page) ?>">
+                <a href="/lego_shop_php/adminreview" class="<?= isActive('review', $current_page) ?>">
                     <i class="fa-solid fa-star"></i>Đánh giá
                 </a>
             </li>

@@ -8,9 +8,8 @@
         --bg-body: #f7fafc;
     }
 
-    body { background-color: var(--bg-body); font-family: 'Inter', sans-serif; color: var(--text-main); }
+    body { background-color: var(--bg-body); color: var(--text-main); }
 
-    /* --- HEADER ĐỒNG BỘ VỚI CATEGORY --- */
     .header-sync { 
         display: flex; 
         justify-content: space-between; 
@@ -129,14 +128,289 @@
     transform: translateY(-1px);
 }
 
+
+/* Màu sắc đặc trưng cho User Form */
+.form-container.user-form {
+    border-left: 5px solid #e3000b; /* Màu đỏ LEGO */
+}
+
+.password-note {
+    font-size: 12px;
+    color: #a0aec0;
+    margin-top: 5px;
+}
+
+.role-badge-select {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.role-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+
+.form-container.user-form { 
+        background: #fff;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+        border-left: 6px solid var(--danger-lego);
+        transition: all 0.3s ease;
+    }
+
+    /* 2. PHÂN CHIA VÙNG NHẬP LIỆU (FORM GROUP) */
+    .form-group { 
+        margin-bottom: 20px; 
+    }
+    
+    .form-group label { 
+        display: block; 
+        margin-bottom: 8px; 
+        font-weight: 700; 
+        color: var(--text-label);
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-input { 
+        width: 100%; 
+        padding: 12px 15px; 
+        border: 1px solid var(--border-color); 
+        border-radius: 8px; 
+        outline: none;
+        background-color: var(--bg-field);
+        font-size: 15px;
+        color: var(--text-dark);
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    .form-input:focus { 
+        background-color: #fff;
+        border-color: var(--primary); 
+        box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.1); 
+    }
+
+    /* 3. VÙNG PHÂN QUYỀN & LỰA CHỌN (ROLE & STATUS) */
+    .role-badge-select {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+        background: #f1f5f9;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .role-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 6px;
+        transition: 0.2s;
+    }
+
+    .role-option:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    .role-option input[type="radio"] {
+        accent-color: var(--primary);
+        width: 18px;
+        height: 18px;
+    }
+
+    .password-note {
+        font-size: 12px;
+        color: #718096;
+        margin-top: 8px;
+        background: #fffaf0;
+        padding: 5px 10px;
+        border-left: 3px solid #f6ad55;
+
+    }
+
+    /* 4. VÙNG NÚT BẤM (ACTION AREA) */
+    .btn-submit { 
+        background: var(--primary); 
+        color: white !important; 
+        padding: 14px 30px; 
+        border: none; 
+        border-radius: 10px; 
+        cursor: pointer; 
+        font-weight: 800; 
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover { 
+        background: var(--primary-dark); 
+        transform: translateY(-2px); 
+        box-shadow: 0 6px 15px rgba(49, 130, 206, 0.4);
+    }
+
+    .btn-cancel-link {
+        margin-left: 20px;
+        text-decoration: none;
+        color: #718096;
+        font-weight: 600;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+
+    .btn-cancel-link:hover {
+        color: var(--text-dark);
+        text-decoration: underline;
+    }
+
+    /* Hiệu ứng phân biệt 2 cột */
+    @media (min-width: 768px) {
+        .form-container form > div:first-child {
+            border-bottom: none;
+        }
+    }
+
+    #status-alert-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+    }
+
+    .alert-box {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        font-weight: 600;
+        animation: slideInRight 0.5s ease;
+        color: #fff;
+    }
+
+    .success-js {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        border-left: 5px solid #276749;
+    }
+
+    .error-js {
+        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        border-left: 5px solid #9b2c2c;
+    }
+
+    .alert-box i {
+        font-size: 20px;
+    }
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Style chung cho nút thao tác để cân bằng kích thước */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+/* Nút Sửa (giữ phong cách cũ của bạn nhưng làm gọn hơn) */
+.btn-edit {
+    background: #ebf8ff;
+    color: #3182ce ;
+}
+.btn-edit:hover {
+    background: #bee3f8;
+    transform: translateY(-1px);
+}
+
+/* NÚT KHÓA/MỞ KHÓA RIÊNG BIỆT */
+.btn-status-toggle {
+    min-width: 75px; /* Cố định độ rộng để không nhảy chữ */
+    justify-content: center;
+    font-weight: 700;
+}
+
+/* Trạng thái khi chuẩn bị KHÓA (Nút hiện màu đỏ nhạt) */
+.btn-status-toggle.is-locking {
+    background: #fff5f5;
+    color: #e53e3e ;
+}
+.btn-status-toggle.is-locking:hover {
+    background: #e53e3e;
+    color: #fff;
+}
+
+/* Trạng thái khi chuẩn bị MỞ (Nút hiện màu xanh nhạt) */
+.btn-status-toggle.is-unlocking {
+    background: #f0fff4;
+    color: #38a169 ;
+}
+.btn-status-toggle.is-unlocking:hover {
+    background: #38a169;
+    color: #fff ;
+}
+
+/* Hiệu ứng icon */
+.btn-status-toggle i {
+    font-size: 12px;
+}
+
+
 </style>
 
-<?php if ($msg = get_flash_message('success')): ?>
+<?php 
+// Lấy thông báo từ session
+$session_msg = get_flash_message('msg');
+$session_error = get_flash_message('error');
+?>
+
+<?php if($session_msg || $session_error): ?>
     <div id="status-alert-container">
-        <div class="alert-box alert-success">
-            <i class="fa-solid fa-circle-check"></i>
-            <span><?= $msg ?></span>
-        </div>
+        <?php if($session_msg): ?>
+            <div class="alert-box success-js">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>
+                    <?php
+                        if($session_msg == 'success') echo "Thêm thành viên mới thành công!";
+                        if($session_msg == 'updated') echo "Đã cập nhật thông tin thành viên!";
+                    ?>
+                </span>
+            </div>
+        <?php endif; ?>
+
+        <?php if($session_error): ?>
+            <div class="alert-box error-js">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>
+                    <?php
+                        if($session_error == 'exists_email') echo "Email này đã được sử dụng!";
+                        if($session_error == 'exists_phone') echo "Số điện thoại này đã được sử dụng!";
+                        if($session_error == 'empty') echo "Vui lòng điền đầy đủ các trường bắt buộc!";
+                        if($session_error == 'db') echo "Lỗi hệ thống: Không thể xử lý dữ liệu.";
+                    ?>
+                </span>
+            </div>
+        <?php endif; ?>
     </div>
 <?php endif; ?>
 
@@ -161,11 +435,92 @@
         </div>
 
         <?php if(!isset($is_form) || $is_form === false): ?>
-            <a href="/lego_shop_php/" class="btn-add">
+            <a href="/lego_shop_php/admincustomer/add" class="btn-add">
                 <i class="fa-solid fa-plus"></i> Thêm người dùng
             </a>
         <?php endif; ?>
+</div>
+
+<?php if (isset($is_form) && $is_form == true): ?>
+        <div class="form-container user-form">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
+                <i class="fa-solid fa-user-gear" style="color: #e3000b; font-size: 24px;"></i>
+                <h3 style="margin:0; color: #1a202c; font-weight: 800;">
+                    <?= (isset($customer) && $customer) ? 'CHỈNH SỬA THÀNH VIÊN' : 'THÊM NGƯỜI DÙNG MỚI' ?>
+                </h3>
+            </div>
+            
+                <form action="/lego_shop_php/admincustomer/<?= (!empty($customer) && isset($customer['id'])) ? 'update/'.$customer['id'] : 'store' ?>" method="POST">    
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+        <div>
+            <div class="form-group">
+                <label>Họ và tên <span style="color:red">*</span></label>
+                <input type="text" name="fullname" class="form-input" 
+                    placeholder="Nhập tên khách hàng..."
+                    value="<?= $customer['fullname'] ?? '' ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label>Số điện thoại <span style="color:red">*</span></label>
+                <input type="text" name="phone" class="form-input" 
+                    placeholder="Ví dụ: 0961xxxxxx"
+                    value="<?= $customer['phone'] ?? '' ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label>Địa chỉ Email <span style="color:red">*</span></label>
+                <input type="email" name="email" class="form-input" 
+                    placeholder="name@example.com"
+                    value="<?= $customer['email'] ?? '' ?>" required>
+            </div>
+        </div>
+
+        <div>
+            <div class="form-group">
+                <label>Mật khẩu <?= (!empty($customer)) ? '(Để trống nếu không đổi)' : '<span style="color:red">*</span>' ?></label>
+                <input type="password" name="password" class="form-input" 
+                    placeholder="********" 
+                    <?= (!empty($customer)) ? '' : 'required' ?>>
+                <?php if(!empty($customer)): ?>
+                    <p class="password-note">Lưu ý: Chỉ nhập khi muốn thay đổi mật khẩu mới.</p>
+                <?php endif; ?>
+            </div>
+
+            <div class="form-group">
+                <label>Phân quyền hệ thống</label>
+                <div class="role-badge-select">
+                    <label class="role-option">
+                        <input type="radio" name="role" value="customer" <?= (empty($customer) || (isset($customer['role']) && $customer['role'] == 'customer')) ? 'checked' : '' ?>>
+                        <span class="badge-custom role-user">Khách hàng</span>
+                    </label>
+                    <label class="role-option">
+                        <input type="radio" name="role" value="admin" <?= (isset($customer['role']) && $customer['role'] == 'admin') ? 'checked' : '' ?>>
+                        <span class="badge-custom role-admin">Quản trị viên</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Trạng thái tài khoản</label>
+                <select name="status" class="form-input">
+                    <option value="active" <?= (isset($customer['status']) && $customer['status'] == 'active') ? 'selected' : '' ?>>Đang hoạt động</option>
+                    <option value="locked" <?= (isset($customer['status']) && $customer['status'] == 'locked') ? 'selected' : '' ?>>Khóa tài khoản</option>
+                </select>
+            </div>
+        </div>
     </div>
+
+    <div style="margin-top: 15px; padding-top: 20px; border-top: 1px solid #edf2f7; display: flex; align-items: center;">
+        <button type="submit" class="btn-submit">
+            <i class="fa-solid fa-floppy-disk"></i> 
+            <?= (!empty($customer)) ? 'CẬP NHẬT THÔNG TIN' : 'LƯU NGƯỜI DÙNG' ?>
+        </button>
+        <a href="/lego_shop_php/admincustomer" class="btn-cancel-link">Quay lại danh sách</a>
+    </div>
+</form>
+        </div>
+<?php endif; ?>
     
 
     <div class="table-container">
@@ -188,7 +543,7 @@
                     <?php foreach ($customers as $user): ?>
                     <tr>
                         <td class="ps-4">
-                            <span class="fw-bold text-muted" style="font-size: 12px;">
+                            <span class="fw-bold text-muted" style="">
                                 CUS-<?= str_pad($user['id'], 4, '0', STR_PAD_LEFT) ?>
                             </span>
                         </td>
@@ -199,8 +554,8 @@
                             </div>
                         </td>
                         <td>
-                            <div style="font-size: 13px; color: #4a5568; "><i class="fa-regular fa-envelope me-1 opacity-50" style="margin-right: 10px;"></i><?= $user['email'] ?></div>
-                            <div style="font-size: 11px; color: #a0aec0; "><i class="fa-solid fa-phone me-1 opacity-50" style="margin-right: 10px;"></i><?= $user['phone'] ?></div>
+                            <div style=" color: #4a5568; "><i class="fa-regular fa-envelope me-1 opacity-50" style="margin-right: 10px;"></i><?= $user['email'] ?></div>
+                            <div style=" color: #a0aec0; "><i class="fa-solid fa-phone me-1 opacity-50" style="margin-right: 10px;"></i><?= $user['phone'] ?></div>
                         </td>
                         <td>
                             <?php 
@@ -219,19 +574,26 @@
                                 <span class="badge-custom status-locked">Đã khóa</span>
                             <?php endif; ?>
                         </td>
-                        <td class="text-muted" style="font-size: 13px;">
+                        <td class="text-muted" style="">
                             <?= date('d/m/Y', strtotime($user['created_at'])) ?>
                         </td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-2">
-                                <a href="/lego_shop_php/admincustomer/edit/<?= $user['id'] ?>" class="btn-action btn-edit" title="Sửa">
-                                    <i class="fa-solid fa-pen-to-square"></i> Sửa
-                                </a>
+                                <a href="/lego_shop_php/admincustomer/edit/<?= $user['id'] ?>?search=<?= urlencode($search) ?>&status=<?= $status ?>&page=<?= $currentPage ?>" 
+                                    class="btn-action btn-edit" title="Sửa">
+                                        <i class="fa-solid fa-pen-to-square"></i> Sửa
+                                    </a>
+                                <?php 
+                                    $isLocked = ($user['status'] !== 'active');
+                                    $toggleLabel = $isLocked ? 'Mở' : 'Khóa';
+                                    $toggleIcon = $isLocked ? 'fa-unlock' : 'fa-lock';
+                                    $statusClass = $isLocked ? 'is-unlocking' : 'is-locking';
+                                ?>
                                 <a href="/lego_shop_php/admincustomer/toggleStatus/<?= $user['id'] ?>" 
-                                   class="btn-action btn-lock" 
-                                   onclick="return confirm('Thay đổi trạng thái tài khoản này?')">
-                                    <i class="fa-solid <?= $user['status'] === 'active' ? 'fa-lock' : 'fa-unlock' ?>"></i>
-                                    <?= $user['status'] === 'active' ? 'Khóa' : 'Mở' ?>
+                                class="btn-action btn-status-toggle <?= $statusClass ?>" 
+                                onclick="return confirm('Xác nhận <?= mb_strtolower($toggleLabel) ?> tài khoản này?')">
+                                    <i class="fa-solid <?= $toggleIcon ?>"></i>
+                                    <span><?= $toggleLabel ?></span>
                                 </a>
                             </div>
                         </td>
@@ -242,26 +604,47 @@
         </table>
     </div>
 
+    <?php 
+        // --- LOGIC XỬ LÝ URL PHÂN TRANG GIỐNG CATEGORY ---
+        $baseUrl = "/lego_shop_php/admincustomer/";
+        
+        if (isset($currentAction) && $currentAction === 'add') {
+            $baseUrl .= "add";
+        } elseif (isset($currentAction) && $currentAction === 'edit') {
+            $baseUrl .= "edit/" . ($editId ?? '');
+        } else {
+            $baseUrl .= "index";
+        }
+
+        // Giữ lại bộ lọc tìm kiếm và trạng thái
+        $queryString = "?search=" . urlencode($search ?? '') . "&status=" . ($status ?? '');
+    ?>
+
     <?php if (isset($totalPages) && $totalPages > 1): ?>
-    <div class="pagination">
-        <a href="?search=<?= urlencode($search) ?>&status=<?= $status ?>&page=<?= $currentPage - 1 ?>" 
-           class="page-link <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
-            <i class="fa-solid fa-chevron-left"></i>
-        </a>
-
-        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-            <a href="?search=<?= urlencode($search) ?>&status=<?= $status ?>&page=<?= $i ?>" 
-               class="page-link <?= ($currentPage == $i) ? 'active' : '' ?>">
-                <?= $i ?>
+        <div class="pagination">
+            <a href="<?= $baseUrl . $queryString ?>&page=<?= $currentPage - 1 ?>" 
+            class="page-link <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+                <i class="fa-solid fa-chevron-left"></i>
             </a>
-        <?php endfor; ?>
 
-        <a href="?search=<?= urlencode($search) ?>&status=<?= $status ?>&page=<?= $currentPage + 1 ?>" 
-           class="page-link <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
-            <i class="fa-solid fa-chevron-right"></i>
-        </a>
-    </div>
-<?php endif; ?>
+            <?php 
+            // Hiển thị tối đa 5 trang để tránh bị tràn giao diện nếu có quá nhiều user
+            $start = max(1, $currentPage - 2);
+            $end = min($totalPages, $currentPage + 2);
+            
+            for ($i = $start; $i <= $end; $i++): ?>
+                <a href="<?= $baseUrl . $queryString ?>&page=<?= $i ?>" 
+                class="page-link <?= ($currentPage == $i) ? 'active' : '' ?>">
+                    <?= $i ?>
+                </a>
+            <?php endfor; ?>
+
+            <a href="<?= $baseUrl . $queryString ?>&page=<?= $currentPage + 1 ?>" 
+            class="page-link <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    <?php endif; ?>
 </div>
 
 <script>
