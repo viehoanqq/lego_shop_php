@@ -384,13 +384,13 @@ class ProductModel extends Database {
 
         if ($existing) {
             // ĐÃ CÓ -> CẬP NHẬT & Set lại thành 'pending'
-            $sql = "UPDATE product_reviews SET rating = ?, comment = ?, status = 'pending', created_at = NOW() WHERE id = ?";
+            $sql = "UPDATE product_reviews SET rating = ?, comment = ?, status = 'approved', created_at = NOW() WHERE id = ?";
             $stmt = $db->prepare($sql);
             $stmt->bind_param("isi", $rating, $comment, $existing['id']);
             return $stmt->execute();
         } else {
             // CHƯA CÓ -> INSERT MỚI là 'pending'
-            $sql = "INSERT INTO product_reviews (product_id, user_id, rating, comment, status, created_at) VALUES (?, ?, ?, ?, 'pending', NOW())";
+            $sql = "INSERT INTO product_reviews (product_id, user_id, rating, comment, status, created_at) VALUES (?, ?, ?, ?, 'approved', NOW())";
             $stmt = $db->prepare($sql);
             $stmt->bind_param("iiis", $product_id, $user_id, $rating, $comment);
             return $stmt->execute();
