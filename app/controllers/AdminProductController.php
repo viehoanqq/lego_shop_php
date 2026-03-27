@@ -194,24 +194,47 @@ class AdminProductController extends Controller {
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = [
-                'name' => $_POST['name'] ?? '',
-                'sku' => $_POST['sku'] ?? '',
+                'name' => trim($_POST['name'] ?? ''),
+                'sku' => strtoupper(trim($_POST['sku'] ?? '')),
                 'selling_price' => intval($_POST['selling_price'] ?? 0),
                 'category_id' => intval($_POST['category_id'] ?? 0),
                 'pieces' => intval($_POST['pieces'] ?? 0),
-                'description' => $_POST['description'] ?? '',
+                'description' => trim($_POST['description'] ?? ''),
                 'main_image' => !empty($_FILES['main_image']['name']) ? $this->uploadFile($_FILES['main_image']) : null
             ];
 
-            if (empty($data['name']) || empty($data['sku'])) {
+            // ===== VALIDATE =====
+            if ($data['name'] === '' || $data['sku'] === '') {
                 set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/adminproduct/add'); 
+                header('Location: /lego_shop_php/adminproduct/add');
                 exit();
             }
 
+            // SKU format
+            if (!preg_match('/^[A-Z0-9-]+$/', $data['sku'])) {
+                set_flash_message('error', 'invalid_sku');
+                header('Location: /lego_shop_php/adminproduct/add');
+                exit();
+            }
+
+            // price
+            if ($data['selling_price'] <= 0) {
+                set_flash_message('error', 'invalid_price');
+                header('Location: /lego_shop_php/adminproduct/add');
+                exit();
+            }
+
+            // pieces
+            if ($data['pieces'] < 0) {
+                set_flash_message('error', 'invalid_pieces');
+                header('Location: /lego_shop_php/adminproduct/add');
+                exit();
+            }
+
+            // SKU trùng
             if ($this->productModel->isSkuExists($data['sku'])) {
                 set_flash_message('error', 'sku_exists');
-                header('Location: /lego_shop_php/adminproduct/add'); 
+                header('Location: /lego_shop_php/adminproduct/add');
                 exit();
             }
 
@@ -229,17 +252,43 @@ class AdminProductController extends Controller {
     public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = [
-                'name' => $_POST['name'],
-                'sku' => $_POST['sku'],
-                'selling_price' => intval($_POST['selling_price']),
-                'category_id' => intval($_POST['category_id']),
-                'pieces' => intval($_POST['pieces']),
+                'name' => trim($_POST['name'] ?? ''),
+                'sku' => strtoupper(trim($_POST['sku'] ?? '')),
+                'selling_price' => intval($_POST['selling_price'] ?? 0),
+                'category_id' => intval($_POST['category_id'] ?? 0),
+                'pieces' => intval($_POST['pieces'] ?? 0),
                 'main_image' => !empty($_FILES['main_image']['name']) ? $this->uploadFile($_FILES['main_image']) : null
             ];
 
+            // VALIDATE giống store()
+            if ($data['name'] === '' || $data['sku'] === '') {
+                set_flash_message('error', 'empty');
+                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
+                exit();
+            }
+
+            if (!preg_match('/^[A-Z0-9-]+$/', $data['sku'])) {
+                set_flash_message('error', 'invalid_sku');
+                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
+                exit();
+            }
+
+            if ($data['selling_price'] <= 0) {
+                set_flash_message('error', 'invalid_price');
+                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
+                exit();
+            }
+
+            if ($data['pieces'] < 0) {
+                set_flash_message('error', 'invalid_pieces');
+                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
+                exit();
+            }
+
+            // SKU trùng (trừ chính nó)
             if ($this->productModel->isSkuExists($data['sku'], $id)) {
                 set_flash_message('error', 'sku_exists');
-                header('Location: /lego_shop_php/adminproduct/edit/'.$id); 
+                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
                 exit();
             }
 
@@ -279,10 +328,22 @@ class AdminProductController extends Controller {
 
 
     private function uploadFile($file) {
+        $allowed = ['image/jpeg', 'image/png', 'image/webp'];
+
+        if (!in_array($file['type'], $allowed)) {
+            return 'default.jpg';
+        }
+
+        if ($file['size'] > 2 * 1024 * 1024) {
+            return 'default.jpg';
+        }
+
         $targetDir = "public/assets/images/";
         if (!file_exists($targetDir)) mkdir($targetDir, 0777, true);
+
         $fileName = time() . '_' . basename($file["name"]);
         $targetFile = $targetDir . $fileName;
+
         return move_uploaded_file($file["tmp_name"], $targetFile) ? $fileName : 'default.jpg';
     }
 
@@ -352,4 +413,18 @@ class AdminProductController extends Controller {
             'keyword'     => $keyword // Truyền ngược lại để hiển thị trong ô input
         ]);
     }
+
+    public function updateGlobalMinStock() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $min_stock = intval($_POST['min_stock_level']);
+
+        if ($min_stock < 0) {
+            echo "error";
+            return;
+        }
+
+        $this->productModel->updateAllMinStock($min_stock);
+        echo "success";
+    }
+}
 }

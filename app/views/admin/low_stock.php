@@ -1,64 +1,187 @@
 <style>
-
+/* ===== HEADER ===== */
 .header { 
     display: flex; 
     justify-content: space-between; 
-    align-items: flex-end; /* Căn chỉnh các ô input và nút bấm nằm trên một đường thẳng đáy */
+    align-items: flex-end;
     margin-bottom: 25px; 
     gap: 20px;
     background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    padding: 20px 25px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
 }
 
-/* Đảm bảo form dàn hàng ngang và chiếm hết chiều rộng của nhóm bên trái */
-.filter-form { 
-    display: flex; 
-    gap: 15px; 
-    margin-top: 15px; 
-    align-items: center;
-    width: 100%; /* Đảm bảo form mở rộng hết mức có thể */
-}
-
-/* Thanh tìm kiếm: Chiếm toàn bộ không gian còn trống ở giữa */
-.search-wrapper { 
-    position: relative; 
-    flex-grow: 1; /* Đây là dòng quan trọng để kéo dài thanh search */
-}
-
-.search-wrapper input {
-    padding-left: 35px;
-    width: 100%;
-}
-
-/* Ô lọc: Giới hạn chiều rộng lại để không bị quá dài, đẩy nó về bên phải */
-.filter-select { 
-    width: 250px; 
-    flex: none ;
-    cursor: pointer;
-}
-
-/* Căn chỉnh lại Header để cân đối */
 .header-left { 
-    flex-grow: 1; 
-    display: flex; 
+    flex: 1;
+    display: flex;
     flex-direction: column;
 }
 
-/* Đồng bộ chiều cao cho đẹp */
+.header-left h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.header-left p {
+    color: #718096;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* ===== FORM ===== */
+.filter-form { 
+    display: flex; 
+    gap: 12px; 
+    align-items: center;
+    margin-top: 15px;
+}
+
+/* ===== SEARCH ===== */
+.search-wrapper { 
+    position: relative; 
+    flex: 2;
+}
+
+.search-wrapper input {
+    width: 100%;
+    height: 42px;
+    padding: 0 110px 0 38px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    outline: none;
+    transition: 0.2s;
+}
+
+.search-wrapper input:focus {
+    border-color: #3182ce;
+    box-shadow: 0 0 0 2px rgba(49,130,206,0.15);
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0aec0;
+}
+
+/* Nút search */
+.btn-search-inside {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30px;
+    padding: 0 14px;
+    border-radius: 6px;
+    border: none;
+    background: #3182ce;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-search-inside:hover {
+    background: #2b6cb0;
+}
+
+/* ===== SELECT ===== */
 .form-control {
     height: 42px;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border-radius: 10px;
+    padding: 0 12px;
+    background: #fff;
+    transition: 0.2s;
 }
-/* Kiểu dáng Badge trạng thái */
+
+.form-control:focus {
+    border-color: #3182ce;
+    box-shadow: 0 0 0 2px rgba(49,130,206,0.15);
+}
+
+/* ===== BUTTON SETTINGS ===== */
+.btn-filter-action {
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 10px;
+    border: none;
+    background: #edf2f7;
+    color: #2d3748;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+}
+
+.btn-filter-action:hover {
+    background: #e2e8f0;
+}
+
+/* ===== TABLE ===== */
+.table-container {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+
+.lego-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.lego-table thead {
+    background: #f8fafc;
+}
+
+.lego-table th {
+    text-align: left;
+    padding: 15px;
+    color: #4a5568;
+    font-size: 13px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #edf2f7;
+}
+
+.lego-table td {
+    padding: 15px;
+    border-bottom: 1px solid #edf2f7;
+    vertical-align: middle;
+}
+
+/* Hover row */
+.lego-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* ===== PRODUCT ===== */
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.img-product {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+}
+
+/* ===== BADGE ===== */
 .stock-badge {
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
-    display: inline-block;
 }
 
 .stock-low {
@@ -71,103 +194,104 @@
     background: #fff5f5;
     color: #e53e3e;
     border: 1px solid #feb2b2;
-    animation: pulse-red 2s infinite; /* Hiệu ứng nháy nhẹ cho hàng đã hết sạch */
 }
 
-@keyframes pulse-red {
-    0% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(229, 62, 62, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0); }
-}
-
-/* Tùy chỉnh bảng */
-.lego-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-}
-
-.lego-table thead tr {
-    background: #f8fafc;
-}
-
-.lego-table th {
-    padding: 15px 20px;
-    color: #4a5568;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid #edf2f7;
-}
-
-.lego-table td {
-    padding: 15px 20px;
-    vertical-align: middle;
-    border-bottom: 1px solid #edf2f7;
-}
-
-/* Ảnh sản phẩm */
-.img-product {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
-
-.product-cell {
+/* ===== PAGINATION ===== */
+.pagination {
     display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-/* Nút quay lại */
-.btn-back {
-    display: inline-flex;
-    align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 10px 18px;
-    background: #718096;
-    color: white;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.btn-back:hover {
-    background: #4a5568;
-    transform: translateX(-3px);
+    margin-top: 25px;
 }
 
 .page-link {
-    padding: 8px 16px;
+    padding: 8px 14px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     text-decoration: none;
     color: #4a5568;
     background: #fff;
     font-weight: 600;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: 0.2s;
 }
 
 .page-link:hover {
     background: #edf2f7;
-    border-color: #cbd5e0;
 }
 
 .page-link.active {
     background: #3182ce;
     color: #fff;
     border-color: #3182ce;
-    box-shadow: 0 4px 6px rgba(49, 130, 206, 0.2);
+}
+
+/* ===== MODAL ===== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background: #fff;
+    padding: 25px;
+    width: 360px;
+    border-radius: 14px;
+    margin: 120px auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    animation: fadeIn 0.25s ease;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+}
+
+/* input modal */
+.modal-content input {
+    width: 100%;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 0 10px;
+    margin-top: 8px;
+}
+
+/* button modal */
+.modal-content button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.modal-content button:first-child {
+    background: #3182ce;
+    color: white;
+}
+
+.modal-content button:last-child {
+    background: #edf2f7;
+}
+
+.modal-content button:hover {
+    opacity: 0.9;
+}
+
+/* animation */
+@keyframes fadeIn {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 </style>
@@ -184,6 +308,9 @@
                        placeholder="Tìm tên sản phẩm..." 
                        value="<?= $_GET['keyword'] ?? '' ?>"
                        style="padding-left: 35px; width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; height: 40px;">
+                <button type="submit" class="btn-search-inside">
+                    Tìm kiếm
+                </button>
             </div>
 
             <select name="type" class="form-control" onchange="this.form.submit()" 
@@ -194,6 +321,9 @@
             </select>
             
             <input type="hidden" name="page" value="1">
+            <button type="button" class="btn-filter-action" onclick="openSettingModal()">
+                <i class="fa-solid fa-gear"></i> Cài đặt
+            </button>
         </form>
     </div>
     <div style="display: flex; gap: 10px;">
@@ -212,7 +342,7 @@
                 <th>Dòng LEGO</th>
                 <th>Tồn kho thực tế</th>
                 <th>Mức cảnh báo</th>
-                <th>Trạng thái</th>
+                <th style="text-align: center;">Trạng thái</th>
             </tr>
         </thead>
         <tbody>
@@ -236,7 +366,7 @@
                     
                     <td><span style="color: #718096;">≤ <?= $p['min_stock_level'] ?></span></td>
                     
-                    <td>
+                    <td style="text-align: center;">
                         <span class="stock-badge <?= $p['stock_quantity'] <= 0 ? 'stock-empty' : 'stock-low' ?>">
                             <?= $p['stock_quantity'] <= 0 ? 'Hết' : 'Sắp hết' ?>
                         </span>
@@ -273,3 +403,46 @@
         
     </div>
 <?php endif; ?>
+
+<div id="settingModal" class="modal">
+    <div class="modal-content">
+        <h3>⚙️ Cài đặt mức cảnh báo</h3>
+
+        <label>Nhập mức cảnh báo chung:</label>
+        <input type="number" id="globalMinStock" min="0" placeholder="Ví dụ: 10">
+
+        <div style="margin-top: 15px;">
+            <button onclick="saveMinStock()">Lưu</button>
+            <button onclick="closeSettingModal()">Hủy</button>
+        </div>
+    </div>
+</div>
+<script>
+function openSettingModal() {
+    document.getElementById('settingModal').style.display = 'block';
+}
+
+function closeSettingModal() {
+    document.getElementById('settingModal').style.display = 'none';
+}
+
+function saveMinStock() {
+    let value = document.getElementById('globalMinStock').value;
+
+    if (value === '' || value < 0) {
+        alert('Giá trị không hợp lệ');
+        return;
+    }
+
+    fetch('/lego_shop_php/adminproduct/updateGlobalMinStock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'min_stock_level=' + value
+    })
+    .then(res => res.text())
+    .then(() => {
+        alert('Đã cập nhật!');
+        location.reload();
+    });
+}
+</script>

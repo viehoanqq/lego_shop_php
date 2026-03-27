@@ -25,28 +25,52 @@ class AdminReviewController extends Controller {
 
     // Thay đổi trạng thái Duyệt/Ẩn
     public function toggleStatus() {
-        if (isset($_GET['id']) && isset($_GET['status'])) {
-            $id = $_GET['id'];
-            $currentStatus = $_GET['status'];
-            
-            // Đảo trạng thái
-            $newStatus = ($currentStatus === 'approved') ? 'hidden' : 'approved';
-            
-            if ($this->reviewModel->updateStatus($id, $newStatus)) {
-                $_SESSION['success'] = "Cập nhật trạng thái thành công!";
-            } else {
-                $_SESSION['error'] = "Có lỗi xảy ra khi cập nhật.";
-            }
+        if (!isset($_GET['id']) || !isset($_GET['status'])) {
+            $_SESSION['error'] = 'notfound';
+            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            exit();
         }
-        header('Location: ' . $_SERVER['HTTP_REFERER']); // Quay lại trang trước đó
+
+        $id = (int) $_GET['id'];
+        $currentStatus = $_GET['status'];
+
+        // Validate status hợp lệ
+        if (!in_array($currentStatus, ['approved', 'hidden'])) {
+            $_SESSION['error'] = 'invalid';
+            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            exit();
+        }
+
+        // Đảo trạng thái
+        $newStatus = ($currentStatus === 'approved') ? 'hidden' : 'approved';
+
+        if ($this->reviewModel->updateStatus($id, $newStatus)) {
+            set_flash_message('msg', 'updated');
+        } else {
+            set_flash_message('error', 'db');
+        }
+
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
         exit();
     }
 
-    // Xóa đánh giá
+
+    // ===== DELETE REVIEW =====
     public function delete($id) {
-        if ($this->reviewModel->deleteReview($id)) {
-            $_SESSION['success'] = "Đã xóa đánh giá.";
+        if (empty($id)) {
+            $_SESSION['error'] = 'notfound';
+            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            exit();
         }
+
+        $id = (int) $id;
+
+        if ($this->reviewModel->deleteReview($id)) {
+            set_flash_message('msg', 'deleted');
+        } else {
+            set_flash_message('error', 'db');
+        }
+
         header('Location: ' . $_SERVER['HTTP_REFERER']);
         exit();
     }

@@ -466,6 +466,13 @@ class ProductModel extends Database {
         return $row['total'] ?? 0;
     }
 
+    public function updateAllMinStock($min_stock) {
+        $db = $this->getConnection();
+
+        $sql = "UPDATE products SET min_stock_level = " . intval($min_stock);
+        return $db->query($sql);
+    }
+
 
     // Hàm check xóa
     public function canDeleteProduct($id) {

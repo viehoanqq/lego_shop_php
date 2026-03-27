@@ -27,8 +27,56 @@
 
     .filter-form-sync { display: flex; gap: 10px; margin-top: 15px; align-items: center; }
     
-    .search-wrapper-sync { position: relative; flex: 2; }
-    .search-wrapper-sync i { position: absolute; left: 12px; top: 12px; color: #a0aec0; }
+/* Container giữ vị trí tương đối */
+.search-wrapper-sync {
+    position: relative;
+    flex: 2; /* Để thanh search dài hơn */
+}
+
+.search-wrapper-sync i.fa-magnifying-glass {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 1;
+}
+
+.form-control-sync { 
+    width: 100%; 
+    padding: 10px 100px 10px 35px ; /* Trừa chỗ cho nút tìm kiếm bên phải */
+    box-sizing: border-box;
+}
+
+/* Style cho nút bấm bên trong */
+.btn-search-inside {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-search-inside:hover {
+    background: #2b6cb0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Nếu bạn muốn dùng icon thay vì chữ "Tìm kiếm" */
+.btn-search-inside i {
+    font-size: 14px;
+}
 
     .form-control-sync { 
         width: 100%; 
@@ -234,7 +282,6 @@
         margin-top: 8px;
         background: #fffaf0;
         padding: 5px 10px;
-        border-left: 3px solid #f6ad55;
 
     }
 
@@ -364,6 +411,7 @@
 .btn-status-toggle.is-unlocking {
     background: #f0fff4;
     color: #38a169 ;
+    border: 1px solid #9ae6b4;
 }
 .btn-status-toggle.is-unlocking:hover {
     background: #38a169;
@@ -373,6 +421,49 @@
 /* Hiệu ứng icon */
 .btn-status-toggle i {
     font-size: 12px;
+}
+
+.btn-search-inside {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-search-inside:hover {
+    background: #2b6cb0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Nếu bạn muốn dùng icon thay vì chữ "Tìm kiếm" */
+.btn-search-inside i {
+    font-size: 14px;
+}
+
+.error-text {
+    color: #e53e3e;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.input-error {
+    border-color: #e53e3e ;
+}
+
+.input-success {
+    border-color: #38a169 ;
 }
 
 
@@ -424,6 +515,7 @@ $session_error = get_flash_message('error');
                     <input type="text" name="search" class="form-control-sync" 
                            placeholder="Tìm tên, email hoặc số điện thoại..." 
                            value="<?= htmlspecialchars($search ?? '') ?>">
+                    <button type="submit" class="btn-search-inside"> Tìm kiếm </button>
                 </div>
 
                 <select name="status" class="form-control-sync" onchange="this.form.submit()" style="flex: 1; cursor: pointer; padding-left: 12px;">
@@ -456,35 +548,46 @@ $session_error = get_flash_message('error');
         <div>
             <div class="form-group">
                 <label>Họ và tên <span style="color:red">*</span></label>
-                <input type="text" name="fullname" class="form-input" 
+                <input type="text" id="fullname" name="fullname" class="form-input" 
                     placeholder="Nhập tên khách hàng..."
                     value="<?= $customer['fullname'] ?? '' ?>" required>
+                <small class="error-text"></small>
             </div>
 
             <div class="form-group">
                 <label>Số điện thoại <span style="color:red">*</span></label>
-                <input type="text" name="phone" class="form-input" 
+                <input type="text" id="phone" name="phone" class="form-input" 
                     placeholder="Ví dụ: 0961xxxxxx"
                     value="<?= $customer['phone'] ?? '' ?>" required>
+                    <small class="error-text"></small>
             </div>
 
             <div class="form-group">
                 <label>Địa chỉ Email <span style="color:red">*</span></label>
-                <input type="email" name="email" class="form-input" 
+                <input type="email" id="email" name="email" class="form-input" 
                     placeholder="name@example.com"
                     value="<?= $customer['email'] ?? '' ?>" required>
+                    <small class="error-text"></small>
             </div>
         </div>
 
         <div>
             <div class="form-group">
                 <label>Mật khẩu <?= (!empty($customer)) ? '(Để trống nếu không đổi)' : '<span style="color:red">*</span>' ?></label>
-                <input type="password" name="password" class="form-input" 
+                <input type="password" id="password" name="password" class="form-input" 
                     placeholder="********" 
                     <?= (!empty($customer)) ? '' : 'required' ?>>
                 <?php if(!empty($customer)): ?>
                     <p class="password-note">Lưu ý: Chỉ nhập khi muốn thay đổi mật khẩu mới.</p>
                 <?php endif; ?>
+                <small class="error-text"></small>
+            </div>
+
+            <div class="form-group">
+                <label>Nhập lại mật khẩu <span style="color:red">*</span></label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-input" 
+                    placeholder="Nhập lại mật khẩu">
+                <small class="error-text"></small>
             </div>
 
             <div class="form-group">
@@ -648,6 +751,149 @@ $session_error = get_flash_message('error');
 </div>
 
 <script>
+    const confirmPassword = document.getElementById("confirm_password");
+    const form = document.querySelector(".form-container form");
+    const fullname = document.getElementById("fullname");
+    const phone = document.getElementById("phone");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+
+    confirmPassword.addEventListener("input", validateConfirmPassword);
+
+    form.addEventListener("submit", function(e) {
+        const isValid =
+            validateFullname() &&
+            validatePhone() &&
+            validateEmail() &&
+            validatePassword() &&
+            validateConfirmPassword();
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+
+    // ===== VALIDATE CONFIRM =====
+    function validateConfirmPassword() {
+        const pass = password.value;
+        const confirm = confirmPassword.value;
+
+        // Nếu đang edit và không nhập password → bỏ qua
+        if (pass === "" && confirm === "") {
+            showSuccess(confirmPassword);
+            return true;
+        }
+
+        if (confirm === "") {
+            showError(confirmPassword, "Vui lòng nhập lại mật khẩu");
+            return false;
+        }
+
+        if (pass !== confirm) {
+            showError(confirmPassword, "Mật khẩu không khớp");
+            return false;
+        }
+
+        showSuccess(confirmPassword);
+        return true;
+    }
+
+    // ===== UI =====
+    function showError(input, message) {
+        input.classList.add("input-error");
+        input.classList.remove("input-success");
+        input.nextElementSibling.innerText = message;
+    }
+
+    function showSuccess(input) {
+        input.classList.remove("input-error");
+        input.classList.add("input-success");
+        input.nextElementSibling.innerText = "";
+    }
+
+    // ===== VALIDATE =====
+
+    // 1. FULLNAME
+    function validateFullname() {
+        const value = fullname.value.trim();
+
+        if (value === "") {
+            showError(fullname, "Không được để trống");
+            return false;
+        }
+
+        if (value.length < 3) {
+            showError(fullname, "Tối thiểu 3 ký tự");
+            return false;
+        }
+
+        showSuccess(fullname);
+        return true;
+    }
+
+    // 2. PHONE
+    function validatePhone() {
+        const value = phone.value.trim();
+        const regex = /^0[0-9]{9}$/;
+
+        if (value === "") {
+            showError(phone, "Không được để trống");
+            return false;
+        }
+
+        if (!regex.test(value)) {
+            showError(phone, "SĐT phải 10 số và bắt đầu bằng 0");
+            return false;
+        }
+
+        showSuccess(phone);
+        return true;
+    }
+
+    // 3. EMAIL
+    function validateEmail() {
+        const value = email.value.trim();
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (value === "") {
+            showError(email, "Không được để trống");
+            return false;
+        }
+
+        if (!regex.test(value)) {
+            showError(email, "Email không hợp lệ");
+            return false;
+        }
+
+        showSuccess(email);
+        return true;
+    }
+
+    // 4. PASSWORD
+    function validatePassword() {
+        const value = password.value;
+
+        // Nếu là edit thì cho phép bỏ trống
+        if (value === "") {
+            showSuccess(password);
+            return true;
+        }
+
+        if (value.length < 6) {
+            showError(password, "Tối thiểu 6 ký tự");
+            return false;
+        }
+
+        showSuccess(password);
+        return true;
+    }
+
+    // ===== REALTIME =====
+    fullname.addEventListener("input", validateFullname);
+    phone.addEventListener("input", validatePhone);
+    email.addEventListener("input", validateEmail);
+    password.addEventListener("input", validatePassword);
+
     // Tự động ẩn thông báo sau 4 giây
     setTimeout(() => {
         const alert = document.querySelector('.alert-box');
