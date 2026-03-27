@@ -364,11 +364,11 @@ $session_error = get_flash_message('error');
                 <span>
                     <?php
                         switch($session_msg) {
-                            case 'success': echo "Thêm sản phẩm thành công!"; break;
-                            case 'updated': echo "Đã cập nhật thông tin sản phẩm!"; break;
-                            case 'show':    echo "Đã mở khóa sản phẩm!"; break;
-                            case 'hidden':  echo "Đã khóa sản phẩm khỏi cửa hàng!"; break;
-                            case 'deleted': echo "Đã xóa sản phẩm thành công!"; break;
+                            case 'success':                 echo "Thêm sản phẩm thành công!"; break;
+                            case 'updated':                 echo "Đã cập nhật thông tin sản phẩm!"; break;
+                            case 'show':                    echo "Đã mở khóa sản phẩm!"; break;
+                            case 'hidden':                  echo "Đã khóa sản phẩm khỏi cửa hàng!"; break;
+                            case 'deleted':                 echo "Đã xóa sản phẩm thành công!"; break;
                             default:        echo "Thao tác thành công!"; break;
                         }
                     ?>
@@ -382,16 +382,17 @@ $session_error = get_flash_message('error');
                 <span>
                     <?php
                         switch($session_error) {
-                            case 'empty':          echo "Vui lòng điền đầy đủ các trường bắt buộc!"; break;
-                            case 'db':             echo "Lỗi hệ thống: Không thể xử lý dữ liệu."; break;
-                            case 'sku_exists':     echo "Lỗi: Mã SKU này đã tồn tại!"; break;
-                            case 'already_hidden': echo "Sản phẩm này đã bị khóa!"; break;
-                            case 'already_shown':  echo "Sản phẩm này hiện đang được mở bán!"; break;
-                            case 'notfound':       echo "Không tìm thấy sản phẩm yêu cầu!"; break;
-                            case 'has_history':    echo "Không thể xóa! Sản phẩm này đã có trong phiếu nhập hoặc đơn hàng."; break;
-                            case 'cat_is_locked':  echo "Danh mục của sản phẩm này đã bị khóa, không thể mở."; break;
-                            case 'db':             echo "Lỗi hệ thống: Không thể xóa dữ liệu vào lúc này."; break;
-                            default:               echo "Có lỗi xảy ra, vui lòng thử lại."; break;
+                            case 'empty':                   echo "Vui lòng điền đầy đủ các trường bắt buộc!"; break;
+                            case 'db':                      echo "Lỗi hệ thống: Không thể xử lý dữ liệu."; break;
+                            case 'sku_exists':              echo "Lỗi: Mã SKU này đã tồn tại!"; break;
+                            case 'already_hidden':          echo "Sản phẩm này đã bị khóa!"; break;
+                            case 'already_shown':           echo "Sản phẩm này hiện đang được mở bán!"; break;
+                            case 'notfound':                echo "Không tìm thấy sản phẩm yêu cầu!"; break;
+                            case 'has_history':             echo "Không thể xóa! Sản phẩm này đã có trong phiếu nhập hoặc đơn hàng."; break;
+                            case 'hidden_due_to_history':   echo "Không thể xóa! Sản phẩm này đã có trong phiếu nhập hoặc đơn hàng. Hệ thống đã tự động <b>Khóa</b> sản phẩm này!"; break;
+                            case 'cat_is_locked':           echo "Danh mục của sản phẩm này đã bị khóa, không thể mở."; break;
+                            case 'db':                      echo "Lỗi hệ thống: Không thể xóa dữ liệu vào lúc này."; break;
+                            default:                        echo "Có lỗi xảy ra, vui lòng thử lại."; break;
                         }
                     ?>
                 </span>
@@ -403,7 +404,7 @@ $session_error = get_flash_message('error');
 
 <div class="header">
     <div class="header-left">
-        <h2>📦 Quản lý Kho LEGO</h2>
+        <h2> Quản lý Sản Phẩm</h2>
         
         <form action="/lego_shop_php/adminproduct" method="GET" class="search-form">
             <div class="search-box">

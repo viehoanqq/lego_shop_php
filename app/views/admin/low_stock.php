@@ -297,7 +297,7 @@
 </style>
 <div class="header">
     <div class="header-left">
-        <h2>⚠️ Cảnh báo hết hàng trong kho</h2>
+        <h2>Cảnh báo hết hàng trong kho</h2>
         <p style="color: #718096; font-size: 14px;">Danh sách sản phẩm có số lượng tồn kho chạm mức tối thiểu.</p>
 
         <form action="/lego_shop_php/adminproduct/lowstock" method="GET" class="filter-form" style="display: flex; gap: 10px; align-items: center;">
@@ -319,11 +319,18 @@
                 <option value="out" <?= ($currentType == 'out') ? 'selected' : '' ?>>Đã hết (0)</option>
                 <option value="low" <?= ($currentType == 'low') ? 'selected' : '' ?>>Sắp hết hàng (Dưới ngưỡng)</option>
             </select>
+
+
+
             
             <input type="hidden" name="page" value="1">
-            <button type="button" class="btn-filter-action" onclick="openSettingModal()">
-                <i class="fa-solid fa-gear"></i> Cài đặt
+            <button type="button" class="btn-filter-action" onclick="openSettingModalAll()">
+                <i class="fa-solid fa-gear"></i> Sửa mức cảnh báo chung
             </button>
+
+
+
+
         </form>
     </div>
     <div style="display: flex; gap: 10px;">
@@ -343,12 +350,13 @@
                 <th>Tồn kho thực tế</th>
                 <th>Mức cảnh báo</th>
                 <th style="text-align: center;">Trạng thái</th>
+                <th style="text-align: left;">Thao tác</th>
             </tr>
         </thead>
         <tbody>
             <?php if(!empty($products)): ?>
                 <?php foreach ($products as $p): ?>
-                <tr style="text-align: center;">
+                <tr style="text-align: left;">
                     <td>
                         <div class="product-cell">
                             <img src="/lego_shop_php/public/assets/images/<?= $p['main_image'] ?? 'default.jpg' ?>" class="img-product">
@@ -370,6 +378,15 @@
                         <span class="stock-badge <?= $p['stock_quantity'] <= 0 ? 'stock-empty' : 'stock-low' ?>">
                             <?= $p['stock_quantity'] <= 0 ? 'Hết' : 'Sắp hết' ?>
                         </span>
+                    </td>
+
+                    <td style="text-align: center;">
+                        <button type="button" 
+                                class="btn-filter-action" 
+                                onclick="openEditModal(<?= $p['id'] ?>, '<?= htmlspecialchars($p['name']) ?>', <?= $p['min_stock_level'] ?>)"
+                                style="color: #3182ce; background: #ebf8ff; border: 1px solid #bee3f8;">
+                            <i class="fa-solid fa-pen-to-square"></i> Sửa mức cảnh báo
+                        </button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -404,45 +421,126 @@
     </div>
 <?php endif; ?>
 
-<div id="settingModal" class="modal">
+
+
+
+
+
+<div id="settingModalAll" class="modal">
     <div class="modal-content">
         <h3>⚙️ Cài đặt mức cảnh báo</h3>
 
         <label>Nhập mức cảnh báo chung:</label>
-        <input type="number" id="globalMinStock" min="0" placeholder="Ví dụ: 10">
+        <input type="number" id="globalMinStockAll" min="0" placeholder="Ví dụ: 10">
 
         <div style="margin-top: 15px;">
-            <button onclick="saveMinStock()">Lưu</button>
-            <button onclick="closeSettingModal()">Hủy</button>
+            <button onclick="saveMinStockAll()">Lưu</button>
+            <button onclick="closeSettingModalAll()">Hủy</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<div id="settingModal" class="modal">
+    <div class="modal-content" style="width: 400px;">
+        <h3 id="modalTitle" style="margin-bottom: 5px;">⚙️ Cài đặt cảnh báo</h3>
+        <p id="productNameLabel" style="font-size: 13px; color: #718096; margin-bottom: 15px; min-height: 20px;"></p>
+
+        <input type="hidden" id="editProductId">
+        
+        <label style="font-size: 14px; font-weight: 600;">Mức tồn kho tối thiểu:</label>
+        <input type="number" id="globalMinStock" min="0" placeholder="Ví dụ: 10" style="margin-top: 8px;">
+
+        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+            <button onclick="saveMinStock()" style="background: #3182ce; color: white;">Xác nhận lưu</button>
+            <button onclick="closeSettingModal()" style="background: #edf2f7; color: #4a5568;">Hủy</button>
         </div>
     </div>
 </div>
 <script>
-function openSettingModal() {
-    document.getElementById('settingModal').style.display = 'block';
-}
 
-function closeSettingModal() {
-    document.getElementById('settingModal').style.display = 'none';
-}
 
-function saveMinStock() {
-    let value = document.getElementById('globalMinStock').value;
 
-    if (value === '' || value < 0) {
-        alert('Giá trị không hợp lệ');
-        return;
+
+    function openSettingModalAll() {
+        document.getElementById('settingModalAll').style.display = 'block';
     }
 
-    fetch('/lego_shop_php/adminproduct/updateGlobalMinStock', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'min_stock_level=' + value
-    })
-    .then(res => res.text())
-    .then(() => {
-        alert('Đã cập nhật!');
-        location.reload();
-    });
-}
+    function closeSettingModalAll() {
+        document.getElementById('settingModalAll').style.display = 'none';
+    }
+
+    function saveMinStockAll() {
+        let value = document.getElementById('globalMinStockAll').value;
+
+        if (value === '' || value < 0) {
+            alert('Giá trị không hợp lệ');
+            return;
+        }
+
+        fetch('/lego_shop_php/adminproduct/updateGlobalMinStock', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'min_stock_level=' + value
+        })
+        .then(res => res.text())
+        .then(() => {
+            alert('Đã cập nhật!');
+            location.reload();
+        });
+    }
+
+
+
+
+
+
+    function openSettingModal() {
+        document.getElementById('modalTitle').innerText = "⚙️ Cài đặt cho TẤT CẢ";
+        document.getElementById('productNameLabel').innerText = "Lưu ý: Thao tác này sẽ thay đổi mức cảnh báo của mọi sản phẩm.";
+        document.getElementById('editProductId').value = "all";
+        document.getElementById('globalMinStock').value = "";
+        document.getElementById('settingModal').style.display = 'block';
+    }
+
+    function openEditModal(id, name, currentMin) {
+        document.getElementById('modalTitle').innerText = "⚙️ Chỉnh sửa mức cảnh báo";
+        document.getElementById('productNameLabel').innerText = "Sản phẩm: " + name;
+        document.getElementById('editProductId').value = id;
+        document.getElementById('globalMinStock').value = currentMin;
+        document.getElementById('settingModal').style.display = 'block';
+    }
+
+    function closeSettingModal() {
+        document.getElementById('settingModal').style.display = 'none';
+    }
+
+    function saveMinStock() {
+        const value = document.getElementById('globalMinStock').value;
+        const productId = document.getElementById('editProductId').value;
+
+        if (value === '' || value < 0) {
+            alert('Giá trị không hợp lệ');
+            return;
+        }
+
+        // Gửi đến route xử lý chung
+        fetch('/lego_shop_php/adminproduct/updateMinStock', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `min_stock_level=${value}&product_id=${productId}`
+        })
+        .then(res => res.text())
+        .then(data => {
+            if(data.trim() === "success") {
+                location.reload();
+            } else {
+                alert('Có lỗi xảy ra: ' + data);
+            }
+        });
+    }
 </script>

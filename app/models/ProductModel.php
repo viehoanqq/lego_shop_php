@@ -486,6 +486,13 @@ class ProductModel extends Database {
         return $db->query($sql);
     }
 
+    public function updateSingleMinStock($id, $min_stock) {
+        $db = $this->getConnection();
+        $sql = "UPDATE products SET min_stock_level = ? WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        return $stmt->execute([intval($min_stock), intval($id)]);
+    }
+
 
     // Hàm check xóa
     public function canDeleteProduct($id) {
@@ -512,6 +519,15 @@ class ProductModel extends Database {
         
         // Vì CSDL của bạn có ON DELETE CASCADE nên nó sẽ tự xóa các bảng liên quan
         $sql = "DELETE FROM products WHERE id = $id";
+        return $db->query($sql);
+    }
+
+    // Hàm 2: Chỉ khóa (ẩn) sản phẩm
+    public function hideProduct($id) {
+        $db = $this->getConnection();
+        $id = intval($id);
+        // Giả sử status = 0 là trạng thái bị khóa/ẩn
+        $sql = "UPDATE products SET status = 2 WHERE id = $id";
         return $db->query($sql);
     }
 

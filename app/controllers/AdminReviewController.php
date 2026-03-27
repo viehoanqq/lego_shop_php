@@ -3,6 +3,11 @@ class AdminReviewController extends Controller {
     private $reviewModel;
 
     public function __construct() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        if (!isset($_SESSION['admin_id'])) { 
+            header("Location: /lego_shop_php/admin/login"); 
+            exit; 
+        }
         $this->reviewModel = $this->model('ReviewModel');
     }
 

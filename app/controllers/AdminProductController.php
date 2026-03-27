@@ -5,6 +5,11 @@ class AdminProductController extends Controller {
     private $limit = 6; // Đặt limit chung
 
     public function __construct() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        if (!isset($_SESSION['admin_id'])) { 
+            header("Location: /lego_shop_php/admin/login"); 
+            exit; 
+        }
         $this->productModel = $this->model('ProductModel');
         $this->categoryModel = $this->model('CategoryModel');
     }
@@ -218,7 +223,11 @@ class AdminProductController extends Controller {
             }
 
             // price
-            
+            // if ($data['selling_price'] <= 0) {
+            //     set_flash_message('error', 'invalid_price');
+            //     header('Location: /lego_shop_php/adminproduct/add');
+            //     exit();
+            // }
 
             // pieces
             if ($data['pieces'] < 0) {
@@ -299,23 +308,48 @@ class AdminProductController extends Controller {
         }
     }
 
+    // public function delete($id) {
+    //     $productModel = $this->model("ProductModel");
+
+    //     // BƯỚC 1: KIỂM TRA RÀNG BUỘC
+    //     if (!$productModel->canDeleteProduct($id)) {
+    //         // Gửi mã 'has_history' để View hiển thị đúng câu thông báo
+    //         set_flash_message('error', 'has_history'); 
+    //         header("Location: /lego_shop_php/adminproduct");
+    //         exit();
+    //     }
+
+    //     // BƯỚC 2: TIẾN HÀNH XÓA
+    //     if ($productModel->deleteProduct($id)) {
+    //         // Đồng nhất với View (View của bạn đang dùng 'deleted')
+    //         set_flash_message('msg', 'deleted'); 
+    //     } else {
+    //         set_flash_message('error', 'db');
+    //     }
+
+    //     header("Location: /lego_shop_php/adminproduct");
+    //     exit();
+    // }
+
     public function delete($id) {
         $productModel = $this->model("ProductModel");
+        $id = intval($id);
 
-        // BƯỚC 1: KIỂM TRA RÀNG BUỘC
-        if (!$productModel->canDeleteProduct($id)) {
-            // Gửi mã 'has_history' để View hiển thị đúng câu thông báo
-            set_flash_message('error', 'has_history'); 
-            header("Location: /lego_shop_php/adminproduct");
-            exit();
-        }
-
-        // BƯỚC 2: TIẾN HÀNH XÓA
-        if ($productModel->deleteProduct($id)) {
-            // Đồng nhất với View (View của bạn đang dùng 'deleted')
-            set_flash_message('msg', 'deleted'); 
+        // BƯỚC 1: KIỂM TRA XEM CÓ LỊCH SỬ GIAO DỊCH CHƯA
+        if ($productModel->canDeleteProduct($id)) {
+            // TRƯỜNG HỢP A: Chưa có lịch sử -> Xóa thẳng tay
+            if ($productModel->deleteProduct($id)) {
+                set_flash_message('msg', 'deleted');
+            } else {
+                set_flash_message('error', 'db');
+            }
         } else {
-            set_flash_message('error', 'db');
+            // TRƯỜNG HỢP B: Đã có lịch sử -> Không được xóa, chỉ được Khóa
+            if ($productModel->hideProduct($id)) {
+                set_flash_message('error', 'hidden_due_to_history');
+            } else {
+                set_flash_message('error', 'db');
+            }
         }
 
         header("Location: /lego_shop_php/adminproduct");
@@ -411,16 +445,42 @@ class AdminProductController extends Controller {
     }
 
     public function updateGlobalMinStock() {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $min_stock = intval($_POST['min_stock_level']);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $min_stock = intval($_POST['min_stock_level']);
 
-        if ($min_stock < 0) {
-            echo "error";
-            return;
+            if ($min_stock < 0) {
+                echo "error";
+                return;
+            }
+
+            $this->productModel->updateAllMinStock($min_stock);
+            echo "success";
         }
-
-        $this->productModel->updateAllMinStock($min_stock);
-        echo "success";
     }
-}
+
+    public function updateMinStock() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $min_stock = intval($_POST['min_stock_level']);
+            $product_id = $_POST['product_id']; // Có thể là số ID hoặc chữ "all"
+
+            if ($min_stock < 0) {
+                echo "error_value";
+                return;
+            }
+
+            if ($product_id === 'all') {
+                // Cập nhật toàn bộ
+                $result = $this->productModel->updateAllMinStock($min_stock);
+            } else {
+                // Cập nhật 1 sản phẩm
+                $result = $this->productModel->updateSingleMinStock(intval($product_id), $min_stock);
+            }
+
+            if ($result) {
+                echo "success";
+            } else {
+                echo "error_db";
+            }
+        }
+    }
 }
