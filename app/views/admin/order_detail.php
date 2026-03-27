@@ -117,7 +117,7 @@
                             <?php foreach ($items as $item): ?>
                             <tr>
                                 <td style="display: flex; align-items: center; gap: 10px;">
-                                    <img src="/lego_shop_php/public/assets/images/<?= $item['image_url'] ?? 'default-lego.jpg' ?>" class="product-img">
+                                    <img src="/lego_shop_php/public/assets/images/<?= $item['image_url'] ?? 'default-lego.jpg' ?>" width="40" style="border-radius: 4px; border: 1px solid #e2e8f0; padding: 2px;">
                                     <strong><?= htmlspecialchars($item['name']) ?></strong>
                                 </td>
                                 <td style="text-align: center; font-weight: 600;"><?= $item['quantity'] ?></td>
@@ -126,6 +126,14 @@
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" style="text-align: right; padding-top: 15px; font-weight: 700; color: #475569; border: none;">TỔNG TIỀN :</td>
+                                <td style="text-align: right; padding-top: 15px; font-weight: 800; color: #ef4444; font-size: 16px; border: none;">
+                                    <?= number_format($order['total_amount'], 0, ',', '.') ?>đ
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
