@@ -48,7 +48,7 @@
             <li class="menu-label">Sản phẩm</li>
             <li>
                 <a href="/lego_shop_php/adminproduct" class="<?= isActive('adminproduct', $current_page) ?>">
-                    <i class="fa-solid fa-cubes"></i>Danh sách LEGO
+                    <i class="fa-solid fa-cubes"></i>Sản phẩm
                 </a>
             </li>
             <li>

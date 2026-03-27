@@ -389,7 +389,7 @@ class ProductModel extends Database {
             return $stmt->execute();
         } else {
             // CHƯA CÓ -> INSERT MỚI là 'pending'
-            $sql = "INSERT INTO product_reviews (product_id, user_id, rating, comment, status, created_at) VALUES (?, ?, ?, ?, 'pending', NOW())";
+            $sql = "INSERT INTO product_reviews (product_id, user_id, rating, comment, status, created_at) VALUES (?, ?, ?, ?, 'approved', NOW())";
             $stmt = $db->prepare($sql);
             $stmt->bind_param("iiis", $product_id, $user_id, $rating, $comment);
             return $stmt->execute();
