@@ -198,49 +198,39 @@ class AdminProductController extends Controller {
     // 3. Logic Lưu sản phẩm mới
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            
+            // Xử lý upload ảnh an toàn
+            $uploaded_image = null;
+            if (isset($_FILES['main_image']) && $_FILES['main_image']['error'] === UPLOAD_ERR_OK) {
+                $uploaded_image = $this->uploadFile($_FILES['main_image']);
+            }
+
             $data = [
-                'name' => trim($_POST['name'] ?? ''),
-                'sku' => strtoupper(trim($_POST['sku'] ?? '')),
+                'name'          => trim($_POST['name'] ?? ''),
+                'sku'           => strtoupper(trim($_POST['sku'] ?? '')),
                 'selling_price' => intval($_POST['selling_price'] ?? 0),
-                'category_id' => intval($_POST['category_id'] ?? 0),
-                'pieces' => intval($_POST['pieces'] ?? 0),
-                'description' => trim($_POST['description'] ?? ''),
-                'main_image' => !empty($_FILES['main_image']['name']) ? $this->uploadFile($_FILES['main_image']) : null
+                'category_id'   => intval($_POST['category_id'] ?? 0),
+                'description'   => trim($_POST['description'] ?? ''),
+                'main_image'    => $uploaded_image, // Trả về Tên file hoặc Null
+                
+                'pieces'        => intval($_POST['pieces'] ?? 0),
+                'manufacturer'  => trim($_POST['manufacturer'] ?? ''),
+                'material'      => trim($_POST['material'] ?? ''),
+                'dimensions'    => (!empty($_POST['length']) && !empty($_POST['width']) && !empty($_POST['height'])) 
+                                   ? intval($_POST['length']) . ' x ' . intval($_POST['width']) . ' x ' . intval($_POST['height']) . ' cm' 
+                                   : '',
+                'age_range'     => !empty($_POST['age_range']) ? intval($_POST['age_range']) . '+' : '',
+                'release_year'  => !empty($_POST['release_year']) ? intval($_POST['release_year']) : null,
+                'theme_story'   => trim($_POST['theme_story'] ?? '')
             ];
 
-            // ===== VALIDATE =====
             if ($data['name'] === '' || $data['sku'] === '') {
                 set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/adminproduct/add');
-                exit();
+                header('Location: /lego_shop_php/adminproduct/add'); exit();
             }
-
-            // SKU format
-            if (!preg_match('/^[A-Z0-9-]+$/', $data['sku'])) {
-                set_flash_message('error', 'invalid_sku');
-                header('Location: /lego_shop_php/adminproduct/add');
-                exit();
-            }
-
-            // price
-            // if ($data['selling_price'] <= 0) {
-            //     set_flash_message('error', 'invalid_price');
-            //     header('Location: /lego_shop_php/adminproduct/add');
-            //     exit();
-            // }
-
-            // pieces
-            if ($data['pieces'] < 0) {
-                set_flash_message('error', 'invalid_pieces');
-                header('Location: /lego_shop_php/adminproduct/add');
-                exit();
-            }
-
-            // SKU trùng
             if ($this->productModel->isSkuExists($data['sku'])) {
                 set_flash_message('error', 'sku_exists');
-                header('Location: /lego_shop_php/adminproduct/add');
-                exit();
+                header('Location: /lego_shop_php/adminproduct/add'); exit();
             }
 
             if ($this->productModel->insertProduct($data)) {
@@ -252,49 +242,41 @@ class AdminProductController extends Controller {
             }
             exit();
         }
-    }
-
-    public function update($id) {
+    }   
+    // ==========================================
+    // CẬP NHẬT SẢN PHẨM (Cập nhật 2 bảng cùng lúc)
+    // ==========================================
+   public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            
+            // Bắt file ảnh mới nếu Admin có tải lên
+            $uploaded_image = null;
+            if (isset($_FILES['main_image']) && $_FILES['main_image']['error'] === UPLOAD_ERR_OK) {
+                $uploaded_image = $this->uploadFile($_FILES['main_image']);
+            }
+
             $data = [
-                'name' => trim($_POST['name'] ?? ''),
-                'sku' => strtoupper(trim($_POST['sku'] ?? '')),
+                'name'          => trim($_POST['name'] ?? ''),
+                'sku'           => strtoupper(trim($_POST['sku'] ?? '')),
                 'selling_price' => intval($_POST['selling_price'] ?? 0),
-                'category_id' => intval($_POST['category_id'] ?? 0),
-                'pieces' => intval($_POST['pieces'] ?? 0),
-                'main_image' => !empty($_FILES['main_image']['name']) ? $this->uploadFile($_FILES['main_image']) : null
+                'category_id'   => intval($_POST['category_id'] ?? 0),
+                'description'   => trim($_POST['description'] ?? ''),
+                'main_image'    => $uploaded_image,
+                
+                'pieces'        => intval($_POST['pieces'] ?? 0),
+                'manufacturer'  => trim($_POST['manufacturer'] ?? ''),
+                'material'      => trim($_POST['material'] ?? ''),
+                'dimensions'    => (!empty($_POST['length']) && !empty($_POST['width']) && !empty($_POST['height'])) 
+                                   ? intval($_POST['length']) . ' x ' . intval($_POST['width']) . ' x ' . intval($_POST['height']) . ' cm' 
+                                   : '',
+                'age_range'     => !empty($_POST['age_range']) ? intval($_POST['age_range']) . '+' : '',
+                'release_year'  => !empty($_POST['release_year']) ? intval($_POST['release_year']) : null,
+                'theme_story'   => trim($_POST['theme_story'] ?? '')
             ];
 
-            // VALIDATE giống store()
-            if ($data['name'] === '' || $data['sku'] === '') {
-                set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
-                exit();
-            }
-
-            if (!preg_match('/^[A-Z0-9-]+$/', $data['sku'])) {
-                set_flash_message('error', 'invalid_sku');
-                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
-                exit();
-            }
-
-            if ($data['selling_price'] <= 0) {
-                set_flash_message('error', 'invalid_price');
-                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
-                exit();
-            }
-
-            if ($data['pieces'] < 0) {
-                set_flash_message('error', 'invalid_pieces');
-                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
-                exit();
-            }
-
-            // SKU trùng (trừ chính nó)
             if ($this->productModel->isSkuExists($data['sku'], $id)) {
                 set_flash_message('error', 'sku_exists');
-                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
-                exit();
+                header('Location: /lego_shop_php/adminproduct/edit/'.$id); exit();
             }
 
             if ($this->productModel->updateProduct($id, $data)) {
@@ -308,6 +290,7 @@ class AdminProductController extends Controller {
         }
     }
 
+    
     // public function delete($id) {
     //     $productModel = $this->model("ProductModel");
 
@@ -358,15 +341,15 @@ class AdminProductController extends Controller {
 
 
     private function uploadFile($file) {
-        $allowed = ['image/jpeg', 'image/png', 'image/webp'];
+        $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'image/gif'];
+        
+        // Kiểm tra định dạng thực tế
+        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($fileInfo, $file['tmp_name']);
+        finfo_close($fileInfo);
 
-        if (!in_array($file['type'], $allowed)) {
-            return 'default.jpg';
-        }
-
-        if ($file['size'] > 2 * 1024 * 1024) {
-            return 'default.jpg';
-        }
+        if (!in_array($mimeType, $allowed)) return 'default.jpg';
+        if ($file['size'] > 2 * 1024 * 1024) return 'default.jpg';
 
         $targetDir = "public/assets/images/";
         if (!file_exists($targetDir)) mkdir($targetDir, 0777, true);
@@ -374,9 +357,11 @@ class AdminProductController extends Controller {
         $fileName = time() . '_' . basename($file["name"]);
         $targetFile = $targetDir . $fileName;
 
-        return move_uploaded_file($file["tmp_name"], $targetFile) ? $fileName : 'default.jpg';
+        if (move_uploaded_file($file["tmp_name"], $targetFile)) {
+            return $fileName;
+        }
+        return 'default.jpg';
     }
-
 
 
     // Hàm hiển thị trang chi tiết kỹ thuật
