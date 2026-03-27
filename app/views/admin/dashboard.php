@@ -1,141 +1,270 @@
-<div class="stat-top">
-    <div class="stat-card">
-        <div class="stat-header">
-            <i class="fa-solid fa-bag-shopping"></i>
-            <div class="stat-name">
-                <h3>Tổng doanh thu</h3>
-                <p>212 đơn</p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<?php 
+    // Lấy ngày hôm nay định dạng YYYY-MM-DD để truyền vào Link
+    $today = date('Y-m-d'); 
+?>
+
+<style>
+    /* ==========================================
+       GIAO DIỆN HIỆN ĐẠI (MODERN UI) - TONE XANH ĐỒNG NHẤT
+       ========================================== */
+    .dashboard-wrapper { 
+        font-family: 'Inter', 'Segoe UI', sans-serif; 
+        background: transparent; 
+        padding: 10px; 
+    }
+    
+    /* CARDS THỐNG KÊ MỚI */
+    .stat-top { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 30px; }
+    
+    .stat-card { 
+        background: #fff; 
+        padding: 24px; 
+        border-radius: 16px; 
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.01); 
+        transition: all 0.3s ease; 
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        text-decoration: none; 
+        color: inherit; 
+    }
+    a.stat-card { cursor: pointer; }
+    a.stat-card:hover { 
+        transform: translateY(-4px); 
+        box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.08), 0 8px 10px -6px rgba(59, 130, 246, 0.04); 
+        border-color: #3b82f6;
+    }
+    
+    .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    
+    /* Đồng nhất 1 tone màu xanh cho TẤT CẢ icon - Xóa Gradient cũ */
+    .stat-icon { 
+        width: 54px; height: 54px; 
+        border-radius: 14px; 
+        display: flex; align-items: center; justify-content: center; font-size: 24px; 
+        background: #eff6ff !important; 
+        color: #3b82f6 !important; 
+    }
+    
+    .stat-info h3 { font-size: 14px; color: #64748b; font-weight: 600; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;}
+    .stat-value { font-size: 32px; font-weight: 800; color: #444444; line-height: 1.2;} /* Text số cũng màu xanh */
+    .stat-note { font-size: 13px; font-weight: 600; color: #64748b; display: flex; align-items: center; gap: 6px; margin-top: auto;}
+
+    /* KHU VỰC CHART VÀ STATUS */
+    .dashboard-middle { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 30px; }
+    .chart-card { 
+        background: #fff; padding: 24px; border-radius: 16px; 
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02); 
+    }
+    .card-title { 
+        font-size: 17px; font-weight: 700; margin-bottom: 25px; 
+        display: flex; justify-content: space-between; align-items: center; color: #1e293b;
+    }
+
+    /* BIỂU ĐỒ CỘT */
+    .bar-chart-wrapper { display: flex; align-items: flex-end; justify-content: space-between; height: 200px; padding: 10px 10px 0; border-bottom: 2px solid #f1f5f9; }
+    .bar-col { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 40px; height: 100%; justify-content: flex-end; position: relative; }
+    .bar-fill { 
+        width: 100%; 
+        background: linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%); 
+        border-radius: 6px 6px 0 0; transition: all 0.5s ease; cursor: pointer; opacity: 0.9;
+    }
+    .bar-fill:hover { opacity: 1; filter: brightness(1.1); transform: scaleX(1.1); }
+    .bar-label { font-size: 12px; font-weight: 700; color: #64748b; margin-top: 5px; }
+    .bar-tooltip { 
+        position: absolute; top: -35px; font-size: 12px; font-weight: 700; color: #fff; 
+        background: #0f172a; padding: 6px 10px; border-radius: 6px; opacity: 0; 
+        transition: 0.2s; white-space: nowrap; pointer-events: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .bar-col:hover .bar-tooltip { opacity: 1; top: -40px; }
+
+    /* TRẠNG THÁI GIAO HÀNG */
+    .status-bars { width: 100%; height: 16px; display: flex; border-radius: 8px; overflow: hidden; margin: 30px 0 20px; background: #f1f5f9;}
+    .bar-delivered { background: #3b82f6; } 
+    .bar-shipping { background: #93c5fd; } 
+    .bar-pending { background: #e2e8f0; } 
+    .bar-cancelled { background: #ffdcdc; } /* Thanh màu đỏ cho Hủy */
+    
+    .bar-legend { display: flex; flex-direction: column; gap: 16px; }
+    .bar-legend-item { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: #475569; align-items: center;}
+    .bar-dot { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 10px; }
+
+    /* BẢNG ĐƠN HÀNG */
+    .recent-orders-card { 
+        background: #fff; padding: 24px; border-radius: 16px; 
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    }
+    .mini-table { width: 100%; border-collapse: collapse; }
+    .mini-table th { text-align: left; padding: 16px 12px; border-bottom: 2px solid #f1f5f9; color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;}
+    .mini-table tr.clickable-row { cursor: pointer; transition: 0.2s; }
+    .mini-table tr.clickable-row:hover { background-color: #f8fafc; }
+    .mini-table td { padding: 18px 12px; border-bottom: 1px solid #f8fafc; vertical-align: middle; color: #1e293b; font-size: 14px; font-weight: 600;}
+    .mini-table tr:last-child td { border-bottom: none; }
+    
+    .badge-status { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;}
+    
+    @media(max-width: 900px) { .dashboard-middle { grid-template-columns: 1fr; } }
+</style>
+
+<div class="dashboard-wrapper">
+    
+    <div class="stat-top">
+        <a href="/lego_shop_php/adminorder?search=&status=all&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem tất cả đơn hôm nay">
+            <div class="stat-header">
+                <div class="stat-info">
+                    <h3>Tổng đơn hôm nay</h3>
+                    <div class="stat-value"><?= number_format($tong_don_hom_nay) ?> <span style="font-size: 16px; color: #94a3b8; font-weight: 600;">đơn</span></div>
+                </div>
+                <div class="stat-icon"><i class="fa-solid fa-file-invoice"></i></div>
             </div>
-            <i class="fa-solid fa-chevron-right"></i>
+            <div class="stat-note"><i class="fa-solid fa-bolt" style="color: #94a3b8;"></i> Click để xem chi tiết</div>
+        </a>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-info">
+                    <h3>Doanh thu hôm nay</h3>
+                    <div class="stat-value"><?= number_format($tong_thu_nhap, 0, ',', '.') ?>đ</div>
+                </div>
+                
+            </div>
+            <div class="stat-note"><i class="fa-solid fa-check-circle" style="color: #94a3b8;"></i> Từ các đơn đã giao thành công</div>
         </div>
-        <div class="stat-value"><h2>12.323$</h2></div>
-        <div class="stat-footer">
-            <i class="fa-solid fa-arrow-trend-up"></i>
-            <p class="percent">+15.23%</p>
-            <p class="subtext">+1.2k tuần này</p>
+
+        <a href="/lego_shop_php/adminorder?search=&status=cancelled&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem các đơn bị hủy hôm nay">
+            <div class="stat-header">
+                <div class="stat-info">
+                    <h3>Đơn hàng bị hủy</h3>
+                    <div class="stat-value"><?= number_format($don_huy_tra) ?> <span style="font-size: 16px; color: #94a3b8; font-weight: 600;">đơn</span></div>
+                </div>
+                
+            </div>
+            <div class="stat-note"><i class="fa-solid fa-triangle-exclamation" style="color: #94a3b8;"></i> Click để kiểm tra</div>
+        </a>
+    </div>
+
+    <div class="dashboard-middle">
+        <div class="chart-card">
+            <div class="card-title">
+                <span style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-chart-simple" style="color: #94a3b8; padding: 8px; background: #eff6ff; border-radius: 8px;"></i> Hiệu suất doanh thu (7 ngày)</span>
+            </div>
+            
+            <div class="bar-chart-wrapper">
+                <?php if (!empty($doanh_thu_7_ngay)): ?>
+                    <?php foreach($doanh_thu_7_ngay as $data): ?>
+                        <div class="bar-col">
+                            <div class="bar-tooltip"><?= number_format($data['amount'], 0, ',', '.') ?>đ</div>
+                            <div class="bar-fill" style="height: <?= $data['percent'] ?>%;"></div>
+                            <div class="bar-label"><?= $data['day'] ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p style="color: #94a3b8; width: 100%; text-align: center; margin: auto;">Chưa có dữ liệu doanh thu</p>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="card-title">
+                <span style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-truck-fast" style="color: #94a3b8; padding: 8px; background: #eff6ff; border-radius: 8px;"></i> Đơn hàng hôm nay</span>
+                <span style="font-size: 12px; background: #eff6ff; padding: 4px 10px; border-radius: 20px; color: #94a3b8; font-weight: 800;">Tổng: <?= $tong_don_trang_thai ?? 0 ?></span>
+            </div>
+            
+            <div class="status-bars">
+                <div class="bar-delivered" style="width: <?= $ty_le_da_giao ?? 0 ?>%;" title="Đã giao: <?= $ty_le_da_giao ?? 0 ?>%"></div>
+                <div class="bar-shipping" style="width: <?= $ty_le_dang_giao ?? 0 ?>%;" title="Đang giao: <?= $ty_le_dang_giao ?? 0 ?>%"></div>
+                <div class="bar-pending" style="width: <?= $ty_le_cho_xu_ly ?? 0 ?>%;" title="Chờ xử lý: <?= $ty_le_cho_xu_ly ?? 0 ?>%"></div>
+                <div class="bar-cancelled" style="width: <?= $ty_le_da_huy ?? 0 ?>%;" title="Đã hủy: <?= $ty_le_da_huy ?? 0 ?>%"></div>
+            </div>
+            
+            <div class="bar-legend">
+                <div class="bar-legend-item">
+                    <span><i class="bar-dot" style="background:#3b82f6"></i>Đã giao thành công</span>
+                    <span style="font-weight: 800; color: #1e293b;"><?= $ty_le_da_giao ?? 0 ?>%</span>
+                </div>
+                <div class="bar-legend-item">
+                    <span><i class="bar-dot" style="background:#93c5fd"></i>Đang trên đường giao</span>
+                    <span style="font-weight: 800; color: #1e293b;"><?= $ty_le_dang_giao ?? 0 ?>%</span>
+                </div>
+                <div class="bar-legend-item">
+                    <span><i class="bar-dot" style="background:#e2e8f0"></i>Đang chờ xử lý</span>
+                    <span style="font-weight: 800; color: #1e293b;"><?= $ty_le_cho_xu_ly ?? 0 ?>%</span>
+                </div>
+                <div class="bar-legend-item">
+                    <span><i class="bar-dot" style="background:#ffdcdc"></i>Đã hủy đơn</span>
+                    <span style="font-weight: 800; color: #1e293b;"><?= $ty_le_da_huy ?? 0 ?>%</span>
+                </div>  
+            </div>
         </div>
     </div>
 
-    <div class="stat-card">
-        <div class="stat-header">
-            <i class="fa-solid fa-users"></i>
-            <div class="stat-name">
-                <h3>Khách truy cập</h3>
-                <p>Thời gian TB: 4:30</p>
-            </div>
-            <i class="fa-solid fa-chevron-right"></i>
+    <div class="recent-orders-card">
+        <div class="card-title" style="margin-bottom: 10px;">
+            <span style="display: flex; align-items: center; gap: 10px;"><i class="fa-regular fa-clipboard" style="color: #3b82f6; padding: 8px; background: #eff6ff; border-radius: 8px;"></i> Đơn hàng mới nhất</span>
+            <a href="/lego_shop_php/adminorder" style="font-size: 13px; color: #fff; background: #3b82f6; text-decoration: none; font-weight: 600; padding: 6px 14px; border-radius: 8px; transition: 0.2s;">Xem tất cả <i class="fa-solid fa-arrow-right"></i></a>
         </div>
-        <div class="stat-value"><h2>1,232</h2></div>
-        <div class="stat-footer">
-            <i class="fa-solid fa-arrow-trend-up"></i>
-            <p class="percent">+11.23%</p>
-            <p class="subtext">+4.5k tuần này</p>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-header">
-            <i class="fa-solid fa-rotate-left"></i>
-            <div class="stat-name">
-                <h3>Trả hàng</h3>
-                <p>2 tranh chấp</p>
-            </div>
-            <i class="fa-solid fa-chevron-right"></i>
-        </div>
-        <div class="stat-value"><h2>823</h2></div>
-        <div class="stat-footer">
-            <i class="fa-solid fa-arrow-trend-down"></i>
-            <p class="percent">-23.73%</p>
-            <p class="subtext">-198</p>
-        </div>
-    </div>
-</div>
-
-<div class="stat-bottom">
-    <div class="sale-performance">
-        <div class="header">
-            <h2>Hiệu suất bán hàng</h2>
-            <div class="export">
-                <button>Xuất dữ liệu <i class="fa-solid fa-chevron-down"></i></button>
-                <button>14 ngày gần đây <i class="fa-solid fa-chevron-down"></i></button>
-            </div>
-        </div>
-        <div class="legend-line">
-            <div class="legend-item-line" style="color:#3b82f6">Doanh thu</div>
-            <div class="legend-item-line" style="color:#f59e0b">Chi phí</div>
-        </div>
-        <div class="chart-line">
-            <div class="y-axis">
-                <span>250</span><span>200</span><span>150</span><span>100</span><span>50</span><span>0</span>
-            </div>
-            <div class="chart-area">
-                <div class="grid-lines">
-                    <div class="grid-line" style="top:0%"></div>
-                    <div class="grid-line" style="top:20%"></div>
-                    <div class="grid-line" style="top:40%"></div>
-                    <div class="grid-line" style="top:60%"></div>
-                    <div class="grid-line" style="top:80%"></div>
-                </div>
-                <svg class="data-line" viewBox="0 0 700 100" preserveAspectRatio="none">
-                    <polyline class="line-earnings" points="0,72 100,56 200,60 300,32 400,24 500,96 600,72 700,40" />
-                    <polyline class="line-costs" points="0,52 100,80 200,52 300,60 400,40 500,76 600,64 700,56" />
-                    <circle class="dot dot-earnings" cx="300" cy="32" r="4" />
-                    <circle class="dot dot-earnings" cx="400" cy="24" r="4" />
-                    <circle class="dot dot-costs" cx="300" cy="60" r="4" />
-                    <circle class="dot dot-costs" cx="400" cy="40" r="4" />
-                </svg>
-            </div>
-        </div>
-        <div class="x-labels">
-            <span>03 Tư</span><span>05 Sáu</span><span>07 CN</span><span>09 Ba</span>
-            <span>11 Năm</span><span>13 Bảy</span><span>15 Hai</span><span>16 Ba</span>
-        </div>
-    </div>
-
-    <div class="right-chart">
-        <div class="category-chart-container">
-            <h2>Top danh mục</h2>
-            <div class="donut-container">
-                <div class="donut-chart">
-                    <svg viewBox="0 0 160 160">
-                        <circle class="donut-bg" cx="80" cy="80" r="66"></circle>
-                        <circle class="donut-segment" cx="80" cy="80" r="66" stroke="#3b82f6" stroke-dasharray="207.3 377.0" stroke-dashoffset="0"></circle>
-                        <circle class="donut-segment" cx="80" cy="80" r="66" stroke="#10b981" stroke-dasharray="94.2 377.0" stroke-dashoffset="-207.3"></circle>
-                        <circle class="donut-segment" cx="80" cy="80" r="66" stroke="#ef4444" stroke-dasharray="75.4 377.0" stroke-dashoffset="-301.5"></circle>
-                    </svg>
-                    <div class="donut-center">$6.2k</div>
-                </div>
-                <div class="donut-legend">
-                    <div class="donut-legend-item"><span style="color:#3b82f6">Xe ô tô mô hình</span><span>55%</span></div>
-                    <div class="donut-legend-item"><span style="color:#10b981">Tàu vũ trụ</span><span>25%</span></div>
-                    <div class="donut-legend-item"><span style="color:#ef4444">Robot chiến binh</span><span>20%</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="delivery-status">
-            <h2>Trạng thái giao hàng</h2>
-            <div class="bar-container">
-                <div class="status-bars">
-                    <div class="bar-delivered"></div>
-                    <div class="bar-shipping"></div>
-                    <div class="bar-pending"></div>
-                </div>
-                <div class="bar-legend">
-                    <div class="bar-legend-item">
-                        <span style="color: #22c55e;"><i class="bar-dot" style="background:#22c55e"></i>Đã giao</span>
-                        <span>60%</span>
-                    </div>
-                    <div class="bar-legend-item">
-                        <span style="color: #f59e0b"><i class="bar-dot" style="background:#f59e0b"></i>Đang giao</span>
-                        <span>25%</span>
-                    </div>
-                    <div class="bar-legend-item">
-                        <span style="color: #cbd5e1"><i class="bar-dot" style="background:#cbd5e1"></i>Chờ xử lý</span>
-                        <span>15%</span>
-                    </div>
-                </div>
-            </div>
+        
+        <div style="overflow-x: auto;">
+            <table class="mini-table">
+                <thead>
+                    <tr>
+                        <th>Mã Đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Thanh toán</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th style="text-align: right;">Thời gian</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                        $badge_map = [
+                            'pending'   => ['lbl' => 'Chờ xử lý',   'bg' => '#f8fafc', 'col' => '#64748b', 'icon' => 'fa-solid fa-hourglass-half'],
+                            'confirmed' => ['lbl' => 'Đã xác nhận', 'bg' => '#e0e7ff', 'col' => '#3730a3', 'icon' => 'fa-solid fa-box-open'],
+                            'shipping'  => ['lbl' => 'Đang giao',   'bg' => '#dbeafe', 'col' => '#1e40af', 'icon' => 'fa-solid fa-truck-fast'],
+                            'delivered' => ['lbl' => 'Thành công',  'bg' => '#eff6ff', 'col' => '#2563eb', 'icon' => 'fa-solid fa-check-double'],
+                            'cancelled' => ['lbl' => 'Đã hủy',      'bg' => '#fef2f2', 'col' => '#ef4444', 'icon' => 'fa-solid fa-ban']
+                        ];
+                    ?>
+                    
+                    <?php if(!empty($don_moi_nhat)): ?>
+                        <?php foreach($don_moi_nhat as $don): 
+                            $st = $don['trang_thai'] ?? 'pending';
+                            $badge = $badge_map[$st] ?? $badge_map['pending'];
+                            $pm = $don['payment_method'] ?? 'cash';
+                        ?>
+                        <tr class="clickable-row" onclick="window.location.href='/lego_shop_php/adminorder/detail/<?= $don['id'] ?>'">
+                            <td>
+                                <span style="font-family: monospace; font-size: 15px; font-weight: 800; color: #3b82f6;">
+                                    #<?= $don['id'] ?>
+                                </span>
+                            </td>
+                            <td><?= htmlspecialchars($don['khach_hang']) ?></td>
+                            <td style="color: #475569; font-weight: 600;">
+                                <?= ($pm == 'cash' ? 'Tiền mặt' : 'Chuyển khoản') ?>
+                            </td>
+                            <td style="font-weight: 800; font-size: 15px; color: #1e293b;"><?= number_format($don['tong_tien'], 0, ',', '.') ?>đ</td>
+                            <td>
+                                <span class="badge-status" style="background: <?= $badge['bg'] ?>; color: <?= $badge['col'] ?>;">
+                                    <i class="<?= $badge['icon'] ?>"></i> <?= $badge['lbl'] ?>
+                                </span>
+                            </td>
+                            <td style="text-align: right; color: #64748b; font-size: 13px; font-weight: 600;"><i class="fa-regular fa-clock"></i> <?= $don['thoi_gian'] ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px; color: #94a3b8; font-weight: 600;">Hôm nay chưa có đơn hàng nào.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

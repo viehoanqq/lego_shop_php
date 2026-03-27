@@ -6,13 +6,13 @@ class AdminController extends Controller {
             header("Location: /lego_shop_php/admin/login");
             exit;
         }
-        header("Location: /lego_shop_php/admin/dashboard");
+        header("Location: /lego_shop_php/admindashboard");
         exit;
     }
 
     public function login() {
         if (isset($_SESSION['admin_id'])) {
-            header("Location: /lego_shop_php/admin/dashboard");
+            header("Location: /lego_shop_php/admindashboard");
             exit;
         }
 

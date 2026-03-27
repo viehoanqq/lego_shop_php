@@ -15,10 +15,9 @@
     <script src="/lego_shop_php/public/assets/js/admin.js" defer></script>
 </head>
 <body>
-
     <?php require_once __DIR__ . '/../components/admin_sidebar.php'; ?>
 
-    <div class="main-content">
+    <div class="main-content" id="admin-main-content">
         <?php require_once __DIR__ . '/../components/admin_header.php'; ?>
 
         <section class="content">
@@ -29,6 +28,57 @@
             ?>
         </section>
     </div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const contentArea = document.querySelector('#admin-main-content');
+    const sidebarLinks = document.querySelectorAll('.side-bar .menu a');
 
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+
+            // Không chặn link Logout hoặc link ra ngoài
+            if (href.includes('logout') || href.startsWith('http')) return;
+
+            e.preventDefault(); // Ngăn load lại trang
+            
+            // Hiệu ứng mờ dần cho chuyên nghiệp
+            contentArea.style.opacity = '0.5';
+            contentArea.style.transition = '0.3s';
+
+            fetch(href)
+                .then(response => response.text())
+                .then(html => {
+                    // Tạo một tài liệu ảo để bóc tách dữ liệu trả về
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.querySelector('#admin-main-content').innerHTML;
+                    const newTitle = doc.querySelector('title').innerText;
+
+                    // Cập nhật nội dung và tiêu đề trang
+                    contentArea.innerHTML = newContent;
+                    document.title = newTitle;
+                    contentArea.style.opacity = '1';
+
+                    // Cập nhật URL trên thanh địa chỉ để nút Back/Forward vẫn dùng được
+                    window.history.pushState({path: href}, '', href);
+
+                    // Cập nhật class Active cho menu
+                    sidebarLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                })
+                .catch(err => {
+                    console.error('Lỗi load trang:', err);
+                    window.location.href = href; // Nếu lỗi AJAX thì cho load trang kiểu cũ
+                });
+        });
+    });
+
+    // Xử lý khi bấm nút Back/Forward của trình duyệt
+    window.addEventListener('popstate', function() {
+        window.location.reload();
+    });
+});
+</script>
 </body>
 </html>
