@@ -332,12 +332,14 @@ $session_error = get_flash_message('error');
                                 onerror="this.src='https://placehold.co/60x60?text=LEGO'">
                             <div>
                                 <a href="/lego_shop_php/adminproduct/detail/<?= $p['id'] ?>" 
-                                style="text-decoration: none; display: block; group">
-                                    <div style="font-weight: 700; color: #3182ce; transition: 0.2s;" onmouseover="this.style.color='#2c5282'" onmouseout="this.style.color='#3182ce'">
-                                        <?= htmlspecialchars($p['name']) ?> 
-                                        <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px; margin-left: 4px; opacity: 0.5;"></i>
-                                    </div>
-                                </a>
+   style="text-decoration: none; display: block;">
+    <div style="font-weight: 700; color: #3182ce; transition: color 0.2s;" 
+         onmouseover="this.style.color='#2c5282'" 
+         onmouseout="this.style.color='#3182ce'">
+        <?= htmlspecialchars($p['name']) ?> 
+        <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px; margin-left: 4px; opacity: 0.5;"></i>
+    </div>
+</a>
                                 <div style="font-size: 11px; color: #a0aec0; letter-spacing: 0.5px;">SKU: <?= strtoupper($p['sku']) ?></div>
                             </div>
                         </div>

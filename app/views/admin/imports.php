@@ -66,6 +66,62 @@
         </a>
     <?php endif; ?>
 </div>
+<?php if(!isset($is_form) || $is_form === false): ?>
+<div style="background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+    
+    <form id="filterForm" action="/lego_shop_php/adminimport" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+        
+        <div style="flex: 1; min-width: 180px;">
+            <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Tìm kiếm</label>
+            <div style="position: relative;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
+                <input type="text" name="keyword" value="<?= htmlspecialchars($filters['keyword']) ?>" 
+                       placeholder="Nhập mã PN-..." class="form-control" 
+                       style="width: 100%; padding: 10px 10px 10px 35px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none;"
+                       onkeypress="if(event.keyCode==13) { this.form.submit(); return false; }">
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 180px;">
+            <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Nhà cung cấp</label>
+            <select name="supplier_id" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
+                <option value="">-- Tất cả đối tác --</option>
+                <?php foreach($suppliers as $s): ?>
+                    <option value="<?= $s['id'] ?>" <?= ($filters['supplier_id'] == $s['id']) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($s['name']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        
+        <div style="flex: 1; min-width: 130px;">
+            <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Trạng thái</label>
+            <select name="status" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
+                <option value="">-- Tất cả --</option>
+                <option value="completed" <?= ($filters['status'] == 'completed') ? 'selected' : '' ?>>Hoàn tất</option>
+                <option value="draft" <?= ($filters['status'] == 'draft') ? 'selected' : '' ?>>Bản nháp</option>
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 130px;">
+            <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Từ ngày</label>
+            <input type="date" name="start_date" value="<?= htmlspecialchars($filters['start_date']) ?>" onchange="this.form.submit()" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
+        </div>
+
+        <div style="flex: 1; min-width: 130px;">
+            <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Đến ngày</label>
+            <input type="date" name="end_date" value="<?= htmlspecialchars($filters['end_date']) ?>" onchange="this.form.submit()" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
+        </div>
+
+        <div>
+            <a href="/lego_shop_php/adminimport" style="display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; text-decoration: none; padding: 0 15px; border-radius: 6px; font-weight: 600; height: 42px; transition: 0.2s;">
+                <i class="fa-solid fa-rotate-right" style="margin-right: 5px;"></i> Xóa
+            </a>
+        </div>
+
+    </form>
+</div>
+<?php endif; ?>
 
 <?php if(isset($is_form) && $is_form === true): ?>
     <div class="form-container">

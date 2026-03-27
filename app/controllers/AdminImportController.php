@@ -9,12 +9,25 @@ class AdminImportController extends Controller {
     }
 
     // Trang mặc định (Chỉ hiện bảng lịch sử)
+    // Trang mặc định (Chỉ hiện bảng lịch sử và Bộ lọc)
     public function index() {
         $importModel = $this->model('ImportModel');
         
-        $data['imports'] = $importModel->getAllImports();
+        // 1. Nhận dữ liệu lọc từ URL (Thêm keyword)
+        $filters = [
+            'keyword'     => $_GET['keyword'] ?? '',
+            'supplier_id' => $_GET['supplier_id'] ?? '',
+            'status'      => $_GET['status'] ?? '',
+            'start_date'  => $_GET['start_date'] ?? '',
+            'end_date'    => $_GET['end_date'] ?? ''
+        ];
+        
+        // 2. Truyền ra view
+        $data['filters'] = $filters; 
+        $data['suppliers'] = $importModel->getAllSuppliers(); 
+        $data['imports'] = $importModel->getAllImports($filters); 
         $data['title'] = "Quản lý Nhập hàng";
-        $data['is_form'] = false; // Báo cho view biết KHÔNG hiện form
+        $data['is_form'] = false; 
         
         $this->view('admin/imports', $data);
     }

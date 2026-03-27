@@ -39,7 +39,41 @@
 </style>
 
 <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px;">
-    <div>
+<div style="background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+    <form id="filterForm" action="/lego_shop_php/adminprice" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+        
+        <div style="flex: 1; min-width: 250px;">
+            <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Tìm kiếm sản phẩm</label>
+            <div style="position: relative;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
+                <input type="text" name="keyword" value="<?= htmlspecialchars($filters['keyword']) ?>" 
+                       placeholder="Nhập tên LEGO hoặc mã SKU..." class="form-control" 
+                       style="width: 100%; padding: 10px 10px 10px 35px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none;"
+                       onkeypress="if(event.keyCode==13) { this.form.submit(); return false; }">
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 200px;">
+            <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Danh mục LEGO</label>
+            <select name="category_id" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
+                <option value="">-- Tất cả danh mục --</option>
+                <?php foreach($categories as $c): ?>
+                    <option value="<?= $c['id'] ?>" <?= ($filters['category_id'] == $c['id']) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($c['name']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div>
+            <a href="/lego_shop_php/adminprice" style="display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; text-decoration: none; padding: 0 20px; border-radius: 6px; font-weight: 600; height: 42px; transition: 0.2s;">
+                <i class="fa-solid fa-rotate-right" style="margin-right: 5px;"></i> Xóa lọc
+            </a>
+        </div>
+
+    </form>
+</div>    
+<div>
         <h2 style="margin:0; color: #1a202c;">💰 Quản Lý Giá Bán</h2>
         <small style="color: #718096;">Cập nhật tỉ lệ lợi nhuận và giá bán niêm yết</small>
     </div>
