@@ -333,12 +333,16 @@ class ProfileController extends Controller {
 
         // Lấy chi tiết các sản phẩm trong đơn đó
         $items = $orderModel->getOrderItems($order_id);
+        
+        // [THÊM DÒNG NÀY] Lấy lịch sử dòng thời gian từ bảng order_history
+        $history = $orderModel->getOrderHistory($order_id);
 
         // Trả kết quả về cho JS vẽ lên Modal
         echo json_encode([
             'success' => true,
             'order' => $order,
-            'items' => $items
+            'items' => $items,
+            'history' => $history // [THÊM DÒNG NÀY] Đẩy lịch sử ra cho file JS nhận
         ]);
         exit;
     }
