@@ -251,4 +251,30 @@ class AdminProductController extends Controller {
             exit();
         }
     }
+
+
+    public function lowstock() {
+        
+        // 1. Lấy keyword và type từ URL
+        $type = $_GET['type'] ?? 'all';
+        $keyword = $_GET['keyword'] ?? ''; // Thêm dòng này
+        
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $offset = ($page - 1) * $this->limit;
+
+        // 2. Truyền thêm keyword vào Model
+        $products = $this->productModel->getLowStockProducts($offset, $this->limit, $type, $keyword);
+        $totalItems = $this->productModel->countLowStockProducts($type, $keyword);
+        
+        $totalPages = ceil($totalItems / $this->limit);
+
+        $this->view('admin/low_stock', [
+            'products'    => $products,
+            'totalItems'  => $totalItems,
+            'totalPages'  => $totalPages,
+            'currentPage' => $page,
+            'currentType' => $type,
+            'keyword'     => $keyword // Truyền ngược lại để hiển thị trong ô input
+        ]);
+    }
 }

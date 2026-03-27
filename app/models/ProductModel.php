@@ -397,4 +397,56 @@ class ProductModel extends Database {
         }
     }
 
+    // Hàm lấy sản phẩm sắp hết hàng (tồn kho <= min_stock_level)
+    public function getLowStockProducts($offset = 0, $limit = 6, $type = 'all', $keyword = '') {
+        $db = $this->getConnection();
+        
+        $where = "WHERE p.status IN (1, 2) ";
+
+        // Lọc theo loại tồn kho
+        if ($type === 'out') {
+            $where .= " AND p.stock_quantity <= 0";
+        } elseif ($type === 'low') {
+            $where .= " AND p.stock_quantity > 0 AND p.stock_quantity <= p.min_stock_level";
+        } else {
+            $where .= " AND p.stock_quantity <= p.min_stock_level";
+        }
+
+        // Lọc theo từ khóa tìm kiếm (Thêm phần này)
+        if (!empty($keyword)) {
+            $k = $db->real_escape_string($keyword);
+            $where .= " AND (p.name LIKE '%$k%' OR p.sku LIKE '%$k%')";
+        }
+
+        $sql = "SELECT p.*, c.name as category_name, 
+                (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM products p 
+                LEFT JOIN categories c ON p.category_id = c.id 
+                $where
+                ORDER BY p.stock_quantity ASC 
+                LIMIT " . (int)$offset . ", " . (int)$limit;
+
+        $result = $db->query($sql);
+        return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    public function countLowStockProducts($type = 'all', $keyword = '') {
+        $db = $this->getConnection();
+        
+        $where = "WHERE status IN (1, 2) ";
+        if ($type === 'out') $where .= " AND stock_quantity <= 0";
+        elseif ($type === 'low') $where .= " AND stock_quantity > 0 AND stock_quantity <= min_stock_level";
+        else $where .= " AND stock_quantity <= min_stock_level";
+
+        // Lọc theo từ khóa tìm kiếm cho hàm đếm (Thêm phần này)
+        if (!empty($keyword)) {
+            $k = $db->real_escape_string($keyword);
+            $where .= " AND (name LIKE '%$k%' OR sku LIKE '%$k%')";
+        }
+
+        $sql = "SELECT COUNT(*) as total FROM products $where";
+        $result = $db->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'] ?? 0;
+    }
 }

@@ -19,8 +19,8 @@
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admin/alerts" class="<?= isActive('alerts', $current_page) ?>">
-                    <i class="fa-solid fa-bell-slash"></i>Cảnh báo hết hàng
+                <a href="/lego_shop_php/adminproduct/lowstock" class="<?= isActive('adminproduct/lowstock', $current_page) ?>">
+                    <i class="fa-solid fa-triangle-exclamation"></i>Cảnh báo hết hàng
                 </a>
             </li>
             <li>
@@ -47,7 +47,7 @@
         <ul class="system">
             <li class="menu-label">Sản phẩm</li>
             <li>
-                <a href="/lego_shop_php/adminproduct" class="<?= isActive('adminproduct', $current_page) ?>">
+                <a href="/lego_shop_php/adminproduct" class="<?= ($current_page == 'adminproduct') ? 'active' : '' ?>">
                     <i class="fa-solid fa-cubes"></i>Danh sách LEGO
                 </a>
             </li>
