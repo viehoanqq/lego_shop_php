@@ -110,9 +110,13 @@ class AdminCategoryController extends Controller {
         }
     }
 
+    // Hàm Mở khóa danh mục
     public function unlock($id) {
-        if ($this->categoryModel->updateStatus($id, 'active')) {
-            set_flash_message('msg', 'unlocked'); // Lưu vào session
+        $id = intval($id);
+        // Sử dụng hàm updateStatusAdmin
+        if ($this->categoryModel->updateStatusAdmin($id, 'active')) {
+            // Thông báo: Chỉ mở danh mục, sản phẩm vẫn ẩn
+            set_flash_message('msg', 'unlocked'); 
         } else {
             set_flash_message('error', 'db');
         }
@@ -120,8 +124,11 @@ class AdminCategoryController extends Controller {
         exit();
     }
 
+    // Hàm Khóa danh mục
     public function delete($id) {
-        if ($this->categoryModel->updateStatus($id, 'locked')) {
+        $id = intval($id);
+        // Khi khóa danh mục -> Model sẽ tự khóa luôn sản phẩm bên trong
+        if ($this->categoryModel->updateStatusAdmin($id, 'locked')) {
             set_flash_message('msg', 'hidden');
         } else {
             set_flash_message('error', 'db');

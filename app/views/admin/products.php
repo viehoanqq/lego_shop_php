@@ -202,6 +202,9 @@ $session_error = get_flash_message('error');
                             case 'already_hidden': echo "Sản phẩm này đã bị khóa!"; break;
                             case 'already_shown':  echo "Sản phẩm này hiện đang được mở bán!"; break;
                             case 'notfound':       echo "Không tìm thấy sản phẩm yêu cầu!"; break;
+                            case 'has_history':    echo "Không thể xóa! Sản phẩm này đã có trong phiếu nhập hoặc đơn hàng."; break;
+                            case 'cat_is_locked':  echo "Danh mục của sản phẩm này đã bị khóa, không thể mở."; break;
+                            case 'db':             echo "Lỗi hệ thống: Không thể xóa dữ liệu vào lúc này."; break;
                             default:               echo "Có lỗi xảy ra, vui lòng thử lại."; break;
                         }
                     ?>
@@ -386,6 +389,24 @@ $session_error = get_flash_message('error');
                                     <?= $btnText ?>
                                 </span>
                             </a>
+
+                            <?php if($p['status'] != 0): ?>
+                                <a href="/lego_shop_php/adminproduct/hide/<?= $p['id'] ?>" 
+                                class="btn-action" 
+                                style="color: #e53e3e;" 
+                                title="Ẩn hoàn toàn (Xóa mềm)"
+                                onclick="return confirm('Sản phẩm sẽ bị ẩn hoàn toàn. Xác nhận?')">
+                                    <i class="fa-solid fa-eye-slash"></i> Ẩn
+                                </a>
+                            <?php else: ?>
+                                <a href="/lego_shop_php/adminproduct/show/<?= $p['id'] ?>" 
+                                class="btn-action" 
+                                style="color: #718096;" 
+                                title="Hiện lại">
+                                    <i class="fa-solid fa-eye"></i> Hiện
+                                </a>
+                            <?php endif; ?>
+
                             <a href="/lego_shop_php/adminproduct/delete/<?= $p['id'] ?>" class="btn-action" style="color: #e53e3e;" onclick="return confirm('Xóa vĩnh viễn sản phẩm?')">
                                 <i class="fa-solid fa-trash"></i> Xóa
                             </a>
