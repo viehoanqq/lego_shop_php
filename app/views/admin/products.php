@@ -160,6 +160,8 @@
     transform: translateX(50px);
     transition: all 0.5s ease;
 }
+
+
 </style>
 
 <?php 
@@ -365,11 +367,24 @@ $session_error = get_flash_message('error');
                             <a href="/lego_shop_php/adminproduct/edit/<?= $p['id'] ?>" class="btn-action" title="Chỉnh sửa" style="color: #3182ce;">
                                 <i class="fa-solid fa-pen-to-square"></i> Sửa
                             </a>
-                            <a href="/lego_shop_php/adminproduct/hide/<?= $p['id'] ?>" class="btn-action" title="Xóa" style="color: #e53e3e;" onclick="return confirm('Bạn có chắc chắn muốn khóa sản phẩm <?= $p['name'] ?>?')">
-                                <i class="fa-solid fa-eye-slash"></i> Khóa
-                            </a>
-                            <a href="/lego_shop_php/adminproduct/show/<?= $p['id'] ?>" class="btn-action" title="Hiển thị lại" style="color: #38a169;">
-                                <i class="fa-solid fa-eye"></i> Mở khóa
+                            <?php 
+                                // 1. Tính toán trạng thái ngay trong vòng lặp
+                                $isActive = ($p['status'] == 1); // 1 là đang bán, 2 là tạm khóa
+                                $btnIcon  = $isActive ? 'fa-lock' : 'fa-lock-open';
+                                $btnColor = $isActive ? '#e53e3e' : '#38a169'; // Đỏ khi sắp Khóa, Xanh khi sắp Mở
+                                $btnText  = $isActive ? 'Khóa' : 'Mở';
+                            ?>
+
+                            <a href="/lego_shop_php/adminproduct/toggleStatus/<?= $p['id'] ?>?current=<?= $p['status'] ?>" 
+                                class="btn-action btn-toggle-status" 
+                                title="<?= $isActive ? 'Tạm dừng bán' : 'Mở bán lại' ?>" 
+                                style="color: <?= $btnColor ?>;"
+                                onclick="return confirm('Xác nhận <?= mb_strtolower($btnText) ?> sản phẩm này?')">
+                                
+                                <i class="fa-solid <?= $btnIcon ?>"></i>
+                                <span style="margin-left: 4px; font-weight: 600;">
+                                    <?= $btnText ?>
+                                </span>
                             </a>
                             <a href="/lego_shop_php/adminproduct/delete/<?= $p['id'] ?>" class="btn-action" style="color: #e53e3e;" onclick="return confirm('Xóa vĩnh viễn sản phẩm?')">
                                 <i class="fa-solid fa-trash"></i> Xóa

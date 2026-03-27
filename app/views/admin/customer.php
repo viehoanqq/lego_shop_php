@@ -321,6 +321,61 @@
     from { opacity: 0; transform: translateX(100px); }
     to { opacity: 1; transform: translateX(0); }
 }
+
+/* Style chung cho nút thao tác để cân bằng kích thước */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+/* Nút Sửa (giữ phong cách cũ của bạn nhưng làm gọn hơn) */
+.btn-edit {
+    background: #ebf8ff;
+    color: #3182ce ;
+}
+.btn-edit:hover {
+    background: #bee3f8;
+    transform: translateY(-1px);
+}
+
+/* NÚT KHÓA/MỞ KHÓA RIÊNG BIỆT */
+.btn-status-toggle {
+    min-width: 75px; /* Cố định độ rộng để không nhảy chữ */
+    justify-content: center;
+    font-weight: 700;
+}
+
+/* Trạng thái khi chuẩn bị KHÓA (Nút hiện màu đỏ nhạt) */
+.btn-status-toggle.is-locking {
+    background: #fff5f5;
+    color: #e53e3e ;
+}
+.btn-status-toggle.is-locking:hover {
+    background: #e53e3e;
+    color: #fff;
+}
+
+/* Trạng thái khi chuẩn bị MỞ (Nút hiện màu xanh nhạt) */
+.btn-status-toggle.is-unlocking {
+    background: #f0fff4;
+    color: #38a169 ;
+}
+.btn-status-toggle.is-unlocking:hover {
+    background: #38a169;
+    color: #fff ;
+}
+
+/* Hiệu ứng icon */
+.btn-status-toggle i {
+    font-size: 12px;
+}
+
+
 </style>
 
 <?php 
@@ -488,7 +543,7 @@ $session_error = get_flash_message('error');
                     <?php foreach ($customers as $user): ?>
                     <tr>
                         <td class="ps-4">
-                            <span class="fw-bold text-muted" style="font-size: 12px;">
+                            <span class="fw-bold text-muted" style="">
                                 CUS-<?= str_pad($user['id'], 4, '0', STR_PAD_LEFT) ?>
                             </span>
                         </td>
@@ -499,8 +554,8 @@ $session_error = get_flash_message('error');
                             </div>
                         </td>
                         <td>
-                            <div style="font-size: 13px; color: #4a5568; "><i class="fa-regular fa-envelope me-1 opacity-50" style="margin-right: 10px;"></i><?= $user['email'] ?></div>
-                            <div style="font-size: 11px; color: #a0aec0; "><i class="fa-solid fa-phone me-1 opacity-50" style="margin-right: 10px;"></i><?= $user['phone'] ?></div>
+                            <div style=" color: #4a5568; "><i class="fa-regular fa-envelope me-1 opacity-50" style="margin-right: 10px;"></i><?= $user['email'] ?></div>
+                            <div style=" color: #a0aec0; "><i class="fa-solid fa-phone me-1 opacity-50" style="margin-right: 10px;"></i><?= $user['phone'] ?></div>
                         </td>
                         <td>
                             <?php 
@@ -519,7 +574,7 @@ $session_error = get_flash_message('error');
                                 <span class="badge-custom status-locked">Đã khóa</span>
                             <?php endif; ?>
                         </td>
-                        <td class="text-muted" style="font-size: 13px;">
+                        <td class="text-muted" style="">
                             <?= date('d/m/Y', strtotime($user['created_at'])) ?>
                         </td>
                         <td class="text-center">
@@ -528,11 +583,17 @@ $session_error = get_flash_message('error');
                                     class="btn-action btn-edit" title="Sửa">
                                         <i class="fa-solid fa-pen-to-square"></i> Sửa
                                     </a>
+                                <?php 
+                                    $isLocked = ($user['status'] !== 'active');
+                                    $toggleLabel = $isLocked ? 'Mở' : 'Khóa';
+                                    $toggleIcon = $isLocked ? 'fa-unlock' : 'fa-lock';
+                                    $statusClass = $isLocked ? 'is-unlocking' : 'is-locking';
+                                ?>
                                 <a href="/lego_shop_php/admincustomer/toggleStatus/<?= $user['id'] ?>" 
-                                   class="btn-action btn-lock" 
-                                   onclick="return confirm('Thay đổi trạng thái tài khoản này?')">
-                                    <i class="fa-solid <?= $user['status'] === 'active' ? 'fa-lock' : 'fa-unlock' ?>"></i>
-                                    <?= $user['status'] === 'active' ? 'Khóa' : 'Mở' ?>
+                                class="btn-action btn-status-toggle <?= $statusClass ?>" 
+                                onclick="return confirm('Xác nhận <?= mb_strtolower($toggleLabel) ?> tài khoản này?')">
+                                    <i class="fa-solid <?= $toggleIcon ?>"></i>
+                                    <span><?= $toggleLabel ?></span>
                                 </a>
                             </div>
                         </td>

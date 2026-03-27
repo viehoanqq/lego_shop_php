@@ -128,6 +128,33 @@ class AdminProductController extends Controller {
         exit();
     }
 
+
+    public function toggleStatus($id) {
+        // Đổi $this->productModel->find($id) thành hàm bạn đã có:
+        $product = $this->productModel->getProductFullDetail($id);
+        
+        if (!$product) {
+            set_flash_message('error', 'notfound');
+            header("Location: /lego_shop_php/adminproduct");
+            exit();
+        }
+
+        // Đảo ngược trạng thái
+        $newStatus = ($product['status'] == 1) ? 2 : 1;
+        
+        // Gọi hàm updateStatus bạn đã có ở dòng 134 của Model
+        $result = $this->productModel->updateStatus($id, $newStatus);
+        
+        if ($result) {
+            set_flash_message('msg', ($newStatus == 2 ? 'hidden' : 'show'));
+        } else {
+            set_flash_message('error', 'db');
+        }
+        
+        header("Location: /lego_shop_php/adminproduct");
+        exit();
+    }
+
     // 3. Logic Lưu sản phẩm mới
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -254,7 +281,7 @@ class AdminProductController extends Controller {
 
 
     public function lowstock() {
-        
+
         // 1. Lấy keyword và type từ URL
         $type = $_GET['type'] ?? 'all';
         $keyword = $_GET['keyword'] ?? ''; // Thêm dòng này

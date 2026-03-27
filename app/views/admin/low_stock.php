@@ -1,6 +1,5 @@
 <style>
-/* Container chính */
-/* Header Container */
+
 .header { 
     display: flex; 
     justify-content: space-between; 
@@ -145,6 +144,32 @@
     transform: translateX(-3px);
 }
 
+.page-link {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #4a5568;
+    background: #fff;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-link:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+}
+
+.page-link.active {
+    background: #3182ce;
+    color: #fff;
+    border-color: #3182ce;
+    box-shadow: 0 4px 6px rgba(49, 130, 206, 0.2);
+}
+
 </style>
 <div class="header">
     <div class="header-left">
@@ -164,7 +189,7 @@
             <select name="type" class="form-control" onchange="this.form.submit()" 
                     style="flex: 1; cursor: pointer; border-radius: 8px; border: 1px solid #e2e8f0; height: 40px; padding: 0 10px;">
                 <option value="all" <?= ($currentType == 'all') ? 'selected' : '' ?>>-- Tất cả cảnh báo --</option>
-                <option value="out" <?= ($currentType == 'out') ? 'selected' : '' ?>>Đã hết sạch (0)</option>
+                <option value="out" <?= ($currentType == 'out') ? 'selected' : '' ?>>Đã hết (0)</option>
                 <option value="low" <?= ($currentType == 'low') ? 'selected' : '' ?>>Sắp hết hàng (Dưới ngưỡng)</option>
             </select>
             
@@ -248,32 +273,3 @@
         
     </div>
 <?php endif; ?>
-
-<style>
-/* CSS cho các nút phân trang đồng bộ với giao diện của bạn */
-.page-link {
-    padding: 8px 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #4a5568;
-    background: #fff;
-    font-weight: 600;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.page-link:hover {
-    background: #edf2f7;
-    border-color: #cbd5e0;
-}
-
-.page-link.active {
-    background: #3182ce;
-    color: #fff;
-    border-color: #3182ce;
-    box-shadow: 0 4px 6px rgba(49, 130, 206, 0.2);
-}
-</style>

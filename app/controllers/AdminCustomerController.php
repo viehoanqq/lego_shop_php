@@ -1,7 +1,7 @@
 <?php
 class AdminCustomerController extends Controller {
     private $customerModel;
-    private $limit = 2;
+    private $limit = 5;
 
     public function __construct() {
         $this->customerModel = $this->model('CustomerModel');

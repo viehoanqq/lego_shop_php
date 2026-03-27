@@ -24,7 +24,7 @@
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admin/messages" class="<?= isActive('messages', $current_page) ?>">
+                <a href="/lego_shop_php/adminreview" class="<?= isActive('review', $current_page) ?>">
                     <i class="fa-solid fa-star"></i>Đánh giá
                 </a>
             </li>
