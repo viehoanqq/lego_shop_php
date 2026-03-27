@@ -162,7 +162,6 @@ function calcFromSell(id) {
     const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
     if (wac > 0) row.querySelector('.input-margin').value = (((sell - wac) / wac) * 100).toFixed(1);
 }
-
 async function savePrice(id) {
     const row = document.getElementById('row_' + id);
     const btn = row.querySelector('.btn-save-price');

@@ -1,5 +1,5 @@
 <?php
-class AdminPriceController extends Controller {
+class AdminpriceController extends Controller {
     
     public function __construct() {
         if (!isset($_SESSION['admin_id'])) { 

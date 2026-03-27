@@ -137,6 +137,19 @@ class ProductModel extends Database {
     }
     // --- Cập nhật Giá bán và Tỉ lệ lợi nhuận ---
    // --- Lấy danh sách sản phẩm để quản lý giá ---
+      public function updatePriceAndMargin($product_id, $selling_price, $profit_margin) {
+        $db = $this->getConnection();
+        
+        $product_id = intval($product_id);
+        $selling_price = intval($selling_price);
+        $profit_margin = floatval($profit_margin);
+
+        $sql = "UPDATE products SET selling_price = ?, profit_margin = ? WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("idi", $selling_price, $profit_margin, $product_id);
+        
+        return $stmt->execute();
+    }
     // --- Lấy danh sách sản phẩm để quản lý giá (CÓ TÌM KIẾM & LỌC) ---
     public function getAllProductsWithPrices($filters = []) {
         $db = $this->getConnection();

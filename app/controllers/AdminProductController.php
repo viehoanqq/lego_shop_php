@@ -218,11 +218,7 @@ class AdminProductController extends Controller {
             }
 
             // price
-            if ($data['selling_price'] <= 0) {
-                set_flash_message('error', 'invalid_price');
-                header('Location: /lego_shop_php/adminproduct/add');
-                exit();
-            }
+            
 
             // pieces
             if ($data['pieces'] < 0) {
