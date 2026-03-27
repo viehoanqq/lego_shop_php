@@ -229,6 +229,7 @@ $session_error = get_flash_message('error');
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span>
                     <?php
+                        if($session_error == 'cat_is_locked') echo "Không được mở sản phẩm khi danh mục đang khóa.";
                         if($session_error == 'db') echo "Lỗi hệ thống: Không thể xử lý dữ liệu.";
                         if($session_error == 'empty') echo "Vui lòng không để trống các trường bắt buộc!";
                     ?>

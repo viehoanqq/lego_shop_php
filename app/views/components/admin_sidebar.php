@@ -19,12 +19,12 @@
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admin/alerts" class="<?= isActive('alerts', $current_page) ?>">
-                    <i class="fa-solid fa-bell-slash"></i>Cảnh báo hết hàng
+                <a href="/lego_shop_php/adminproduct/lowstock" class="<?= isActive('adminproduct/lowstock', $current_page) ?>">
+                    <i class="fa-solid fa-triangle-exclamation"></i>Cảnh báo hết hàng
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admin/messages" class="<?= isActive('messages', $current_page) ?>">
+                <a href="/lego_shop_php/adminreview" class="<?= isActive('review', $current_page) ?>">
                     <i class="fa-solid fa-star"></i>Đánh giá
                 </a>
             </li>
@@ -33,7 +33,7 @@
         <ul class="system">
             <li class="menu-label">Kinh doanh</li>
             <li>
-                <a href="/lego_shop_php/admin/orders" class="<?= isActive('orders', $current_page) ?>">
+                <a href="/lego_shop_php/adminorder" class="<?= isActive('orders', $current_page) ?>">
                     <i class="fa-solid fa-cart-shopping"></i>Quản lý đơn hàng
                 </a>
             </li>
@@ -48,7 +48,7 @@
             <li class="menu-label">Sản phẩm</li>
             <li>
                 <a href="/lego_shop_php/adminproduct" class="<?= isActive('adminproduct', $current_page) ?>">
-                    <i class="fa-solid fa-cubes"></i>Danh sách LEGO
+                    <i class="fa-solid fa-cubes"></i>Sản phẩm
                 </a>
             </li>
             <li>
@@ -66,7 +66,7 @@
         <ul class="system">
             <li class="menu-label">Kho hàng</li>
             <li>
-                <a href="/lego_shop_php/admin/suppliers" class="<?= isActive('suppliers', $current_page) ?>">
+                <a href="/lego_shop_php/adminsupplier" class="<?= isActive('suppliers', $current_page) ?>">
                     <i class="fa-solid fa-handshake"></i>Nhà cung cấp
                 </a>
             </li>
@@ -83,7 +83,7 @@
         </ul>
 
         <ul class="support">
-            <li><a href="/lego_shop_php/admin/settings"><i class="fa-solid fa-gear"></i>Cài đặt hệt thống</a></li>
+            <li><a href="/lego_shop_php/adminsetting"><i class="fa-solid fa-gear"></i>Cài đặt hệt thống</a></li>
             <li><a href="/lego_shop_php/admin/logout"><i class="fa-solid fa-power-off"></i>Đăng xuất</a></li>
         </ul>
     </nav>

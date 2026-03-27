@@ -160,6 +160,8 @@
     transform: translateX(50px);
     transition: all 0.5s ease;
 }
+
+
 </style>
 
 <?php 
@@ -200,6 +202,9 @@ $session_error = get_flash_message('error');
                             case 'already_hidden': echo "Sản phẩm này đã bị khóa!"; break;
                             case 'already_shown':  echo "Sản phẩm này hiện đang được mở bán!"; break;
                             case 'notfound':       echo "Không tìm thấy sản phẩm yêu cầu!"; break;
+                            case 'has_history':    echo "Không thể xóa! Sản phẩm này đã có trong phiếu nhập hoặc đơn hàng."; break;
+                            case 'cat_is_locked':  echo "Danh mục của sản phẩm này đã bị khóa, không thể mở."; break;
+                            case 'db':             echo "Lỗi hệ thống: Không thể xóa dữ liệu vào lúc này."; break;
                             default:               echo "Có lỗi xảy ra, vui lòng thử lại."; break;
                         }
                     ?>
@@ -279,7 +284,8 @@ $session_error = get_flash_message('error');
                 <div>
                     <div class="form-group">
                         <label>Giá bán (VNĐ)</label>
-                        <input type="number" name="selling_price" class="form-control" value="<?= $product['selling_price'] ?? '' ?>" style="font-weight: bold; color: #2b6cb0;">
+                        <input type="number" name="selling_price" class="form-control" value="<?= $product['selling_price'] ?? '' ?>" style="font-weight: bold; color: #2b6cb0;"
+                        readonly>
                     </div>
                     <div class="form-group">
                         <label>Số mảnh ghép (Pieces)</label>
@@ -366,12 +372,43 @@ $session_error = get_flash_message('error');
                             <a href="/lego_shop_php/adminproduct/edit/<?= $p['id'] ?>" class="btn-action" title="Chỉnh sửa" style="color: #3182ce;">
                                 <i class="fa-solid fa-pen-to-square"></i> Sửa
                             </a>
-                            <a href="/lego_shop_php/adminproduct/hide/<?= $p['id'] ?>" class="btn-action" title="Xóa" style="color: #e53e3e;" onclick="return confirm('Bạn có chắc chắn muốn khóa sản phẩm <?= $p['name'] ?>?')">
-                                <i class="fa-solid fa-eye-slash"></i> Khóa
+                            <?php 
+                                // 1. Tính toán trạng thái ngay trong vòng lặp
+                                $isActive = ($p['status'] == 1); // 1 là đang bán, 2 là tạm khóa
+                                $btnIcon  = $isActive ? 'fa-lock' : 'fa-lock-open';
+                                $btnColor = $isActive ? '#e53e3e' : '#38a169'; // Đỏ khi sắp Khóa, Xanh khi sắp Mở
+                                $btnText  = $isActive ? 'Khóa' : 'Mở';
+                            ?>
+
+                            <a href="/lego_shop_php/adminproduct/toggleStatus/<?= $p['id'] ?>?current=<?= $p['status'] ?>" 
+                                class="btn-action btn-toggle-status" 
+                                title="<?= $isActive ? 'Tạm dừng bán' : 'Mở bán lại' ?>" 
+                                style="color: <?= $btnColor ?>;"
+                                onclick="return confirm('Xác nhận <?= mb_strtolower($btnText) ?> sản phẩm này?')">
+                                
+                                <i class="fa-solid <?= $btnIcon ?>"></i>
+                                <span style="margin-left: 4px; font-weight: 600;">
+                                    <?= $btnText ?>
+                                </span>
                             </a>
-                            <a href="/lego_shop_php/adminproduct/show/<?= $p['id'] ?>" class="btn-action" title="Hiển thị lại" style="color: #38a169;">
-                                <i class="fa-solid fa-eye"></i> Mở khóa
-                            </a>
+
+                            <?php if($p['status'] != 0): ?>
+                                <a href="/lego_shop_php/adminproduct/hide/<?= $p['id'] ?>" 
+                                class="btn-action" 
+                                style="color: #e53e3e;" 
+                                title="Ẩn hoàn toàn (Xóa mềm)"
+                                onclick="return confirm('Sản phẩm sẽ bị ẩn hoàn toàn. Xác nhận?')">
+                                    <i class="fa-solid fa-eye-slash"></i> Ẩn
+                                </a>
+                            <?php else: ?>
+                                <a href="/lego_shop_php/adminproduct/show/<?= $p['id'] ?>" 
+                                class="btn-action" 
+                                style="color: #718096;" 
+                                title="Hiện lại">
+                                    <i class="fa-solid fa-eye"></i> Hiện
+                                </a>
+                            <?php endif; ?>
+
                             <a href="/lego_shop_php/adminproduct/delete/<?= $p['id'] ?>" class="btn-action" style="color: #e53e3e;" onclick="return confirm('Xóa vĩnh viễn sản phẩm?')">
                                 <i class="fa-solid fa-trash"></i> Xóa
                             </a>

@@ -88,45 +88,107 @@ class AdminProductController extends Controller {
         $id = intval($id);
         $product = $this->productModel->getProductById($id);
 
-        // Kiểm tra xem sản phẩm có tồn tại không
+        // 1. Kiểm tra sản phẩm có tồn tại không
         if (!$product) {
             set_flash_message('error', 'db');
+            header('Location: /lego_shop_php/adminproduct');
+            exit();
+        }
 
-        // Nếu sản phẩm ĐÃ BỊ KHÓA RỒI (status == 2)
-        } elseif ($product['status'] == 2) {
+        // 2. Nếu sản phẩm đã ẩn rồi (status == 0) thì thông báo luôn
+        if ($product['status'] == 0) {
             set_flash_message('error', 'already_hidden');
-
-        // Nếu chưa khóa thì mới tiến hành khóa
-        } elseif ($this->productModel->updateStatus($id, 2)) {
-            set_flash_message('msg', 'hidden');
-        } else {
-            set_flash_message('error', 'db');
+        } 
+        // 3. Nếu chưa ẩn (status là 1 hoặc 2) thì tiến hành đưa về 0
+        else {
+            if ($this->productModel->updateStatus($id, 0)) {
+                set_flash_message('msg', 'hidden');
+            } else {
+                set_flash_message('error', 'db');
+            }
         }
+
         header('Location: /lego_shop_php/adminproduct');
         exit();
     }
 
-// Hàm Mở khóa sản phẩm (Chuyển từ 2 sang 1)
-    public function show($id) {
-        $id = intval($id);
+    // Hàm Mở khóa sản phẩm (Chuyển từ 2 sang 1)
+    // public function show($id) {
+    //     $id = intval($id);
+    //     $product = $this->productModel->getProductById($id);
+
+    //     if (!$product) {
+    //         set_flash_message('error', 'db');
+
+    //     // Chỉ cho phép đổi từ 0 -> 2
+    //     } elseif ($product['status'] != 0) {
+    //         set_flash_message('error', 'invalid_status');
+
+    //     // Update status = 2
+    //     } elseif ($this->productModel->updateStatus($id, 2)) {
+    //         set_flash_message('msg', 'updated_to_2');
+
+    //     } else {
+    //         set_flash_message('error', 'db');
+    //     }
+
+    //     header('Location: /lego_shop_php/adminproduct');
+    //     exit();
+    // }
+
+
+    // public function toggleStatus($id) {
+    //     // Đổi $this->productModel->find($id) thành hàm bạn đã có:
+    //     $product = $this->productModel->getProductFullDetail($id);
+        
+    //     if (!$product) {
+    //         set_flash_message('error', 'notfound');
+    //         header("Location: /lego_shop_php/adminproduct");
+    //         exit();
+    //     }
+
+    //     // Đảo ngược trạng thái
+    //     $newStatus = ($product['status'] == 1) ? 2 : 1;
+        
+    //     // Gọi hàm updateStatus bạn đã có ở dòng 134 của Model
+    //     $result = $this->productModel->updateStatus($id, $newStatus);
+        
+    //     if ($result) {
+    //         set_flash_message('msg', ($newStatus == 2 ? 'hidden' : 'show'));
+    //     } else {
+    //         set_flash_message('error', 'db');
+    //     }
+        
+    //     header("Location: /lego_shop_php/adminproduct");
+    //     exit();
+    // }
+
+    public function toggleStatus($id) {
         $product = $this->productModel->getProductById($id);
-
         if (!$product) {
-            set_flash_message('error', 'db');
+            set_flash_message('error', 'notfound');
+            header("Location: /lego_shop_php/adminproduct");
+            exit();
+        }
 
-        // Nếu sản phẩm ĐANG MỞ RỒI (status == 1)
-        } elseif ($product['status'] == 1) {
-            set_flash_message('error', 'already_shown');
+        // Đảo trạng thái: Nếu đang là 1 thì chuyển sang 2, ngược lại chuyển sang 1
+        $newStatus = ($product['status'] == 1) ? 2 : 1;
 
-        // Nếu đang khóa thì mới mở
-        } elseif ($this->productModel->updateStatus($id, 1)) {
-            set_flash_message('msg', 'show');
+        // Gọi hàm Model có tích hợp sẵn kiểm tra danh mục
+        $result = $this->productModel->updateStatusWithTaskCheck($id, $newStatus);
+
+        if ($result === 'success') {
+            set_flash_message('msg', ($newStatus == 2 ? 'hidden' : 'show'));
+        } elseif ($result === 'cat_locked') {
+            set_flash_message('error', 'cat_is_locked');
         } else {
             set_flash_message('error', 'db');
         }
-        header('Location: /lego_shop_php/adminproduct');
+
+        header("Location: /lego_shop_php/adminproduct");
         exit();
     }
+
 
     // 3. Logic Lưu sản phẩm mới
     public function store() {
@@ -193,12 +255,25 @@ class AdminProductController extends Controller {
     }
 
     public function delete($id) {
-        if ($this->productModel->updateStatus($id, 0)) {
-            set_flash_message('msg', 'deleted');
+        $productModel = $this->model("ProductModel");
+
+        // BƯỚC 1: KIỂM TRA RÀNG BUỘC
+        if (!$productModel->canDeleteProduct($id)) {
+            // Gửi mã 'has_history' để View hiển thị đúng câu thông báo
+            set_flash_message('error', 'has_history'); 
+            header("Location: /lego_shop_php/adminproduct");
+            exit();
+        }
+
+        // BƯỚC 2: TIẾN HÀNH XÓA
+        if ($productModel->deleteProduct($id)) {
+            // Đồng nhất với View (View của bạn đang dùng 'deleted')
+            set_flash_message('msg', 'deleted'); 
         } else {
             set_flash_message('error', 'db');
         }
-        header('Location: /lego_shop_php/adminproduct');
+
+        header("Location: /lego_shop_php/adminproduct");
         exit();
     }
 
@@ -250,5 +325,31 @@ class AdminProductController extends Controller {
             header("Location: /lego_shop_php/adminproduct/detail/" . $id);
             exit();
         }
+    }
+
+
+    public function lowstock() {
+
+        // 1. Lấy keyword và type từ URL
+        $type = $_GET['type'] ?? 'all';
+        $keyword = $_GET['keyword'] ?? ''; // Thêm dòng này
+        
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $offset = ($page - 1) * $this->limit;
+
+        // 2. Truyền thêm keyword vào Model
+        $products = $this->productModel->getLowStockProducts($offset, $this->limit, $type, $keyword);
+        $totalItems = $this->productModel->countLowStockProducts($type, $keyword);
+        
+        $totalPages = ceil($totalItems / $this->limit);
+
+        $this->view('admin/low_stock', [
+            'products'    => $products,
+            'totalItems'  => $totalItems,
+            'totalPages'  => $totalPages,
+            'currentPage' => $page,
+            'currentType' => $type,
+            'keyword'     => $keyword // Truyền ngược lại để hiển thị trong ô input
+        ]);
     }
 }

@@ -266,13 +266,33 @@
 }
 
 /* ==========================================
-   CÁC CSS BỐ CỤC CHUNG (GIỮ NGUYÊN)
+   CÁC CSS BỐ CỤC CHUNG VÀ KHUNG ẢNH
    ========================================== */
 .product-detail-grid { display: grid; grid-template-columns: 45% 55%; gap: 40px; margin-bottom: 50px; }
-.main-image-box { border: 1px solid #eee; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 15px; background: #fff; }
-.main-image-box img { max-width: 100%; height: auto; max-height: 400px; object-fit: contain; }
+
+/* FIX CỨNG KHUNG ẢNH CHÍNH (MAGIC HERE) */
+.main-image-box { 
+    border: 1px solid #eee; 
+    border-radius: 12px; 
+    padding: 20px; 
+    background: #fff; 
+    margin-bottom: 15px;
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Cố định thành khung hình vuông hoàn hảo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.main-image-box img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: contain; /* Ảnh luôn nằm lọt thỏm bên trong khung vuông, không làm giãn layout */
+    object-position: center;
+}
+
 .thumbnail-list { display: flex; gap: 10px; flex-wrap: wrap; }
-.thumb-item { width: 80px; height: 80px; border: 1px solid #ddd; border-radius: 8px; padding: 5px; cursor: pointer; transition: 0.2s; }
+.thumb-item { width: 80px; height: 80px; border: 1px solid #ddd; border-radius: 8px; padding: 5px; cursor: pointer; transition: 0.2s; background: #fff; }
 .thumb-item:hover { border-color: #a4161a; }
 .thumb-item img { width: 100%; height: 100%; object-fit: contain; }
 

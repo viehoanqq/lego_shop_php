@@ -1,9 +1,26 @@
+<?php
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
+    
+    // Gọi Model lấy cài đặt hệ thống
+    require_once __DIR__ . '/../../models/SettingModel.php'; 
+    $settingModel = new SettingModel();
+    $settings = $settingModel->getSettings();
+
+    // Gán biến mặc định
+    $shop_name = $settings['shop_name'] ?? 'LEGO World Store';
+    $logo_url  = $settings['logo_url'] ?? 'logo.png';
+    
+    $policy_1 = $settings['policy_1'] ?? 'Miễn phí giao hàng đơn từ 500k';
+    $policy_2 = $settings['policy_2'] ?? 'Giao hàng hỏa tốc 4 tiếng';
+    $policy_4 = $settings['policy_4'] ?? 'Mua hàng trả góp';
+    $policy_5 = $settings['policy_5'] ?? 'Hệ thống 200 cửa hàng';
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= isset($title) ? $title : 'LEGO World Store' ?></title>
+    <title><?= isset($title) ? $title . ' - ' . htmlspecialchars($shop_name) : htmlspecialchars($shop_name) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
     
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/global.css">
@@ -15,17 +32,17 @@
 <body>
   <header>
     <div class="top-bar">
-      <span><i class="fa-solid fa-truck-fast"></i> Miễn phí giao hàng đơn từ 500k</span>
-      <span><i class="fa-solid fa-bolt"></i> Giao hàng hỏa tốc 4 tiếng</span>
-      <span><i class="fa-solid fa-gift"></i> Chương trình thành viên</span>
-      <span><i class="fa-solid fa-credit-card"></i> Mua hàng trả góp</span>
-      <span><i class="fa-solid fa-store"></i> Hệ thống 200 cửa hàng</span>
+      <?php if(!empty($policy_1)): ?><span><i class="fa-solid fa-truck-fast"></i> <?= htmlspecialchars($policy_1) ?></span><?php endif; ?>
+      <?php if(!empty($policy_2)): ?><span><i class="fa-solid fa-bolt"></i> <?= htmlspecialchars($policy_2) ?></span><?php endif; ?>
+      <?php if(!empty($policy_3)): ?><span><i class="fa-solid fa-gift"></i> <?= htmlspecialchars($policy_3) ?></span><?php endif; ?>
+      <?php if(!empty($policy_4)): ?><span><i class="fa-solid fa-credit-card"></i> <?= htmlspecialchars($policy_4) ?></span><?php endif; ?>
+      <?php if(!empty($policy_5)): ?><span><i class="fa-solid fa-store"></i> <?= htmlspecialchars($policy_5) ?></span><?php endif; ?>
     </div>
 
     <div class="main-header">
       <div class="logo">
         <a href="/lego_shop_php/home">
-          <img src="/lego_shop_php/public/assets/images/logo.png" alt="LEGO World Store" />
+          <img src="/lego_shop_php/public/assets/images/<?= htmlspecialchars($logo_url) ?>" alt="<?= htmlspecialchars($shop_name) ?>" />
         </a>
       </div>
 
@@ -149,7 +166,9 @@
             </li>
         <?php endif; ?>
       </ul>
-    </nav> </header> <style>
+    </nav>
+</header>
+<style>
     /* Chống rớt dòng cụm Header */
     .main-header { display: flex; flex-wrap: nowrap !important; align-items: center; justify-content: space-between; gap: 15px; }
     .user-options { display: flex; align-items: center; gap: 15px; white-space: nowrap !important; flex-shrink: 0; }
