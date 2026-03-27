@@ -83,7 +83,7 @@
         </ul>
 
         <ul class="support">
-            <li><a href="/lego_shop_php/admin/settings"><i class="fa-solid fa-gear"></i>Cài đặt hệt thống</a></li>
+            <li><a href="/lego_shop_php/adminsetting"><i class="fa-solid fa-gear"></i>Cài đặt hệt thống</a></li>
             <li><a href="/lego_shop_php/admin/logout"><i class="fa-solid fa-power-off"></i>Đăng xuất</a></li>
         </ul>
     </nav>
