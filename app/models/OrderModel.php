@@ -150,6 +150,10 @@ class OrderModel extends Database {
         if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) { $orders[] = $row; }
         }
+        if (isset($filters['sort']) && $filters['sort'] == 'ward_asc') {
+    // Sắp xếp theo 3 cấp: Thành phố -> Quận -> Phường
+    $orderBy = "shipping_city ASC, shipping_district ASC, shipping_ward ASC";
+}
         return $orders;
     }
 
