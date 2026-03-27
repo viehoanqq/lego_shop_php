@@ -12,7 +12,6 @@
     
     $policy_1 = $settings['policy_1'] ?? 'Miễn phí giao hàng đơn từ 500k';
     $policy_2 = $settings['policy_2'] ?? 'Giao hàng hỏa tốc 4 tiếng';
-    $policy_3 = $settings['policy_3'] ?? 'Chương trình thành viên';
     $policy_4 = $settings['policy_4'] ?? 'Mua hàng trả góp';
     $policy_5 = $settings['policy_5'] ?? 'Hệ thống 200 cửa hàng';
 ?>
