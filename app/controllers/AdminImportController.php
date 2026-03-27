@@ -35,13 +35,15 @@ class AdminImportController extends Controller {
     // Trang tạo mới (Hiện form phía trên, bảng lịch sử phía dưới)
     public function create() {
         $importModel = $this->model('ImportModel');
-        $productModel = $this->model('ProductModel');
+        $productModel = $this->model('ProductModel'); // Thêm lại dòng này
         
-        $data['imports'] = $importModel->getAllImports(); // Lấy danh sách để hiện ở dưới
+        $data['imports'] = $importModel->getAllImports();
         $data['suppliers'] = $importModel->getAllSuppliers();
+        // THÊM LẠI DÒNG NÀY ĐỂ LOAD DANH SÁCH SẢN PHẨM:
         $data['products'] = $productModel->getFilteredProducts(['status' => '1,2'], 0, 1000); 
+        
         $data['title'] = "Lập phiếu nhập kho";
-        $data['is_form'] = true; // Báo cho view biết PHẢI hiện form
+        $data['is_form'] = true; 
         
         $this->view('admin/imports', $data);
     }
@@ -106,5 +108,78 @@ class AdminImportController extends Controller {
             header("Location: /lego_shop_php/adminimport/detail/$id?error=1");
         }
         exit;
+    }
+    public function searchProductsAjax() {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            header('Content-Type: application/json');
+            ob_clean(); // Xóa các khoảng trắng thừa để JSON không bị lỗi
+            
+            $keyword = trim($_GET['keyword'] ?? '');
+            
+            if (strlen($keyword) < 2) {
+                echo json_encode(['success' => true, 'data' => []]);
+                exit;
+            }
+
+            $importModel = $this->model('ImportModel');
+            $products = $importModel->searchProductsForImport($keyword);
+            
+            echo json_encode(['success' => true, 'data' => $products]);
+            exit;
+        }
+    }
+    public function edit($id) {
+        $importModel = $this->model('ImportModel');
+        
+        $receipt = $importModel->getImportById($id);
+        
+        // Chặn người dùng cố tình gõ URL để sửa phiếu đã hoàn tất
+        if (!$receipt || $receipt['status'] === 'completed') {
+            header("Location: /lego_shop_php/adminimport?error=1");
+            exit;
+        }
+
+        $data['receipt'] = $receipt;
+        $data['details'] = $importModel->getImportDetails($id);
+        
+        // Load lại danh sách y như form tạo mới
+        $data['imports'] = $importModel->getAllImports();
+        $data['suppliers'] = $importModel->getAllSuppliers();
+        $data['products'] = $importModel->getProductsForImportForm(); 
+        
+        $data['title'] = "Sửa phiếu nhập kho #PN-" . $id;
+        $data['is_form'] = true; 
+        $data['is_edit'] = true; // Cờ báo hiệu giao diện biết là đang Sửa
+        
+        $this->view('admin/imports', $data);
+    }
+    public function update($id) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ob_clean(); 
+            header('Content-Type: application/json');
+
+            try {
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!$data) throw new Exception("Dữ liệu không hợp lệ");
+                
+                $supplier_id = intval($data['supplier_id']);
+                $products = $data['products']; 
+                $status = $data['status'] ?? 'draft'; 
+                $admin_id = $_SESSION['admin_id']; 
+
+                $importModel = $this->model('ImportModel'); 
+                // Gọi hàm update mới viết
+                $success = $importModel->updateImportTransaction($id, $admin_id, $supplier_id, $products, $status);
+
+                if ($success) {
+                    echo json_encode(['success' => true]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Lỗi cập nhật CSDL (Có thể phiếu đã hoàn tất)']);
+                }
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+            exit;
+        }
     }
 }

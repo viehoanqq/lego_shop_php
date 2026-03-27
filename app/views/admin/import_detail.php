@@ -1,4 +1,5 @@
 <style>
+    /* ... (CSS của bạn giữ nguyên 100%) ... */
     .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 25px; margin-bottom: 30px; }
     .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
     .info-item label { color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; display: block; margin-bottom: 5px; }
@@ -11,6 +12,11 @@
     .badge-completed { background: #d1fae5; color: #059669; border: 1px solid #a7f3d0; }
     .btn-complete { background: #10b981; color: white; padding: 12px 25px; border: none; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4); }
     .btn-complete:hover { background: #059669; transform: translateY(-2px); }
+    
+    /* MỚI THÊM CHO NÚT SỬA */
+    .btn-edit { background: #f59e0b; color: white; padding: 12px 25px; border: none; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.4); margin-right: 10px;}
+    .btn-edit:hover { background: #d97706; transform: translateY(-2px); }
+
     .product-cell { display: flex; align-items: center; gap: 15px; }
     .img-product { width: 60px; height: 60px; min-width: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; }
 </style>
@@ -18,6 +24,11 @@
 <?php if(isset($_GET['msg']) && $_GET['msg'] == 'completed'): ?>
     <div style="padding: 15px; border-radius: 8px; background: #f0fff4; color: #2f855a; border: 1px solid #c6f6d5; margin-bottom: 20px; font-weight: 600;">
         <i class="fa-solid fa-circle-check"></i> Đã hoàn tất phiếu nhập! Hệ thống đã tính lại giá vốn (WAC), giá bán và cập nhật số lượng tồn kho.
+    </div>
+<?php endif; ?>
+<?php if(isset($_GET['msg']) && $_GET['msg'] == 'updated'): ?>
+    <div style="padding: 15px; border-radius: 8px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; margin-bottom: 20px; font-weight: 600;">
+        <i class="fa-solid fa-circle-check"></i> Đã cập nhật bản nháp thành công!
     </div>
 <?php endif; ?>
 
@@ -39,9 +50,15 @@
                 <h4 style="color: #b45309; margin: 0 0 5px 0;"><i class="fa-solid fa-triangle-exclamation"></i> Phiếu nhập này đang ở trạng thái Bản nháp!</h4>
                 <p style="margin: 0; color: #92400e; font-size: 14px;">Kho hàng và Giá vốn (WAC) <b>chưa</b> được cập nhật. Bạn cần kiểm tra lại thông tin bên dưới và nhấn "Hoàn tất".</p>
             </div>
-            <a href="/lego_shop_php/adminimport/complete/<?= $receipt['id'] ?>" class="btn-complete" onclick="return confirm('Sau khi hoàn tất, hệ thống sẽ tự động cập nhật kho hàng và tính lại giá bán. Bạn không thể hoàn tác. Xác nhận?')">
-                <i class="fa-solid fa-check-double"></i> XÁC NHẬN HOÀN TẤT
-            </a>
+            <div>
+                <a href="/lego_shop_php/adminimport/edit/<?= $receipt['id'] ?>" class="btn-edit">
+                    <i class="fa-solid fa-pen-to-square"></i> SỬA PHIẾU NHẬP
+                </a>
+                
+                <a href="/lego_shop_php/adminimport/complete/<?= $receipt['id'] ?>" class="btn-complete" onclick="return confirm('Sau khi hoàn tất, hệ thống sẽ tự động cập nhật kho hàng và tính lại giá bán. Bạn không thể hoàn tác. Xác nhận?')">
+                    <i class="fa-solid fa-check-double"></i> XÁC NHẬN HOÀN TẤT
+                </a>
+            </div>
         </div>
     <?php endif; ?>
 
