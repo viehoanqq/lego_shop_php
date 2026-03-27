@@ -217,4 +217,50 @@ class ImportModel extends Database {
             return false;
         }
     }
+
+    // --- LƯU CHỈNH SỬA PHIẾU NHÁP ---
+    public function updateDraftTransaction($receipt_id, $supplier_id, $products_list) {
+        $db = $this->getConnection();
+        $receipt_id = intval($receipt_id);
+
+        // Kiểm tra xem phiếu có tồn tại và đúng là bản nháp không
+        $receipt = $this->getImportById($receipt_id);
+        if (!$receipt || $receipt['status'] !== 'draft') return false;
+
+        $db->begin_transaction();
+        try {
+            // 1. Tính tổng tiền mới
+            $total_amount = 0;
+            foreach ($products_list as $item) {
+                $total_amount += intval($item['quantity']) * intval($item['price']);
+            }
+
+            // 2. Cập nhật Nhà cung cấp và Tổng tiền ở bảng phiếu nhập
+            $stmtR = $db->prepare("UPDATE import_receipts SET supplier_id = ?, total_amount = ? WHERE id = ?");
+            $stmtR->bind_param("iii", $supplier_id, $total_amount, $receipt_id);
+            $stmtR->execute();
+
+            // 3. XÓA TOÀN BỘ chi tiết cũ của phiếu này
+            $db->query("DELETE FROM import_receipt_details WHERE receipt_id = $receipt_id");
+
+            // 4. THÊM LẠI chi tiết mới (từ mảng người dùng gửi lên)
+            foreach ($products_list as $item) {
+                $p_id = intval($item['product_id']);
+                $qty_in = intval($item['quantity']);
+                $price_in = intval($item['price']);
+                
+                // Vì là draft nên WAC và Giá bán vẫn lưu = 0
+                $sqlDetail = "INSERT INTO import_receipt_details (receipt_id, product_id, quantity, price, calculated_average_price, calculated_selling_price) VALUES (?, ?, ?, ?, 0, 0)";
+                $stmtD = $db->prepare($sqlDetail);
+                $stmtD->bind_param("iiii", $receipt_id, $p_id, $qty_in, $price_in);
+                $stmtD->execute();
+            }
+
+            $db->commit();
+            return true;
+        } catch (Exception $e) {
+            $db->rollback();
+            return false;
+        }
+    }
 }
