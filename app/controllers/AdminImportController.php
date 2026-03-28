@@ -35,13 +35,15 @@ class AdminImportController extends Controller {
     // Trang tạo mới (Hiện form phía trên, bảng lịch sử phía dưới)
     public function create() {
         $importModel = $this->model('ImportModel');
-        $productModel = $this->model('ProductModel');
+        $productModel = $this->model('ProductModel'); // Thêm lại dòng này
         
-        $data['imports'] = $importModel->getAllImports(); // Lấy danh sách để hiện ở dưới
+        $data['imports'] = $importModel->getAllImports();
         $data['suppliers'] = $importModel->getAllSuppliers();
+        // THÊM LẠI DÒNG NÀY ĐỂ LOAD DANH SÁCH SẢN PHẨM:
         $data['products'] = $productModel->getFilteredProducts(['status' => '1,2'], 0, 1000); 
+        
         $data['title'] = "Lập phiếu nhập kho";
-        $data['is_form'] = true; // Báo cho view biết PHẢI hiện form
+        $data['is_form'] = true; 
         
         $this->view('admin/imports', $data);
     }

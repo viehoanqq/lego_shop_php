@@ -74,12 +74,14 @@ class CategoryModel extends Database {
 
     // Lấy tất cả danh mục cho trang Admin (Bao gồm cả active và locked)
     // Thêm tham số $limit và $offset vào cuối
+    // 1. CHẶN HIỂN THỊ DANH MỤC ĐÃ XÓA MỀM
     public function getAdminCategoriesWithCount($keyword = '', $status = 'all', $limit = 6, $offset = 0) {
         $db = $this->getConnection();
+        // Đổi WHERE 1=1 thành WHERE c.status != 'deleted'
         $sql = "SELECT c.*, COUNT(p.id) as product_count 
                 FROM categories c 
-                LEFT JOIN products p ON c.id = p.category_id 
-                WHERE 1=1";
+                LEFT JOIN products p ON c.id = p.category_id AND p.status = 1
+                WHERE c.status != 'deleted'"; 
 
         if (!empty($keyword)) {
             $keyword = $db->real_escape_string($keyword);
@@ -98,11 +100,39 @@ class CategoryModel extends Database {
     // Hàm đếm tổng số bản ghi
     public function countAdminCategories($keyword = '', $status = 'all') {
         $db = $this->getConnection();
-        $sql = "SELECT COUNT(*) as total FROM categories WHERE 1=1";
-        // ... Thêm các điều kiện lọc giống hệt hàm trên ...
+        $sql = "SELECT COUNT(*) as total FROM categories WHERE status != 'deleted'"; 
+        
+        if (!empty($keyword)) {
+            $keyword = $db->real_escape_string($keyword);
+            $sql .= " AND name LIKE '%$keyword%'";
+        }
+        if ($status !== 'all') {
+            $status = $db->real_escape_string($status);
+            $sql .= " AND status = '$status'";
+        }
         $result = $db->query($sql);
         $row = $result->fetch_assoc();
         return $row['total'] ?? 0;
+    }
+
+    // 3. THÊM HÀM XÓA MỀM VÀO CUỐI FILE
+    public function softDeleteCategory($id) {
+        $db = $this->getConnection();
+        $id = intval($id);
+        
+        $db->begin_transaction();
+        try {
+            // Chuyển trạng thái danh mục thành 'deleted' (Ẩn khỏi bảng)
+            $db->query("UPDATE categories SET status = 'deleted' WHERE id = $id");
+            // Tự động Khóa (status = 2) tất cả sản phẩm thuộc danh mục này để không bán nhầm
+            $db->query("UPDATE products SET status = 2 WHERE category_id = $id");
+            
+            $db->commit();
+            return true;
+        } catch (Exception $e) {
+            $db->rollback();
+            return false;
+        }
     }
 
     // Cập nhật trạng thái danh mục và ẨN/HIỆN toàn bộ sản phẩm thuộc danh mục đó

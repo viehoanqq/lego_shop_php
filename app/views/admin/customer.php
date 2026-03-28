@@ -507,7 +507,7 @@ $session_error = get_flash_message('error');
 
 <div class="header-sync">
         <div class="header-left-group">
-            <h2>Quản lý Người dùng</h2>
+            <h2><i class="fa-solid fa-user-group"></i>  Quản lý Khách hàng</h2>
             
             <form action="/lego_shop_php/admincustomer/index" method="GET" class="filter-form-sync">
                 <div class="search-wrapper-sync">

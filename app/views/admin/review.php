@@ -258,7 +258,7 @@ $session_error = get_flash_message('error');
 <div class="review-management-container">
     <div class="header">
         <div class="header-title">
-            <h2><i class="fa-solid fa-comments" style="color: #3182ce;"></i> Quản lý Đánh giá</h2>
+            <h2><i class="fa-solid fa-star" style="color: #ecc94b;"></i> Quản lý Đánh giá</h2>
             <p>Hiện có <?= count($reviews) ?> phản hồi từ khách hàng trong hệ thống.</p>
 
             <form action="/lego_shop_php/adminreview" method="GET" 

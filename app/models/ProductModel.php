@@ -4,7 +4,11 @@ class ProductModel extends Database {
     // Lấy chi tiết 1 sản phẩm kèm thông số kỹ thuật
     public function getProductById($id) {
         $db = $this->getConnection();
-        $sql = "SELECT p.*, c.name as category_name, pd.* FROM products p 
+        
+        // Bổ sung Sub-query lấy image_url làm main_image
+        $sql = "SELECT p.*, c.name as category_name, pd.*,
+               (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.id 
                 LEFT JOIN product_details pd ON p.id = pd.product_id 
                 WHERE p.id = " . intval($id);
@@ -324,7 +328,8 @@ class ProductModel extends Database {
 
     public function insertProduct($data) {
         $db = $this->getConnection();
-        $db->begin_transaction();
+        $db->begin_transaction(); 
+        
         try {
             // 1. Insert bảng products
             $sql = "INSERT INTO products (name, sku, category_id, selling_price, stock_quantity, description, status) 
@@ -332,26 +337,31 @@ class ProductModel extends Database {
             $stmt = $db->prepare($sql);
             $stmt->bind_param("ssiis", $data['name'], $data['sku'], $data['category_id'], $data['selling_price'], $data['description']);
             $stmt->execute();
+            
             $product_id = $db->insert_id;
 
             // 2. Insert bảng product_details
-            $sqlDetails = "INSERT INTO product_details (product_id, pieces, age_range) VALUES (?, ?, '12+')";
+            $sqlDetails = "INSERT INTO product_details (product_id, pieces, manufacturer, material, dimensions, age_range, release_year, theme_story) 
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             $stmtDetails = $db->prepare($sqlDetails);
-            $stmtDetails->bind_param("ii", $product_id, $data['pieces']);
+            $stmtDetails->bind_param("iissssis", 
+                $product_id, $data['pieces'], $data['manufacturer'], $data['material'], 
+                $data['dimensions'], $data['age_range'], $data['release_year'], $data['theme_story']
+            );
             $stmtDetails->execute();
 
-            // 3. Xử lý ảnh nếu có
-            if (!empty($data['main_image'])) {
-                $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
-                $stmtImg = $db->prepare($sqlImg);
-                $stmtImg->bind_param("is", $product_id, $data['main_image']);
-                $stmtImg->execute();
-            }
+            // 3. LƯU ẢNH (Bắt buộc lưu 1 dòng để giữ chỗ)
+            $image_to_save = !empty($data['main_image']) ? $data['main_image'] : 'default.jpg';
+            $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
+            $stmtImg = $db->prepare($sqlImg);
+            $stmtImg->bind_param("is", $product_id, $image_to_save);
+            $stmtImg->execute();
 
-            $db->commit();
+            $db->commit(); 
             return true;
+            
         } catch (Exception $e) {
-            $db->rollback();
+            $db->rollback(); 
             return false;
         }
     }
@@ -360,23 +370,34 @@ class ProductModel extends Database {
     public function updateProduct($id, $data) {
         $db = $this->getConnection();
         $db->begin_transaction();
+        
         try {
             $id = intval($id);
-            // 1. Update products
-            $sql = "UPDATE products SET name=?, sku=?, selling_price=?, category_id=? WHERE id=?";
+            
+            // 1. Update bảng products
+            $sql = "UPDATE products SET name=?, sku=?, selling_price=?, category_id=?, description=? WHERE id=?";
             $stmt = $db->prepare($sql);
-            $stmt->bind_param("ssiii", $data['name'], $data['sku'], $data['selling_price'], $data['category_id'], $id);
+            $stmt->bind_param("ssiisi", $data['name'], $data['sku'], $data['selling_price'], $data['category_id'], $data['description'], $id);
             $stmt->execute();
 
-            // 2. Update product_details
-            $sqlDetails = "UPDATE product_details SET pieces=? WHERE product_id=?";
+            // 2. Update bảng product_details
+            $sqlDetails = "UPDATE product_details SET 
+                           pieces = ?, manufacturer = ?, material = ?, dimensions = ?, 
+                           age_range = ?, release_year = ?, theme_story = ? 
+                           WHERE product_id = ?";
             $stmtDetails = $db->prepare($sqlDetails);
-            $stmtDetails->bind_param("ii", $data['pieces'], $id);
+            $stmtDetails->bind_param("issssisi", 
+                $data['pieces'], $data['manufacturer'], $data['material'], $data['dimensions'], 
+                $data['age_range'], $data['release_year'], $data['theme_story'], $id
+            );
             $stmtDetails->execute();
 
-            // 3. Update Image nếu có ảnh mới
+            // 3. Update Image CHỈ KHI Admin có tải ảnh mới lên
             if (!empty($data['main_image'])) {
+                // Xóa cờ main của ảnh cũ
                 $db->query("UPDATE product_images SET is_main = 0 WHERE product_id = $id");
+                
+                // Thêm ảnh mới
                 $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
                 $stmtImg = $db->prepare($sqlImg);
                 $stmtImg->bind_param("is", $id, $data['main_image']);
@@ -385,6 +406,7 @@ class ProductModel extends Database {
 
             $db->commit();
             return true;
+            
         } catch (Exception $e) {
             $db->rollback();
             return false;
@@ -485,6 +507,13 @@ class ProductModel extends Database {
         return $db->query($sql);
     }
 
+    public function updateSingleMinStock($id, $min_stock) {
+        $db = $this->getConnection();
+        $sql = "UPDATE products SET min_stock_level = ? WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        return $stmt->execute([intval($min_stock), intval($id)]);
+    }
+
 
     // Hàm check xóa
     public function canDeleteProduct($id) {
@@ -509,8 +538,31 @@ class ProductModel extends Database {
         $db = $this->getConnection();
         $id = intval($id);
         
-        // Vì CSDL của bạn có ON DELETE CASCADE nên nó sẽ tự xóa các bảng liên quan
-        $sql = "DELETE FROM products WHERE id = $id";
+        $db->begin_transaction();
+        try {
+            // Phải xóa thằng con trước (giỏ hàng, đánh giá, ảnh, chi tiết)
+            $db->query("DELETE FROM cart_items WHERE product_id = $id"); // <-- Dòng này giải quyết cái lỗi bạn vừa gửi
+            $db->query("DELETE FROM product_reviews WHERE product_id = $id");
+            $db->query("DELETE FROM product_images WHERE product_id = $id");
+            $db->query("DELETE FROM product_details WHERE product_id = $id");
+            
+            // Xóa sạch con rồi mới được phép xóa thằng cha (sản phẩm)
+            $db->query("DELETE FROM products WHERE id = $id");
+            
+            $db->commit();
+            return true;
+        } catch (Exception $e) {
+            $db->rollback();
+            return false;
+        }
+    }
+
+    // Hàm 2: Chỉ khóa (ẩn) sản phẩm
+    public function hideProduct($id) {
+        $db = $this->getConnection();
+        $id = intval($id);
+        // Giả sử status = 0 là trạng thái bị khóa/ẩn
+        $sql = "UPDATE products SET status = 2 WHERE id = $id";
         return $db->query($sql);
     }
 

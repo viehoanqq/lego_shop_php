@@ -2,7 +2,7 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <style>
-    /* CSS dùng chung với trang quản lý sản phẩm */
+    /* CSS CŨ CỦA BẠN (GIỮ NGUYÊN) */
     .table-container { 
         background: #fff; 
         border-radius: 12px; 
@@ -85,6 +85,7 @@
         </a>
     <?php endif; ?>
 </div>
+
 <?php if(!isset($is_form) || $is_form === false): ?>
 <div style="background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
     
@@ -94,7 +95,7 @@
             <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Tìm kiếm</label>
             <div style="position: relative;">
                 <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
-                <input type="text" name="keyword" value="<?= htmlspecialchars($filters['keyword']) ?>" 
+                <input type="text" name="keyword" value="<?= htmlspecialchars($filters['keyword'] ?? '') ?>" 
                        placeholder="Nhập mã PN-..." class="form-control" 
                        style="width: 100%; padding: 10px 10px 10px 35px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none;"
                        onkeypress="if(event.keyCode==13) { this.form.submit(); return false; }">
@@ -106,7 +107,7 @@
             <select name="supplier_id" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
                 <option value="">-- Tất cả đối tác --</option>
                 <?php foreach($suppliers as $s): ?>
-                    <option value="<?= $s['id'] ?>" <?= ($filters['supplier_id'] == $s['id']) ? 'selected' : '' ?>>
+                    <option value="<?= $s['id'] ?>" <?= (($filters['supplier_id']??'') == $s['id']) ? 'selected' : '' ?>>
                         <?= htmlspecialchars($s['name']) ?>
                     </option>
                 <?php endforeach; ?>
@@ -117,19 +118,19 @@
             <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Trạng thái</label>
             <select name="status" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
                 <option value="">-- Tất cả --</option>
-                <option value="completed" <?= ($filters['status'] == 'completed') ? 'selected' : '' ?>>Hoàn tất</option>
-                <option value="draft" <?= ($filters['status'] == 'draft') ? 'selected' : '' ?>>Bản nháp</option>
+                <option value="completed" <?= (($filters['status']??'') == 'completed') ? 'selected' : '' ?>>Hoàn tất</option>
+                <option value="draft" <?= (($filters['status']??'') == 'draft') ? 'selected' : '' ?>>Bản nháp</option>
             </select>
         </div>
 
         <div style="flex: 1; min-width: 130px;">
             <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Từ ngày</label>
-            <input type="date" name="start_date" value="<?= htmlspecialchars($filters['start_date']) ?>" onchange="this.form.submit()" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
+            <input type="date" name="start_date" value="<?= htmlspecialchars($filters['start_date']??'') ?>" onchange="this.form.submit()" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
         </div>
 
         <div style="flex: 1; min-width: 130px;">
             <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Đến ngày</label>
-            <input type="date" name="end_date" value="<?= htmlspecialchars($filters['end_date']) ?>" onchange="this.form.submit()" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
+            <input type="date" name="end_date" value="<?= htmlspecialchars($filters['end_date']??'') ?>" onchange="this.form.submit()" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; cursor: pointer;">
         </div>
 
         <div>
@@ -224,7 +225,12 @@
                 <button type="button" class="btn-submit" onclick="submitImportForm('draft')" style="background: #f59e0b;">
                     <i class="fa-solid fa-floppy-disk"></i> Lưu nháp
                 </button>
-                <a href="/lego_shop_php/adminimport" style="padding: 10px 20px; color: #718096; text-decoration: none; font-weight: 600; background: #edf2f7; border-radius: 6px; display:flex; align-items:center;">Hủy bỏ</a>
+                
+                <?php if(isset($is_edit) && $is_edit): ?>
+                    <a href="/lego_shop_php/adminimport/detail/<?= $receipt['id'] ?>" style="padding: 10px 20px; color: #718096; text-decoration: none; font-weight: 600; background: #edf2f7; border-radius: 6px; display:flex; align-items:center;">Hủy bỏ sửa</a>
+                <?php else: ?>
+                    <a href="/lego_shop_php/adminimport" style="padding: 10px 20px; color: #718096; text-decoration: none; font-weight: 600; background: #edf2f7; border-radius: 6px; display:flex; align-items:center;">Hủy bỏ</a>
+                <?php endif; ?>
             </div>
         </form>
     </div>
@@ -292,6 +298,10 @@ function addRow() {
             const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
             const price = parseFloat(row.querySelector('.price-input').value) || 0;
             const total = qty * price;
+            
+            if (qty > 0) row.querySelector('.qty-input').style.borderColor = '#e2e8f0';
+            if (price > 0) row.querySelector('.price-input').style.borderColor = '#e2e8f0';
+
             row.querySelector('.row-total').innerText = new Intl.NumberFormat('vi-VN').format(total) + 'đ';
             updateGrandTotal();
         }
@@ -307,11 +317,59 @@ function addRow() {
         }
 
         async function submitImportForm(status) {
+            const supplierId = document.getElementById('supplier_id').value;
+            if (!supplierId) {
+                document.getElementById('supplier_id').style.borderColor = '#e53e3e';
+                return alert("Vui lòng chọn Nhà cung cấp!");
+            } else {
+                document.getElementById('supplier_id').style.borderColor = '#e2e8f0';
+            }
+
             const rows = document.querySelectorAll('#importTable tbody tr');
-            if (rows.length === 0) return alert("Vui lòng thêm ít nhất một sản phẩm!");
+            if (rows.length === 0) return alert("Vui lòng thêm ít nhất một sản phẩm vào phiếu nhập!");
+
+            const productsDataToSend = [];
+            let isValid = true;
+            let errorMessage = "";
+
+            rows.forEach(row => {
+                const productId = row.querySelector('.real-product-id').value;
+                const searchInput = row.querySelector('.combo-search-input');
+                const qtyInput = row.querySelector('.qty-input');
+                const priceInput = row.querySelector('.price-input');
+                
+                const qty = parseFloat(qtyInput.value) || 0;
+                const price = parseFloat(priceInput.value) || 0;
+
+                searchInput.style.borderColor = '#e2e8f0';
+                qtyInput.style.borderColor = '#e2e8f0';
+                priceInput.style.borderColor = '#e2e8f0';
+
+                if (!productId) {
+                    isValid = false;
+                    searchInput.style.borderColor = '#e53e3e';
+                    errorMessage = "Có ô sản phẩm chưa được chọn đúng từ danh sách (viền đỏ).";
+                } else if (qty <= 0) {
+                    isValid = false;
+                    qtyInput.style.borderColor = '#e53e3e';
+                    errorMessage = "Số lượng nhập phải lớn hơn 0.";
+                } else if (price <= 0) {
+                    isValid = false;
+                    priceInput.style.borderColor = '#e53e3e';
+                    errorMessage = "Giá nhập vào phải lớn hơn 0.";
+                } else {
+                    productsDataToSend.push({
+                        product_id: productId,
+                        quantity: qty,
+                        price: price
+                    });
+                }
+            });
+
+            if (!isValid) return alert("LỖI: " + errorMessage + " Vui lòng kiểm tra lại!");
 
             if(status === 'completed') {
-                if(!confirm("Hành động này sẽ tính lại giá và cập nhật thẳng vào kho. Bạn không thể sửa phiếu sau khi hoàn tất. Tiếp tục?")) return;
+                if(!confirm("Hành động này sẽ tính lại giá vốn (WAC) và cập nhật thẳng vào kho. Bạn không thể sửa phiếu sau khi hoàn tất. Xác nhận tiếp tục?")) return;
             }
 
             const formData = {
@@ -336,13 +394,18 @@ function addRow() {
                     body: JSON.stringify(formData)
                 });
                 const result = await response.json();
+                
                 if(result.success) {
-                    window.location.href = '/lego_shop_php/adminimport?msg=success';
+                    if (isEditMode) {
+                        window.location.href = `/lego_shop_php/adminimport/detail/${editReceiptId}?msg=updated`;
+                    } else {
+                        window.location.href = '/lego_shop_php/adminimport?msg=success';
+                    }
                 } else {
-                    window.location.href = '/lego_shop_php/adminimport?error=1';
+                    alert("Lỗi: " + result.message);
                 }
             } catch (err) {
-                window.location.href = '/lego_shop_php/adminimport?error=1';
+                alert("Lỗi kết nối mạng hoặc lỗi server!");
             }
         }
         
@@ -434,7 +497,7 @@ function addRow() {
                     </td>
                     <td style="text-align: center;">
                         <a href="/lego_shop_php/adminimport/detail/<?= $item['id'] ?>" class="btn-action" style="color: #3182ce;">
-                            <i class="fa-solid fa-circle-info"></i> Xem
+                            <i class="fa-solid fa-circle-info"></i> Kiểm tra
                         </a>
                     </td>
                 </tr>

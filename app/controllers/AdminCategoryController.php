@@ -5,6 +5,11 @@ class AdminCategoryController extends Controller {
     private $limit = 10; // Đặt limit chung
 
     public function __construct() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        if (!isset($_SESSION['admin_id'])) { 
+            header("Location: /lego_shop_php/admin/login"); 
+            exit; 
+        }
         $this->categoryModel = $this->model('CategoryModel');
     }
 
@@ -124,10 +129,9 @@ class AdminCategoryController extends Controller {
         exit();
     }
 
-    // Hàm Khóa danh mục
-    public function delete($id) {
+    // Hàm KHÓA danh mục (Đổi tên từ delete -> lock)
+    public function lock($id) {
         $id = intval($id);
-        // Khi khóa danh mục -> Model sẽ tự khóa luôn sản phẩm bên trong
         if ($this->categoryModel->updateStatusAdmin($id, 'locked')) {
             set_flash_message('msg', 'hidden');
         } else {
@@ -137,6 +141,17 @@ class AdminCategoryController extends Controller {
         exit();
     }
 
+    // Hàm XÓA MỀM danh mục (MỚI)
+    public function delete($id) {
+        $id = intval($id);
+        if ($this->categoryModel->softDeleteCategory($id)) {
+            set_flash_message('msg', 'deleted');
+        } else {
+            set_flash_message('error', 'db');
+        }
+        header('Location: /lego_shop_php/admincategory');
+        exit();
+    }
     private function handleUpload($file) {
         if (isset($file) && $file['error'] == 0) {
             $ext = pathinfo($file['name'], PATHINFO_EXTENSION);

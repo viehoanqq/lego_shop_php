@@ -165,26 +165,51 @@
 
             <div class="card-right">
                 <h3 class="card-title"><i class="fa-solid fa-arrows-rotate"></i> Cập nhật Đơn hàng</h3>
-                <form action="/lego_shop_php/adminorder/update_status/<?= $order['id'] ?>" method="POST" id="statusUpdateForm">
-                    
-                    <div style="margin-bottom: 12px;">
-                        <label class="form-label">Chọn trạng thái mới:</label>
-                        <select name="status" id="order_status_select" class="form-control">
-                            <option value="pending" <?= $order['status'] == 'pending' ? 'selected' : '' ?>>Chờ xử lý</option>
-                            <option value="confirmed" <?= $order['status'] == 'confirmed' ? 'selected' : '' ?>>Đã xác nhận</option>
-                            <option value="shipping" <?= $order['status'] == 'shipping' ? 'selected' : '' ?>>Đang giao hàng</option>
-                            <option value="delivered" <?= $order['status'] == 'delivered' ? 'selected' : '' ?>>Giao thành công</option>
-                            <option value="cancelled" <?= $order['status'] == 'cancelled' ? 'selected' : '' ?>>Hủy đơn hàng</option>
-                        </select>
+                
+                <?php 
+                $current_status = $order['status'];
+                
+                // Trạng thái đã chốt (Không cho sửa nữa)
+                if ($current_status === 'delivered'): ?>
+                    <div style="padding: 15px; background: #f0fdf4; color: #15803d; border-radius: 6px; text-align: center; font-weight: 600; border: 1px solid #bbf7d0;">
+                        <i class="fa-solid fa-check-circle"></i> Đơn hàng đã giao thành công.
                     </div>
-                    
-                    <div style="margin-bottom: 5px;">
-                        <label class="form-label">Ghi chú (Note):</label>
-                        <textarea name="note" class="form-control" rows="2" placeholder="Nhập ghi chú hoặc lý do..."></textarea>
+                <?php elseif ($current_status === 'cancelled'): ?>
+                    <div style="padding: 15px; background: #fef2f2; color: #b91c1c; border-radius: 6px; text-align: center; font-weight: 600; border: 1px solid #fecaca;">
+                        <i class="fa-solid fa-ban"></i> Đơn hàng đã bị hủy.
                     </div>
+                <?php else: ?>
+                    <form action="/lego_shop_php/adminorder/update_status/<?= $order['id'] ?>" method="POST" id="statusUpdateForm">
+                        
+                        <div style="margin-bottom: 12px;">
+                            <label class="form-label">Chọn trạng thái mới:</label>
+                            <select name="status" id="order_status_select" class="form-control">
+                                <?php if ($current_status === 'pending'): ?>
+                                    <option value="pending" selected>Chờ xử lý (Hiện tại)</option>
+                                    <option value="confirmed">Xác nhận đơn hàng</option>
+                                    <option value="cancelled">Hủy đơn hàng</option>
+                                
+                                <?php elseif ($current_status === 'confirmed'): ?>
+                                    <option value="confirmed" selected>Đã xác nhận (Hiện tại)</option>
+                                    <option value="shipping">Đang giao hàng</option>
+                                    <option value="cancelled">Hủy đơn hàng</option>
+                                
+                                <?php elseif ($current_status === 'shipping'): ?>
+                                    <option value="shipping" selected>Đang giao hàng (Hiện tại)</option>
+                                    <option value="delivered">Giao thành công</option>
+                                    <option value="cancelled">Hủy đơn</option>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 5px;">
+                            <label class="form-label">Ghi chú (Note):</label>
+                            <textarea name="note" class="form-control" rows="2" placeholder="Nhập lý do hủy hoặc ghi chú..."></textarea>
+                        </div>
 
-                    <button type="submit" class="btn-submit"><i class="fa-solid fa-floppy-disk"></i> Lưu Trạng Thái</button>
-                </form>
+                        <button type="submit" class="btn-submit"><i class="fa-solid fa-floppy-disk"></i> Lưu Trạng Thái</button>
+                    </form>
+                <?php endif; ?>
             </div>
 
             <div class="card-right">
