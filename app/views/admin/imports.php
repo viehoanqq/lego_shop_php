@@ -1,3 +1,6 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <style>
     /* CSS CŨ CỦA BẠN (GIỮ NGUYÊN) */
     .table-container { 
@@ -36,32 +39,21 @@
     .btn-action { text-decoration: none; padding: 6px 12px; border-radius: 6px; transition: 0.2s; font-weight: 600; }
     .btn-action:hover { background: #f1f5f9; }
 
-    /* CSS CHO COMBO BOX (SEARCH & DROPDOWN) */
-    .combo-box-wrapper { position: relative; width: 100%; }
-    .combo-search-input {
-        width: 100%; padding: 10px; padding-right: 35px; 
-        border: 1px solid #e2e8f0; border-radius: 6px; outline: none; 
-        background-color: #fff; font-size: 14px; color: #1a202c;
+    /* --- CSS làm đẹp cho thanh tìm kiếm Select2 --- */
+    .select2-container .select2-selection--single {
+        height: 40px !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 6px !important;
+        display: flex;
+        align-items: center;
     }
-    .combo-search-input:focus { border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
-    .combo-dropdown-icon {
-        position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-        color: #94a3b8; pointer-events: none; transition: transform 0.2s;
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 38px !important;
     }
-    .combo-dropdown-list {
-        display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
-        background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; max-height: 250px;
-        overflow-y: auto; z-index: 9999; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        padding: 5px 0; margin: 0; list-style: none;
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #475569 !important;
+        font-weight: 500;
     }
-    .combo-item {
-        padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f1f5f9;
-        font-size: 14px; color: #1e293b; display: flex; gap: 12px; align-items: center;
-    }
-    .combo-item:last-child { border-bottom: none; }
-    .combo-item:hover { background-color: #f8fafc; color: #3182ce; }
-    .combo-item-sku { font-size: 11px; color: #64748b; margin-top: 4px; display: block; }
-    .combo-empty { padding: 10px 15px; color: #94a3b8; text-align: center; font-style: italic; }
 </style>
 
 <?php if(isset($_GET['msg']) || isset($_GET['error'])): ?>
@@ -154,9 +146,10 @@
 <?php if(isset($is_form) && $is_form === true): ?>
     <div class="form-container">
         <h3 style="margin-top:0; color: #2d3748;">
-            <i class="fa-solid fa-pen-to-square"></i> 
-            <?= isset($is_edit) && $is_edit ? "Sửa Bản Nháp Phiếu Nhập #PN-" . $receipt['id'] : "Lập Phiếu Nhập Kho Mới" ?>
+            <i class="fa-solid <?= isset($receipt) ? 'fa-pen-to-square' : 'fa-cart-plus' ?>"></i> 
+            <?= isset($receipt) ? 'Tiếp tục lập Phiếu nhập nháp (#PN-' . $receipt['id'] . ')' : 'Lập phiếu nhập kho mới' ?>
         </h3>
+
         <form id="importForm" style="margin-top: 20px;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 20px; background: #f7fafc; padding: 15px; border-radius: 8px;">
                 <div class="form-group" style="margin: 0;">
@@ -164,7 +157,9 @@
                     <select id="supplier_id" class="form-control" required>
                         <option value="">-- Chọn nhà cung cấp --</option>
                         <?php foreach($suppliers as $s): ?>
-                            <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name']) ?></option>
+                            <option value="<?= $s['id'] ?>" <?= (isset($receipt) && $receipt['supplier_id'] == $s['id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($s['name']) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -174,18 +169,43 @@
                 </div>
             </div>
 
-            <table class="lego-table" id="importTable" style="margin-bottom: 20px;">
+            <<table class="lego-table" id="importTable" style="margin-bottom: 20px;">
                 <thead>
                     <tr>
-                        <th style="width: 45%;">Sản phẩm nhập (Gõ tìm hoặc chọn)</th>
+                        <th style="width: 5%; text-align: center;">STT</th>
+                        <th style="width: 40%;">Sản phẩm nhập</th>
                         <th style="width: 15%; text-align: center;">Số lượng</th>
                         <th style="width: 20%; text-align: right;">Giá nhập (đ)</th>
                         <th style="width: 15%; text-align: right;">Thành tiền</th>
                         <th style="width: 5%; text-align: center;"></th>
                     </tr>
                 </thead>
-                <tbody>
-                    </tbody>
+                <tbody id="import-body">
+                    <?php if(isset($receipt_details) && !empty($receipt_details)): ?>
+                        <?php $stt = 1; foreach($receipt_details as $index => $item): ?>
+                            <?php $rowId = 'row_old_' . $index; ?>
+                            <tr id="<?= $rowId ?>" class="product-row"> <td class="row-number" style="text-align: center; font-weight: bold; color: #64748b; vertical-align: middle;"><?= $stt++ ?></td>
+                                
+                                <td>
+                                <input type="text" class="form-control display-product-input" list="product-suggestions" 
+                                       placeholder="Gõ tên sản phẩm..." 
+                                       value="<?= htmlspecialchars($item['product_name']) ?> (Tồn: <?= $item['current_stock'] ?>)" 
+                                       onchange="handleProductSelect(this)" required>
+                                
+                                <input type="hidden" class="real-product-id" value="<?= $item['product_id'] ?>">
+                            </td>
+                                <td><input type="number" class="form-control qty-input" value="<?= $item['quantity'] ?>" min="1" oninput="calculateRow('<?= $rowId ?>')" style="text-align:center;"></td>
+                                <td><input type="number" class="form-control price-input" value="<?= $item['price'] ?>" min="0" oninput="calculateRow('<?= $rowId ?>')" style="text-align:right;"></td>
+                                <td style="text-align: right; font-weight: 700; color: #2d3748; vertical-align: middle;" class="row-total"><?= number_format($item['quantity'] * $item['price'], 0, ',', '.') ?>đ</td>
+                                <td style="text-align: center; vertical-align: middle;">
+                                    <button type="button" onclick="removeRow('<?= $rowId ?>')" style="color: #e53e3e; border:none; background:none; cursor:pointer; font-size: 16px;">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
             </table>
 
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px dashed #e2e8f0; padding-top: 20px;">
@@ -218,125 +238,61 @@
     <script>
         const productsData = <?= json_encode($products ?? []) ?>;
         
-        // === CÁC BIẾN KIỂM SOÁT CHẾ ĐỘ SỬA ===
-        const isEditMode = <?= isset($is_edit) && $is_edit ? 'true' : 'false' ?>;
-        const editDetails = <?= json_encode($details ?? []) ?>;
-        const editReceiptId = <?= isset($receipt['id']) ? $receipt['id'] : 'null' ?>;
+        // --- XÁC ĐỊNH TRẠNG THÁI: LÀ SỬA HAY TẠO MỚI ---
+        const isEdit = <?= isset($receipt) ? 'true' : 'false' ?>;
+        const receiptId = <?= $receipt['id'] ?? 'null' ?>;
 
-        function addRow(prefillData = null) {
+        // Hàm thêm dòng
+function addRow() {
             const tbody = document.querySelector('#importTable tbody');
-            const rowId = 'row_' + Date.now() + Math.floor(Math.random() * 1000); // Thêm random để chống trùng ID khi load nhanh
-            
-            let listHtml = productsData.map(p => {
-                let searchStr = (p.name + " " + p.sku).toLowerCase();
-                let safeName = p.name.replace(/'/g, "\\'");
-                let safeImg = p.image_url ? p.image_url : 'default.jpg';
-                
-                return `
-                <li class="combo-item" data-search="${searchStr}" 
-                    onclick="selectProduct('${rowId}', ${p.id}, '${safeName}', ${p.stock_quantity}, ${p.import_price})">
-                    <img src="/lego_shop_php/public/assets/images/${safeImg}" style="width:40px; height:40px; border-radius:4px; object-fit:cover; border: 1px solid #cbd5e1;" onerror="this.src='https://placehold.co/40x40?text=LEGO'">
-                    <div style="flex: 1;">
-                        <div style="font-weight: 700;">${p.name}</div>
-                        <span class="combo-item-sku">SKU: ${p.sku} | Tồn: <b style="color:#e53e3e">${p.stock_quantity}</b> | Giá cũ: ${new Intl.NumberFormat('vi-VN').format(p.import_price)}đ</span>
-                    </div>
-                </li>`;
-            }).join('');
+            const rowId = 'row_' + Date.now();
 
             const rowHtml = `
-                <tr id="${rowId}">
+                <tr id="${rowId}" class="product-row">
+                    <td class="row-number" style="text-align: center; font-weight: bold; color: #64748b; vertical-align: middle;"></td>
                     <td>
-                        <div class="combo-box-wrapper" id="combo_${rowId}">
-                            <input type="text" class="combo-search-input" 
-                                   placeholder="-- Chọn hoặc gõ tên sản phẩm --" 
-                                   onfocus="openDropdown('${rowId}')" 
-                                   onkeyup="filterDropdown('${rowId}', this.value)" 
-                                   autocomplete="off" required>
-                            <i class="fa-solid fa-chevron-down combo-dropdown-icon"></i>
-                            <input type="hidden" class="real-product-id" required>
-                            <ul class="combo-dropdown-list">
-                                ${listHtml}
-                                <li class="combo-empty" style="display:none;">Không tìm thấy sản phẩm...</li>
-                            </ul>
-                        </div>
+                        <input type="text" class="form-control display-product-input" list="product-suggestions" 
+                               placeholder="Gõ tên hoặc mã SKU..." onchange="handleProductSelect(this)" required>
+                        <input type="hidden" class="real-product-id" required>
                     </td>
                     <td><input type="number" class="form-control qty-input" value="1" min="1" oninput="calculateRow('${rowId}')" style="text-align:center;"></td>
                     <td><input type="number" class="form-control price-input" placeholder="0" min="0" oninput="calculateRow('${rowId}')" style="text-align:right;"></td>
-                    <td style="text-align: right; font-weight: 700; color: #2d3748;" class="row-total">0đ</td>
-                    <td style="text-align: center;">
-                        <button type="button" onclick="document.getElementById('${rowId}').remove(); updateGrandTotal();" style="color: #e53e3e; border:none; background:none; cursor:pointer;">
+                    <td style="text-align: right; font-weight: 700; color: #2d3748; vertical-align: middle;" class="row-total">0đ</td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        <button type="button" onclick="removeRow('${rowId}')" style="color: #e53e3e; border:none; background:none; cursor:pointer; font-size: 16px;">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
                 </tr>`;
+            
             tbody.insertAdjacentHTML('beforeend', rowHtml);
-
-            // Nếu đang trong chế độ Edit và có data truyền vào -> Tự động điền
-            if (prefillData) {
-                let safeName = prefillData.product_name.replace(/'/g, "\\'");
-                selectProduct(rowId, prefillData.product_id, safeName, prefillData.current_stock, prefillData.price);
-                
-                const row = document.getElementById(rowId);
-                row.querySelector('.qty-input').value = prefillData.quantity;
-                row.querySelector('.price-input').value = prefillData.price; // Lấy đúng giá trị lưu trong phiếu cũ
-                calculateRow(rowId);
-            }
+            updateRowNumbers();
         }
 
-        function openDropdown(rowId) {
-            document.querySelectorAll('.combo-dropdown-list').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.combo-dropdown-icon').forEach(el => el.style.transform = 'translateY(-50%) rotate(0deg)');
-            
-            const combo = document.getElementById(`combo_${rowId}`);
-            combo.querySelector('.combo-dropdown-list').style.display = 'block';
-            combo.querySelector('.combo-dropdown-icon').style.transform = 'translateY(-50%) rotate(180deg)';
-            filterDropdown(rowId, '');
+        // Hàm xóa dòng và cập nhật lại mọi thứ
+        function removeRow(rowId) {
+            document.getElementById(rowId).remove();
+            updateGrandTotal();
+            updateRowNumbers(); // Đánh lại số thứ tự sau khi xóa
         }
 
-        function filterDropdown(rowId, keyword) {
-            const combo = document.getElementById(`combo_${rowId}`);
-            const items = combo.querySelectorAll('.combo-item');
-            const emptyMsg = combo.querySelector('.combo-empty');
-            let hasResult = false;
-            
-            keyword = keyword.toLowerCase().trim();
-
-            if(keyword !== '') {
-                combo.querySelector('.real-product-id').value = '';
-            }
-
-            items.forEach(item => {
-                const searchStr = item.getAttribute('data-search');
-                if (searchStr.includes(keyword)) {
-                    item.style.display = 'flex'; 
-                    hasResult = true;
-                } else {
-                    item.style.display = 'none';
-                }
+        // Hàm TỰ ĐỘNG CẬP NHẬT SỐ THỨ TỰ (1, 2, 3...)
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('#importTable tbody .product-row');
+            rows.forEach((row, index) => {
+                row.querySelector('.row-number').innerText = index + 1;
             });
-
-            emptyMsg.style.display = hasResult ? 'none' : 'block';
         }
 
-        function selectProduct(rowId, productId, productName, stockQty, oldPrice) {
-            const combo = document.getElementById(`combo_${rowId}`);
-            combo.querySelector('.combo-search-input').value = productName + ` (Tồn: ${stockQty})`;
-            combo.querySelector('.real-product-id').value = productId;
-            combo.querySelector('.combo-dropdown-list').style.display = 'none';
-            combo.querySelector('.combo-dropdown-icon').style.transform = 'translateY(-50%) rotate(0deg)';
-
-            const row = document.getElementById(rowId);
-            row.querySelector('.price-input').value = oldPrice;
-            calculateRow(rowId);
+        // Khởi tạo thanh tìm kiếm (Đã tắt dấu x)
+        function initSelect2() {
+            $('.product-select').select2({
+                placeholder: "🔍 Gõ mã SKU hoặc tên LEGO để tìm...",
+                allowClear: false, // <-- TẮT DẤU "x" Ở ĐÂY
+                width: '100%',
+                language: { noResults: function() { return "Không tìm thấy sản phẩm nào!"; } }
+            });
         }
-
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.combo-box-wrapper')) {
-                document.querySelectorAll('.combo-dropdown-list').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('.combo-dropdown-icon').forEach(el => el.style.transform = 'translateY(-50%) rotate(0deg)');
-            }
-        });
-
         function calculateRow(rowId) {
             const row = document.getElementById(rowId);
             const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
@@ -417,16 +373,22 @@
             }
 
             const formData = {
-                supplier_id: supplierId,
+                supplier_id: document.getElementById('supplier_id').value,
                 status: status,
-                products: productsDataToSend
+                products: Array.from(rows).map(row => ({
+                    product_id: row.querySelector('.real-product-id').value,
+                    quantity: row.querySelector('.qty-input').value,
+                    price: row.querySelector('.price-input').value
+                }))
             };
 
+            // --- CHỌN URL TÙY THEO TRẠNG THÁI ---
+            const targetUrl = isEdit 
+                ? '/lego_shop_php/adminimport/updateDraft/' + receiptId 
+                : '/lego_shop_php/adminimport/store';
+
             try {
-                // CHỈ ĐỊNH API CHUẨN: Lưu mới hay Cập nhật
-                const submitUrl = isEditMode ? `/lego_shop_php/adminimport/update/${editReceiptId}` : '/lego_shop_php/adminimport/store';
-                
-                const response = await fetch(submitUrl, {
+                const response = await fetch(targetUrl, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(formData)
@@ -446,24 +408,52 @@
                 alert("Lỗi kết nối mạng hoặc lỗi server!");
             }
         }
+        
+        function initSelect2() {
+            $('.product-select').select2({
+                placeholder: "🔍 Gõ mã SKU hoặc tên LEGO để tìm...",
+                allowClear: true,
+                width: '100%',
+                language: { noResults: function() { return "Không tìm thấy sản phẩm nào!"; } }
+            });
+        }
 
-        // TỰ ĐỘNG ĐIỀN DỮ LIỆU NẾU ĐANG SỬA
-        window.onload = function() {
-            if (isEditMode && editDetails.length > 0) {
-                // Chọn lại nhà cung cấp cũ
-                document.getElementById('supplier_id').value = "<?= isset($receipt['supplier_id']) ? $receipt['supplier_id'] : '' ?>";
-                
-                // Vòng lặp tự động thêm từng món hàng cũ vào
-                editDetails.forEach(detail => {
-                    addRow(detail);
-                });
-            } else {
-                addRow(); // Mở sẵn 1 dòng trắng nếu tạo mới
+        function handleProductSelect(input) {
+            const val = input.value;
+            const datalist = document.getElementById('product-suggestions');
+            const options = datalist.options;
+            let foundId = "";
+            
+            // Dò tìm ID thực sự của sản phẩm dựa trên đoạn text vừa gõ
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value === val) {
+                    foundId = options[i].getAttribute('data-id');
+                    break;
+                }
             }
-        };
+
+            // Gắn ID vào ô ẩn
+            const hiddenInput = input.parentElement.querySelector('.real-product-id');
+            hiddenInput.value = foundId;
+
+            // Bắt lỗi: Nếu gõ linh tinh không có trong danh sách
+            if (!foundId && val.trim() !== "") {
+                alert("Sản phẩm không hợp lệ! Vui lòng click chọn từ danh sách gợi ý.");
+                input.value = "";
+            }
+        }
+
+        $(document).ready(function() {
+            initSelect2();
+            updateGrandTotal(); // Cập nhật tổng tiền ngay khi load trang
+            
+            // Chỉ đẻ ra dòng mới nếu là TẠO MỚI (không có dữ liệu cũ)
+            <?php if(!isset($receipt_details) || empty($receipt_details)): ?>
+                addRow();
+            <?php endif; ?>
+        });
     </script>
 <?php endif; ?>
-
 <div class="table-container">
     <table class="lego-table">
         <thead>
@@ -533,4 +523,10 @@ setTimeout(function() {
         setTimeout(() => el.style.display = 'none', 500);
     });
 }, 5000);
+
 </script>
+<datalist id="product-suggestions">
+        <?php foreach($products as $p): ?>
+            <option data-id="<?= $p['id'] ?>" value="<?= htmlspecialchars($p['name']) ?> (Tồn: <?= $p['stock_quantity'] ?>)"></option>
+        <?php endforeach; ?>
+    </datalist>

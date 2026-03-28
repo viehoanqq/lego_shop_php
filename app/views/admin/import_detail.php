@@ -19,6 +19,35 @@
 
     .product-cell { display: flex; align-items: center; gap: 15px; }
     .img-product { width: 60px; height: 60px; min-width: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; }
+
+    /* // In ấn: Ẩn các phần không cần thiết khi in */
+    /* --- CSS DÀNH RIÊNG CHO BẢN IN --- */
+    @media print {
+        /* Giấu menu bên trái, phần header admin và các nút bấm */
+        .side-bar, .admin-header, .action-buttons { 
+            display: none !important; 
+        }
+        /* Mở rộng toàn bộ nội dung chiếm 100% tờ giấy A4 */
+        .main-content { 
+            margin-left: 0 !important; 
+            width: 100% !important; 
+            padding: 0 !important; 
+            background: #fff !important;
+        }
+        /* Bỏ đổ bóng, bỏ viền của các khối container để tiết kiệm mực in */
+        .table-container, .summary-box { 
+            box-shadow: none !important; 
+            border: 1px solid #000 !important; 
+            margin: 0 !important; 
+            padding: 15px !important;
+        }
+        /* Hiện phần Header riêng của hóa đơn (logo, tên cửa hàng...) */
+        .print-invoice-header { display: block !important; }
+        body { background: #fff !important; }
+    }
+    
+    /* Ẩn header hóa đơn khi đang xem trên màn hình web */
+    .print-invoice-header { display: none; }
 </style>
 
 <?php if(isset($_GET['msg']) && $_GET['msg'] == 'completed'): ?>
@@ -44,23 +73,37 @@
         </a>
     </div>
 
+   <div class="action-buttons" style="display: flex; gap: 15px; align-items: center; margin-bottom: 25px; padding: 15px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.05);">
+    
+    <a href="/lego_shop_php/adminimport" style="background: #f1f5f9; color: #475569; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: 600; border: 1px solid #cbd5e1;">
+        <i class="fa-solid fa-arrow-left"></i> Quay lại
+    </a>
+
     <?php if($receipt['status'] === 'draft'): ?>
-        <div style="background: #fffbeb; border: 1px dashed #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h4 style="color: #b45309; margin: 0 0 5px 0;"><i class="fa-solid fa-triangle-exclamation"></i> Phiếu nhập này đang ở trạng thái Bản nháp!</h4>
-                <p style="margin: 0; color: #92400e; font-size: 14px;">Kho hàng và Giá vốn (WAC) <b>chưa</b> được cập nhật. Bạn cần kiểm tra lại thông tin bên dưới và nhấn "Hoàn tất".</p>
-            </div>
-            <div>
-                <a href="/lego_shop_php/adminimport/edit/<?= $receipt['id'] ?>" class="btn-edit">
-                    <i class="fa-solid fa-pen-to-square"></i> SỬA PHIẾU NHẬP
-                </a>
-                
-                <a href="/lego_shop_php/adminimport/complete/<?= $receipt['id'] ?>" class="btn-complete" onclick="return confirm('Sau khi hoàn tất, hệ thống sẽ tự động cập nhật kho hàng và tính lại giá bán. Bạn không thể hoàn tác. Xác nhận?')">
-                    <i class="fa-solid fa-check-double"></i> XÁC NHẬN HOÀN TẤT
-                </a>
-            </div>
-        </div>
+        
+        <a href="/lego_shop_php/adminimport/edit/<?= $receipt['id'] ?>" 
+           style="background: #f59e0b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: 600; transition: 0.2s;">
+            <i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa phiếu
+        </a>
+
+        <form action="/lego_shop_php/adminimport/complete/<?= $receipt['id'] ?>" method="POST" style="margin: 0;" onsubmit="return confirm('XÁC NHẬN HOÀN TẤT?\n\nSau khi hoàn tất, kho hàng sẽ được cộng thêm và bạn KHÔNG THỂ chỉnh sửa phiếu này nữa.');">
+            <button type="submit" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;">
+                <i class="fa-solid fa-check-double"></i> Hoàn tất phiếu nhập
+            </button>
+        </form>
+        
+    <?php else: ?>
+        <a href="/lego_shop_php/adminimport/print/<?= $receipt['id'] ?>" target="_blank" 
+           style="display: inline-block; background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; transition: 0.2s;">
+            <i class="fa-solid fa-print"></i> In phiếu nhập
+        </a>
+        
+        <span style="color: #10b981; font-weight: 700; margin-left: auto;">
+            <i class="fa-solid fa-circle-check"></i> Phiếu nhập đã hoàn tất (Không thể sửa)
+        </span>
     <?php endif; ?>
+
+</div>
 
     <div class="info-grid">
         <div class="info-item">

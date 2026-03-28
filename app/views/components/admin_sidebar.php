@@ -3,14 +3,17 @@
         <h2><a href="/lego_shop_php/admindashboard">LEGO ADMIN</a></h2>
     </div>
     <nav class="menu">
-        <?php 
-            $current_page = $_GET['url'] ?? ''; 
-            // Hàm hỗ trợ kiểm tra active menu
-            function isActive($path, $current) {
-    // Loại bỏ các dấu gạch chéo dư thừa để so sánh cho chuẩn
-    return trim($current, '/') === trim($path, '/') ? 'active' : '';
-}
-        ?>
+    <?php 
+        // 1. Dùng REQUEST_URI để lấy chính xác 100% đường dẫn thực tế trên thanh địa chỉ
+        $current_page = $_SERVER['REQUEST_URI'] ?? ''; 
+        
+        // 2. Hàm hỗ trợ kiểm tra active menu
+        function isActive($path, $current) {
+            // Dùng stripos để kiểm tra xem chữ 'adminprice' có nằm trong cái URL dài loằng ngoằng kia không
+            // !== false nghĩa là "Có tìm thấy"
+            return stripos($current, $path) !== false ? 'active' : '';
+        }
+    ?>
 
         <ul class="system">
             <li class="menu-label">Hệ thống</li>

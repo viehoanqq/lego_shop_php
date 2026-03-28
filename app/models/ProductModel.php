@@ -140,8 +140,7 @@ class ProductModel extends Database {
         return $products;
     }
     // --- Cập nhật Giá bán và Tỉ lệ lợi nhuận ---
-   // --- Lấy danh sách sản phẩm để quản lý giá ---
-      public function updatePriceAndMargin($product_id, $selling_price, $profit_margin) {
+    public function updatePriceAndMargin($product_id, $selling_price, $profit_margin) {
         $db = $this->getConnection();
         
         $product_id = intval($product_id);
@@ -599,14 +598,29 @@ class ProductModel extends Database {
 
         return 'error';
     }
-    // Hàm lấy danh sách sản phẩm phục vụ cho Combo Box cài đặt mức cảnh báo
-    public function getAllProductsForDropdown() {
+
+    // --- Tra cứu lịch sử giá theo lô hàng nhập ---
+    public function getProductPriceHistory($product_id) {
         $db = $this->getConnection();
-        $sql = "SELECT p.id, p.name, p.sku, p.stock_quantity, p.min_stock_level, 
-               (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as image_url 
-               FROM products p WHERE p.status IN (1, 2)";
-               
+        
+        // Kết hợp bảng chi tiết phiếu nhập và phiếu nhập để lấy lịch sử
+        $sql = "SELECT d.receipt_id, r.created_at as import_date, 
+                       d.quantity as import_qty, 
+                       d.price as batch_import_price, 
+                       d.calculated_average_price as wac_price, 
+                       d.calculated_selling_price as selling_price
+                FROM import_receipt_details d
+                JOIN import_receipts r ON d.receipt_id = r.id
+                WHERE d.product_id = " . intval($product_id) . " AND r.status = 'completed'
+                ORDER BY r.created_at DESC";
+                
         $result = $db->query($sql);
-        return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
+        $data = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+        }
+        return $data;
     }
 }

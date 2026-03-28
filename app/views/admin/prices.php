@@ -137,10 +137,18 @@
                 </td>
                 
                 <td style="text-align: center;">
-                    <button class="btn-save-price" onclick="savePrice(<?= $p['id'] ?>)" 
-                            style="background: #38a169; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;">
-                        <i class="fa-solid fa-floppy-disk"></i> Lưu
-                    </button>
+                    <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                        <button class="btn-save-price" onclick="savePrice(<?= $p['id'] ?>)" 
+                                style="background: #38a169; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;">
+                            <i class="fa-solid fa-floppy-disk"></i> Lưu
+                        </button>
+                        
+                        <a href="/lego_shop_php/adminprice/history/<?= $p['id'] ?>" 
+                           style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 7px 12px; border-radius: 6px; text-decoration: none; transition: 0.2s;" 
+                           title="Tra cứu theo lô hàng">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </a>
+                    </div>
                 </td>
             </tr>
             <?php endforeach; ?>

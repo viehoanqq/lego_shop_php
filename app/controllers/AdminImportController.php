@@ -109,72 +109,81 @@ class AdminImportController extends Controller {
         }
         exit;
     }
-    public function searchProductsAjax() {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            header('Content-Type: application/json');
-            ob_clean(); // Xóa các khoảng trắng thừa để JSON không bị lỗi
-            
-            $keyword = trim($_GET['keyword'] ?? '');
-            
-            if (strlen($keyword) < 2) {
-                echo json_encode(['success' => true, 'data' => []]);
-                exit;
-            }
 
-            $importModel = $this->model('ImportModel');
-            $products = $importModel->searchProductsForImport($keyword);
-            
-            echo json_encode(['success' => true, 'data' => $products]);
-            exit;
-        }
-    }
-    public function edit($id) {
+    // --- MỞ TRANG IN PHIẾU NHẬP (TAB MỚI) ---
+    public function print($id) {
         $importModel = $this->model('ImportModel');
         
         $receipt = $importModel->getImportById($id);
-        
-        // Chặn người dùng cố tình gõ URL để sửa phiếu đã hoàn tất
-        if (!$receipt || $receipt['status'] === 'completed') {
-            header("Location: /lego_shop_php/adminimport?error=1");
+        if (!$receipt || $receipt['status'] !== 'completed') {
+            echo "<script>alert('Lỗi: Chỉ có thể in phiếu nhập đã hoàn tất!'); window.close();</script>";
             exit;
         }
 
         $data['receipt'] = $receipt;
-        $data['details'] = $importModel->getImportDetails($id);
+        $data['receipt_details'] = $importModel->getImportDetails($id);
         
-        // Load lại danh sách y như form tạo mới
-        $data['imports'] = $importModel->getAllImports();
-        $data['suppliers'] = $importModel->getAllSuppliers();
-        $data['products'] = $importModel->getProductsForImportForm(); 
         
-        $data['title'] = "Sửa phiếu nhập kho #PN-" . $id;
-        $data['is_form'] = true; 
-        $data['is_edit'] = true; // Cờ báo hiệu giao diện biết là đang Sửa
+        // 1. Giải nén mảng $data thành các biến độc lập ($receipt, $receipt_details)
+        extract($data); 
         
-        $this->view('admin/imports', $data);
+        // 2. Gọi thẳng file View HTML thuần túy (Bypass toàn bộ Sidebar/Header)
+        // (Lưu ý: Nếu hệ thống báo lỗi không tìm thấy file, hãy thử đổi thành '../app/views/admin/import_print.php')
+        require_once 'app/views/admin/import_print.php'; 
+        
+        // 3. Ngắt luôn PHP tại đây để hệ thống không tự động nạp thêm Footer
+        exit; 
     }
-    public function update($id) {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            ob_clean(); 
-            header('Content-Type: application/json');
 
+    // ==================================================
+    // 1. HIỂN THỊ FORM SỬA BẢN NHÁP
+    // ==================================================
+    public function edit($id) {
+        $importModel = $this->model('ImportModel');
+        $productModel = $this->model('ProductModel');
+        
+        $receipt = $importModel->getImportById($id);
+        // Chặn nếu không tìm thấy phiếu, hoặc phiếu KHÔNG PHẢI BẢN NHÁP
+        if (!$receipt || $receipt['status'] !== 'draft') {
+            header("Location: /lego_shop_php/adminimport");
+            exit;
+        }
+
+        $data['receipt'] = $receipt;
+        $data['receipt_details'] = $importModel->getImportDetails($id); 
+        $data['suppliers'] = $importModel->getAllSuppliers();
+        $data['products'] = $productModel->getFilteredProducts(['status' => '1,2'], 0, 1000); 
+        
+        $data['title'] = "Tiếp tục lập phiếu nhập (#PN-" . $id . ")";
+        $data['is_form'] = true; 
+        
+        // Gọi ra file View tạo phiếu nhập để load lại dữ liệu cũ
+        $this->view('admin/imports', $data); 
+    }
+
+    // ==================================================
+    // 2. API NHẬN DỮ LIỆU CẬP NHẬT TỪ AJAX (KHI BẤM LƯU)
+    // ==================================================
+    public function updateDraft($id) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ob_clean();
+            header('Content-Type: application/json');
+            
             try {
                 $data = json_decode(file_get_contents('php://input'), true);
-                if (!$data) throw new Exception("Dữ liệu không hợp lệ");
-                
-                $supplier_id = intval($data['supplier_id']);
-                $products = $data['products']; 
-                $status = $data['status'] ?? 'draft'; 
-                $admin_id = $_SESSION['admin_id']; 
+                if (!$data || empty($data['products'])) throw new Exception("Dữ liệu không hợp lệ");
 
-                $importModel = $this->model('ImportModel'); 
-                // Gọi hàm update mới viết
-                $success = $importModel->updateImportTransaction($id, $admin_id, $supplier_id, $products, $status);
+                $supplier_id = intval($data['supplier_id']);
+                $products = $data['products'];
+
+                $importModel = $this->model('ImportModel');
+                // Gọi hàm Update Draft trong Model
+                $success = $importModel->updateDraftTransaction($id, $supplier_id, $products);
 
                 if ($success) {
                     echo json_encode(['success' => true]);
                 } else {
-                    echo json_encode(['success' => false, 'message' => 'Lỗi cập nhật CSDL (Có thể phiếu đã hoàn tất)']);
+                    throw new Exception("Lỗi cập nhật CSDL");
                 }
             } catch (Exception $e) {
                 echo json_encode(['success' => false, 'message' => $e->getMessage()]);

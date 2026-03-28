@@ -217,90 +217,42 @@ class ImportModel extends Database {
             return false;
         }
     }
-    public function searchProductsForImport($keyword) {
-        $db = $this->getConnection();
-        
-        // Chống SQL Injection và thêm % để tìm kiếm tương đối (LIKE)
-        $search = "%" . $db->real_escape_string($keyword) . "%";
-        
-        // Lấy các thông tin cần thiết: ID, Tên, Tồn kho, Giá nhập cũ và Ảnh đại diện
-        $sql = "SELECT p.id, p.name, p.sku, p.stock_quantity, p.import_price, 
-                       (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as image_url
-                FROM products p
-                WHERE p.status IN (1, 2) 
-                AND (p.name LIKE ? OR p.sku LIKE ?) 
-                LIMIT 20"; // Chỉ lấy tối đa 20 kết quả để giao diện không bị giật
-                
-        $stmt = $db->prepare($sql);
-        $stmt->bind_param("ss", $search, $search);
-        $stmt->execute();
-        
-        $result = $stmt->get_result();
-        $products = [];
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) { 
-                $products[] = $row; 
-            }
-        }
-        return $products;
-    }
 
-    public function updateImportTransaction($receipt_id, $admin_id, $supplier_id, $products_list, $status) {
+    // --- LƯU CHỈNH SỬA PHIẾU NHÁP ---
+    public function updateDraftTransaction($receipt_id, $supplier_id, $products_list) {
         $db = $this->getConnection();
-        
-        // 1. Kiểm tra bảo mật: Phiếu này phải tồn tại và đang là Bản nháp (draft)
-        $check = $db->query("SELECT status FROM import_receipts WHERE id = " . intval($receipt_id));
-        if (!$check || $check->num_rows == 0) return false;
-        if ($check->fetch_assoc()['status'] === 'completed') return false; // Khóa chặn: Đã hoàn tất thì cấm sửa
+        $receipt_id = intval($receipt_id);
+
+        // Kiểm tra xem phiếu có tồn tại và đúng là bản nháp không
+        $receipt = $this->getImportById($receipt_id);
+        if (!$receipt || $receipt['status'] !== 'draft') return false;
 
         $db->begin_transaction();
         try {
-            // 2. Tính tổng tiền mới dựa trên dữ liệu gửi lên
+            // 1. Tính tổng tiền mới
             $total_amount = 0;
             foreach ($products_list as $item) {
                 $total_amount += intval($item['quantity']) * intval($item['price']);
             }
 
-            // 3. Cập nhật bảng phiếu nhập chung
-            $stmtR = $db->prepare("UPDATE import_receipts SET supplier_id = ?, total_amount = ?, status = ? WHERE id = ?");
-            $stmtR->bind_param("iisi", $supplier_id, $total_amount, $status, $receipt_id);
+            // 2. Cập nhật Nhà cung cấp và Tổng tiền ở bảng phiếu nhập
+            $stmtR = $db->prepare("UPDATE import_receipts SET supplier_id = ?, total_amount = ? WHERE id = ?");
+            $stmtR->bind_param("iii", $supplier_id, $total_amount, $receipt_id);
             $stmtR->execute();
 
-            // 4. "Dọn dẹp" sạch sẽ các chi tiết sản phẩm cũ của phiếu này
-            $db->query("DELETE FROM import_receipt_details WHERE receipt_id = " . intval($receipt_id));
+            // 3. XÓA TOÀN BỘ chi tiết cũ của phiếu này
+            $db->query("DELETE FROM import_receipt_details WHERE receipt_id = $receipt_id");
 
-            // 5. Thêm lại danh sách chi tiết sản phẩm mới
+            // 4. THÊM LẠI chi tiết mới (từ mảng người dùng gửi lên)
             foreach ($products_list as $item) {
                 $p_id = intval($item['product_id']);
                 $qty_in = intval($item['quantity']);
-                $price_in = intval($item['price']); 
+                $price_in = intval($item['price']);
                 
-                $new_wac = 0;
-                $new_selling_price = 0;
-
-                // LOGIC QUAN TRỌNG: Nếu admin bấm nút "Hoàn tất" từ màn hình Sửa -> Tính giá WAC và Cộng Kho luôn
-                if ($status === 'completed') {
-                    $res = $db->query("SELECT stock_quantity, import_price, profit_margin FROM products WHERE id = $p_id");
-                    $prod = $res->fetch_assoc();
-
-                    $old_stock = intval($prod['stock_quantity']);
-                    $old_wac = intval($prod['import_price']);
-                    $margin = floatval($prod['profit_margin']);
-
-                    $new_stock = $old_stock + $qty_in;
-                    $new_wac = round((($old_stock * $old_wac) + ($qty_in * $price_in)) / $new_stock);
-                    $new_selling_price = round($new_wac * (1 + $margin));
-
-                    // Cập nhật Kho và Giá
-                    $stmtU = $db->prepare("UPDATE products SET stock_quantity = ?, import_price = ?, selling_price = ? WHERE id = ?");
-                    $stmtU->bind_param("iiii", $new_stock, $new_wac, $new_selling_price, $p_id);
-                    $stmtU->execute();
-                }
-
-                // Lưu chi tiết
-                $sqlDetail = "INSERT INTO import_receipt_details (receipt_id, product_id, quantity, price, calculated_average_price, calculated_selling_price) VALUES (?, ?, ?, ?, ?, ?)";
+                // Vì là draft nên WAC và Giá bán vẫn lưu = 0
+                $sqlDetail = "INSERT INTO import_receipt_details (receipt_id, product_id, quantity, price, calculated_average_price, calculated_selling_price) VALUES (?, ?, ?, ?, 0, 0)";
                 $stmtD = $db->prepare($sqlDetail);
-                $stmtD->bind_param("iiiiii", $receipt_id, $p_id, $qty_in, $price_in, $new_wac, $new_selling_price);
+                $stmtD->bind_param("iiii", $receipt_id, $p_id, $qty_in, $price_in);
                 $stmtD->execute();
             }
 
@@ -310,24 +262,5 @@ class ImportModel extends Database {
             $db->rollback();
             return false;
         }
-    }
-    public function getProductsForImportForm() {
-        $db = $this->getConnection();
-        
-        // Dùng Sub-query để lấy đúng ảnh is_main = 1 từ bảng product_images
-        $sql = "SELECT p.id, p.name, p.sku, p.stock_quantity, p.import_price,
-                       (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as image_url
-                FROM products p
-                WHERE p.status IN (1, 2)
-                ORDER BY p.id DESC"; 
-                
-        $result = $db->query($sql);
-        $data = [];
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) { 
-                $data[] = $row; 
-            }
-        }
-        return $data;
     }
 }
