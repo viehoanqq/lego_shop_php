@@ -362,7 +362,7 @@ class AdminProductController extends Controller {
         }
         return 'default.jpg';
     }
-
+    
 
     // Hàm hiển thị trang chi tiết kỹ thuật
     public function detail($id) {

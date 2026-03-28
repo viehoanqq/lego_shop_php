@@ -333,31 +333,35 @@ function addRow() {
             let errorMessage = "";
 
             rows.forEach(row => {
-                const productId = row.querySelector('.real-product-id').value;
-                const searchInput = row.querySelector('.combo-search-input');
+                const productId = row.querySelector('.real-product-id')?.value;
+                
+                // LỖI 1 ĐÃ FIX: Đổi class tìm kiếm thành .display-product-input cho khớp với HTML
+                const searchInput = row.querySelector('.display-product-input'); 
                 const qtyInput = row.querySelector('.qty-input');
                 const priceInput = row.querySelector('.price-input');
                 
-                const qty = parseFloat(qtyInput.value) || 0;
-                const price = parseFloat(priceInput.value) || 0;
+                const qty = parseFloat(qtyInput?.value) || 0;
+                const price = parseFloat(priceInput?.value) || 0;
 
-                searchInput.style.borderColor = '#e2e8f0';
-                qtyInput.style.borderColor = '#e2e8f0';
-                priceInput.style.borderColor = '#e2e8f0';
+                // Thêm câu lệnh if để chống lỗi null
+                if (searchInput) searchInput.style.borderColor = '#e2e8f0';
+                if (qtyInput) qtyInput.style.borderColor = '#e2e8f0';
+                if (priceInput) priceInput.style.borderColor = '#e2e8f0';
 
                 if (!productId) {
                     isValid = false;
-                    searchInput.style.borderColor = '#e53e3e';
-                    errorMessage = "Có ô sản phẩm chưa được chọn đúng từ danh sách (viền đỏ).";
+                    if (searchInput) searchInput.style.borderColor = '#e53e3e';
+                    errorMessage = "Có ô sản phẩm chưa được chọn đúng từ danh sách gợi ý.";
                 } else if (qty <= 0) {
                     isValid = false;
-                    qtyInput.style.borderColor = '#e53e3e';
+                    if (qtyInput) qtyInput.style.borderColor = '#e53e3e';
                     errorMessage = "Số lượng nhập phải lớn hơn 0.";
                 } else if (price <= 0) {
                     isValid = false;
-                    priceInput.style.borderColor = '#e53e3e';
+                    if (priceInput) priceInput.style.borderColor = '#e53e3e';
                     errorMessage = "Giá nhập vào phải lớn hơn 0.";
                 } else {
+                    // Đẩy dữ liệu vào mảng đã kiểm duyệt
                     productsDataToSend.push({
                         product_id: productId,
                         quantity: qty,
@@ -372,17 +376,13 @@ function addRow() {
                 if(!confirm("Hành động này sẽ tính lại giá vốn (WAC) và cập nhật thẳng vào kho. Bạn không thể sửa phiếu sau khi hoàn tất. Xác nhận tiếp tục?")) return;
             }
 
+            // LỖI 2 ĐÃ FIX: Dùng mảng productsDataToSend đã được bắt lỗi thay vì map lại từ HTML
             const formData = {
-                supplier_id: document.getElementById('supplier_id').value,
+                supplier_id: supplierId,
                 status: status,
-                products: Array.from(rows).map(row => ({
-                    product_id: row.querySelector('.real-product-id').value,
-                    quantity: row.querySelector('.qty-input').value,
-                    price: row.querySelector('.price-input').value
-                }))
+                products: productsDataToSend
             };
 
-            // --- CHỌN URL TÙY THEO TRẠNG THÁI ---
             const targetUrl = isEdit 
                 ? '/lego_shop_php/adminimport/updateDraft/' + receiptId 
                 : '/lego_shop_php/adminimport/store';
@@ -396,8 +396,9 @@ function addRow() {
                 const result = await response.json();
                 
                 if(result.success) {
-                    if (isEditMode) {
-                        window.location.href = `/lego_shop_php/adminimport/detail/${editReceiptId}?msg=updated`;
+                    // LỖI 3 ĐÃ FIX: Dùng đúng biến isEdit và receiptId
+                    if (isEdit) {
+                        window.location.href = `/lego_shop_php/adminimport/detail/${receiptId}?msg=updated`;
                     } else {
                         window.location.href = '/lego_shop_php/adminimport?msg=success';
                     }
