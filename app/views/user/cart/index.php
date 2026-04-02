@@ -36,8 +36,8 @@
                         <?php foreach ($cart_items as $item): 
                             $img_src = !empty($item['main_image']) ? $item['main_image'] : 'default-lego.jpg';
                             $item_total = $item['selling_price'] * $item['quantity'];
-                            // CHÚ Ý: Bắt buộc model CartModel phải JOIN lấy cột stock_quantity nhé
-                            $max_stock = $item['stock_quantity'] ?? 999; 
+                            // CHÚ Ý: Bắt buộc model CartModel phải JOIN lấy cột available_quantity nhé
+                            $max_stock = $item['available_stock'] ?? 0; 
                         ?>
                             <div class="cart-item" id="item-<?= $item['cart_item_id'] ?>">
                                 <div class="item-col item-info" style="width: 45%;">
@@ -153,16 +153,16 @@
 function checkAndUpdateCartQty(cartItemId, action) {
     const input = document.getElementById('qty-' + cartItemId);
     let currentVal = parseInt(input.value);
-    let max = parseInt(input.getAttribute('max')) || 999;
+    let max = parseInt(input.getAttribute('max')) || 0;
 
     // Logic kiểm tra bấm Tăng
     if (action === 'increase') {
         if (currentVal >= max) {
             // Quá số lượng trong kho -> Chặn & Báo lỗi
             if(typeof showToast === 'function') {
-                showToast(`Sản phẩm này chỉ còn ${max} cái trong kho!`, "warning");
+                showToast(`Sản phẩm này chỉ còn ${max} sản phẩm!`, "warning");
             } else {
-                alert(`Sản phẩm này chỉ còn ${max} cái trong kho!`);
+                alert(`Sản phẩm này chỉ còn ${max} sản phẩm!`);
             }
             return; // Ngưng tại đây, không cho gọi hàm tiếp theo
         }

@@ -57,7 +57,7 @@ class CartModel extends Database {
         $db = $this->getConnection();
         $user_id = intval($user_id);
         
-        // CHÚ Ý DÒNG SELECT: Đã thêm p.stock_quantity
+        // CHÚ Ý DÒNG SELECT: Đã giữ p.stock_quantity và bổ sung thêm available_stock
         $sql = "SELECT 
                     ci.id as cart_item_id, 
                     ci.quantity, 
@@ -65,6 +65,12 @@ class CartModel extends Database {
                     p.name, 
                     p.selling_price, 
                     p.stock_quantity, 
+                    (p.stock_quantity - COALESCE((
+                        SELECT SUM(od.quantity) 
+                        FROM order_details od 
+                        JOIN orders o ON od.order_id = o.id 
+                        WHERE od.product_id = p.id AND o.status IN ('pending', 'confirmed', 'shipping')
+                    ), 0)) as available_stock,
                     pi.image_url as main_image 
                 FROM cart_items ci
                 JOIN carts c ON ci.cart_id = c.id

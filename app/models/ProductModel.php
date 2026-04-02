@@ -3,20 +3,26 @@
 
         // Lấy chi tiết 1 sản phẩm kèm thông số kỹ thuật
         public function getProductById($id) {
-            $db = $this->getConnection();
-            
-            // Bổ sung Sub-query lấy image_url làm main_image
-            $sql = "SELECT p.*, c.name as category_name, pd.*,
-                (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
-                    FROM products p 
-                    LEFT JOIN categories c ON p.category_id = c.id 
-                    LEFT JOIN product_details pd ON p.id = pd.product_id 
-                    WHERE p.id = " . intval($id);
-            
-            $result = $db->query($sql);
-            return ($result && $result->num_rows > 0) ? $result->fetch_assoc() : false;
-        }
-
+        $db = $this->getConnection();
+        
+        // Bổ sung Sub-query lấy image_url làm main_image 
+        // VÀ Sub-query tính số lượng hàng khả dụng (trừ đi hàng đang chờ giao)
+        $sql = "SELECT p.*, c.name as category_name, pd.*,
+                (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image,
+                (p.stock_quantity - COALESCE((
+                    SELECT SUM(od.quantity) 
+                    FROM order_details od 
+                    JOIN orders o ON od.order_id = o.id 
+                    WHERE od.product_id = p.id AND o.status IN ('pending', 'confirmed', 'shipping')
+                ), 0)) as available_stock
+                FROM products p 
+                LEFT JOIN categories c ON p.category_id = c.id 
+                LEFT JOIN product_details pd ON p.id = pd.product_id 
+                WHERE p.id = " . intval($id);
+        
+        $result = $db->query($sql);
+        return ($result && $result->num_rows > 0) ? $result->fetch_assoc() : false;
+    }
         // HÀM QUAN TRỌNG NHẤT: Lấy danh sách sản phẩm (Dùng cho tất cả các trang)
         public function getFilteredProducts($filters = [], $offset = 0, $limit = 6) {
             $db = $this->getConnection();

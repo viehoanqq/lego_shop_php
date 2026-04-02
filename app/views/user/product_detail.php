@@ -55,8 +55,8 @@
                         <li><span>Số mảnh ghép:</span> <strong><?= (!empty($product['pieces']) && $product['pieces'] > 0) ? number_format($product['pieces'], 0, ',', '.') . ' mảnh' : 'Đang cập nhật' ?></strong></li>
                         <li><span>Series:</span> <strong><?= htmlspecialchars($product['category_name'] ?? 'LEGO') ?></strong></li>
                         <li><span>Tình trạng:</span> 
-                            <?php if ($product['stock_quantity'] > 0): ?>
-                                <strong style="color: #28a745;">Còn hàng (<?= $product['stock_quantity'] ?> sản phẩm)</strong>
+                            <?php if ($product['available_stock'] > 0): ?>
+                                <strong style="color: #28a745;">Còn hàng (<?= $product['available_stock'] ?> sản phẩm)</strong>
                             <?php else: ?>
                                 <strong style="color: #dc3545;">Hết hàng</strong>
                             <?php endif; ?>
@@ -65,7 +65,7 @@
                 </div>
 
                 <div class="action-buttons">
-                    <?php if ($product['stock_quantity'] > 0): ?>
+                    <?php if ($product['available_stock'] > 0): ?>
                         <form id="addToCartForm" style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
                             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                             
@@ -73,7 +73,7 @@
                                 <span style="font-weight: 600; color: #555; font-size: 15px;">Số lượng:</span>
                                 <div class="qty-wrapper">
                                     <button type="button" class="qty-btn" onclick="updateQty(-1)">-</button>
-                                    <input type="number" class="qty-input" id="qtyInput" name="quantity" value="1" min="1" max="<?= $product['stock_quantity'] ?>" readonly>
+                                    <input type="number" class="qty-input" id="qtyInput" name="quantity" value="1" min="1" max="<?= $product['available_stock'] ?>" readonly>
                                     <button type="button" class="qty-btn" onclick="updateQty(1)">+</button>
                                 </div>
                             </div>

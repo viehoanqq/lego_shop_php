@@ -106,11 +106,7 @@ class CheckoutController extends Controller {
                 foreach ($cart_items as $item) {
                     $orderModel->addOrderItem($order_id, $item['product_id'], $item['quantity'], $item['selling_price']);
                     
-                    // =========================================================
-                    // 2. TRỪ KHO NGAY SAU KHI LƯU CHI TIẾT ĐƠN THÀNH CÔNG
-                    // =========================================================
-
-                    // =========================================================
+                   
                 }
 
                 // Xóa giỏ hàng
@@ -227,14 +223,7 @@ class CheckoutController extends Controller {
                     $stmt2->bind_param("is", $order_id, $reason);
                     $stmt2->execute();
 
-                    // 3. HOÀN KHO: Lấy danh sách sản phẩm và cộng lại kho
-                    $items = $orderModel->getOrderItems($order_id);
-                    foreach ($items as $item) {
-                        $qty = (int)$item['quantity'];
-                        $p_id = (int)$item['product_id'];
-                        $db->query("UPDATE products SET stock_quantity = stock_quantity + $qty WHERE id = $p_id");
-                    }
-
+                    
                     // Chốt giao dịch
                     $db->commit();
                     echo json_encode(['success' => true, 'message' => 'Hủy đơn thành công']);

@@ -86,7 +86,42 @@ class AdminOrderController extends Controller {
                 echo "<script>alert('Lỗi: Cập nhật trạng thái không hợp lệ theo quy trình!'); history.back();</script>";
                 exit;
             }
-            // ==========================================
+            // --- BẮT ĐẦU LOGIC TRỪ KHO KHI THÀNH CÔNG ---
+            if ($new_status === 'delivered') {
+                // Lấy danh sách sản phẩm trong đơn hàng
+                $items = $orderModel->getOrderItems($id);
+                $productModel = $this->model('ProductModel');
+                $db = $orderModel->getConnection();
+                
+                $db->begin_transaction();
+                try {
+                    foreach ($items as $item) {
+                        $qty = intval($item['quantity']);
+                        $p_id = intval($item['product_id']);
+                        
+                        // 1. Thực hiện trừ kho vật lý
+                        $db->query("UPDATE products SET stock_quantity = stock_quantity - $qty WHERE id = $p_id");
+                        
+                        // 2. Ghi log vào thẻ kho (stock_adjustments) để trang Inventory hiển thị đúng
+                        // Admin_id lấy từ session
+                        $admin_id = $_SESSION['admin_id'];
+                        $db->query("INSERT INTO stock_adjustments (product_id, admin_id, old_stock, new_stock, qty_change, reason) 
+                                    SELECT $p_id, $admin_id, (stock_quantity + $qty), stock_quantity, -$qty, 'Xuất kho cho đơn hàng #DH-$id' 
+                                    FROM products WHERE id = $p_id");
+                    }
+                    
+                    // Cập nhật trạng thái đơn hàng
+                    $orderModel->updateOrderStatusAdmin($id, $new_status, $note);
+                    
+                    $db->commit();
+                    header("Location: /lego_shop_php/adminorder/detail/$id?msg=status_success");
+                } catch (Exception $e) {
+                    $db->rollback();
+                    header("Location: /lego_shop_php/adminorder/detail/$id?error=stock_error");
+                }
+                exit;
+            }   
+            // --- KẾT THÚC LOGIC TRỪ KHO ---
 
             if ($orderModel->updateOrderStatusAdmin($id, $new_status, $note)) {
                 header("Location: /lego_shop_php/adminorder/detail/$id?msg=status_success");
