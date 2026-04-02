@@ -1,6 +1,6 @@
 <style>
     /* ===== RESET TỔNG THỂ ===== */
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0 }
 
     /* ===== HEADER & TÌM KIẾM ===== */
     .header { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;}

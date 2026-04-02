@@ -22,16 +22,6 @@
                     <i class="fa-solid fa-gauge-high"></i>Tổng quan
                 </a>
             </li>
-            <li>
-                <a href="/lego_shop_php/adminproduct/lowstock" class="<?= isActive('adminproduct/lowstock', $current_page) ?>">
-                    <i class="fa-solid fa-triangle-exclamation"></i>Cảnh báo hết hàng
-                </a>
-            </li>
-            <li>
-                <a href="/lego_shop_php/adminreview" class="<?= isActive('adminreview', $current_page) ?>">
-                    <i class="fa-solid fa-star"></i>Đánh giá
-                </a>
-            </li>
         </ul>
 
         <ul class="system">
@@ -39,6 +29,11 @@
             <li>
                 <a href="/lego_shop_php/adminorder" class="<?= isActive('adminorder', $current_page) ?>">
                     <i class="fa-solid fa-cart-shopping"></i>Quản lý đơn hàng
+                </a>
+            </li>
+             <li>
+                <a href="/lego_shop_php/adminreview" class="<?= isActive('adminreview', $current_page) ?>">
+                    <i class="fa-solid fa-star"></i>Đánh giá
                 </a>
             </li>
             <li>
@@ -80,6 +75,11 @@
         <i class="fa-solid fa-file-invoice-dollar"></i>Quản lý phiếu nhập
     </a>
 </li>
+<li>
+                <a href="/lego_shop_php/admininventory" class="<?= isActive('admininventory', $current_page) ?>">
+                    <i class="fa-solid fa-warehouse"></i>Quản lý tồn kho
+                </a>
+            </li>
             <li>
                 <a href="/lego_shop_php/adminreport" class="<?= isActive('adminreport', $current_page) ?>">
                     <i class="fa-solid fa-chart-line"></i>Thống kê báo cáo

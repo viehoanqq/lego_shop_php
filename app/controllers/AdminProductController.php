@@ -431,69 +431,7 @@ class AdminProductController extends Controller {
             'keyword'      => $keyword 
         ]);
     }
-    public function updateBulkMinStock() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            header('Content-Type: application/json');
-            $data = json_decode(file_get_contents('php://input'), true);
-            
-            if (!$data || empty($data['items'])) {
-                echo json_encode(['success' => false, 'message' => 'Dữ liệu rỗng']);
-                return;
-            }
-            
-            try {
-                foreach ($data['items'] as $item) {
-                    $id = intval($item['product_id']);
-                    $min = intval($item['min_stock']);
-                    if($id > 0 && $min >= 0) {
-                        $this->productModel->updateSingleMinStock($id, $min);
-                    }
-                }
-                echo json_encode(['success' => true]);
-            } catch (Exception $e) {
-                echo json_encode(['success' => false, 'message' => 'Lỗi CSDL']);
-            }
-            exit;
-        }
-    }
+    
 
-    public function updateGlobalMinStock() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $min_stock = intval($_POST['min_stock_level']);
-
-            if ($min_stock < 0) {
-                echo "error";
-                return;
-            }
-
-            $this->productModel->updateAllMinStock($min_stock);
-            echo "success";
-        }
-    }
-
-    public function updateMinStock() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $min_stock = intval($_POST['min_stock_level']);
-            $product_id = $_POST['product_id']; // Có thể là số ID hoặc chữ "all"
-
-            if ($min_stock < 0) {
-                echo "error_value";
-                return;
-            }
-
-            if ($product_id === 'all') {
-                // Cập nhật toàn bộ
-                $result = $this->productModel->updateAllMinStock($min_stock);
-            } else {
-                // Cập nhật 1 sản phẩm
-                $result = $this->productModel->updateSingleMinStock(intval($product_id), $min_stock);
-            }
-
-            if ($result) {
-                echo "success";
-            } else {
-                echo "error_db";
-            }
-        }
-    }
+    
 }

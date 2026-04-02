@@ -109,9 +109,7 @@ class CheckoutController extends Controller {
                     // =========================================================
                     // 2. TRỪ KHO NGAY SAU KHI LƯU CHI TIẾT ĐƠN THÀNH CÔNG
                     // =========================================================
-                    $qty = (int)$item['quantity'];
-                    $p_id = (int)$item['product_id'];
-                    $db->query("UPDATE products SET stock_quantity = stock_quantity - $qty WHERE id = $p_id");
+
                     // =========================================================
                 }
 
