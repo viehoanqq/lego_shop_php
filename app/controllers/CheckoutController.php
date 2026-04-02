@@ -86,8 +86,6 @@ class CheckoutController extends Controller {
             $orderModel = $this->model('OrderModel');
             $status = 'pending'; 
             
-            $ngay_gio_chuan = $this->getExactTime();
-            
             $order_id = $orderModel->createOrder(
                 $user_id, 
                 $status, 
@@ -99,7 +97,6 @@ class CheckoutController extends Controller {
                 $address['ward'], 
                 $address['district'], 
                 $address['city'],
-                $ngay_gio_chuan // <--- Đây chính là tham số thứ 11 bị thiếu!
             );
 
             if ($order_id) {
@@ -312,29 +309,5 @@ class CheckoutController extends Controller {
         }
         exit;
     }
-    protected function getExactTime() {
-    $url = "https://timeapi.io/api/Time/current/zone?timeZone=Asia/Ho_Chi_Minh";
-    
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Quan trọng để chạy trên XAMPP
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0'); 
-    
-    $response = curl_exec($ch);
-    curl_close($ch);
 
-    if ($response) {
-        $data = json_decode($response, true);
-        
-        // Dựa trên JSON Hoàng gửi: key đúng là 'dateTime'
-        if (isset($data['dateTime'])) {
-            // strtotime sẽ tự hiểu định dạng "2026-03-27T23:22:11.4888792"
-            return date('Y-m-d H:i:s', strtotime($data['dateTime']));
-        }
-    }
-
-    // Nếu API lỗi (mất mạng), dùng tạm giờ máy tính làm phương án cuối
-    return date('Y-m-d H:i:s');
-}
 }

@@ -240,7 +240,7 @@ class OrderModel extends Database {
     }
 
     // Lưu thông tin chung của đơn hàng
-    public function createOrder($user_id, $status, $payment_method, $total_amount, $fullname, $phone, $street, $ward, $district, $city, $created_at) {
+    public function createOrder($user_id, $status, $payment_method, $total_amount, $fullname, $phone, $street, $ward, $district, $city) {
         $db = $this->getConnection();
         
         $user_id = (int)$user_id;
@@ -254,12 +254,10 @@ class OrderModel extends Database {
         $district = $db->real_escape_string($district);
         $city = $db->real_escape_string($city);
         
-        // Chống lỗi SQL Injection cho ngày giờ
-        $created_at = $db->real_escape_string($created_at);
 
         // THÊM CỘT created_at VÀO SQL
-        $sql = "INSERT INTO orders (user_id, status, payment_method, total_amount, shipping_fullname, shipping_phone, shipping_street, shipping_ward, shipping_district, shipping_city, created_at) 
-                VALUES ($user_id, '$status', '$payment_method', $total_amount, '$fullname', '$phone', '$street', '$ward', '$district', '$city', '$created_at')";
+        $sql = "INSERT INTO orders (user_id, status, payment_method, total_amount, shipping_fullname, shipping_phone, shipping_street, shipping_ward, shipping_district, shipping_city) 
+                VALUES ($user_id, '$status', '$payment_method', $total_amount, '$fullname', '$phone', '$street', '$ward', '$district', '$city')";
                 
         if ($db->query($sql) === TRUE) {
             return $db->insert_id; 
