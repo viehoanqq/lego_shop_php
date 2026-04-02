@@ -66,6 +66,22 @@ document.addEventListener("DOMContentLoaded", function() {
                     // Cập nhật class Active cho menu
                     sidebarLinks.forEach(l => l.classList.remove('active'));
                     this.classList.add('active');
+
+                    // ========================================================
+                    // ĐÂY LÀ ĐOẠN FIX LỖI: ĐÁNH THỨC CÁC THẺ SCRIPT BỊ NGỦ QUÊN
+                    // ========================================================
+                    const scripts = contentArea.querySelectorAll('script');
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        // Copy các thuộc tính (ví dụ: src="")
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        // Copy mã JS bên trong
+                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                        // Thay thế script cũ bằng script mới để trình duyệt chịu chạy
+                        oldScript.parentNode.replaceChild(newScript, oldScript);
+                    });
+                    // ========================================================
+
                 })
                 .catch(err => {
                     console.error('Lỗi load trang:', err);

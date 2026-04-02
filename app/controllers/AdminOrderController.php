@@ -102,12 +102,7 @@ class AdminOrderController extends Controller {
                         // 1. Thực hiện trừ kho vật lý
                         $db->query("UPDATE products SET stock_quantity = stock_quantity - $qty WHERE id = $p_id");
                         
-                        // 2. Ghi log vào thẻ kho (stock_adjustments) để trang Inventory hiển thị đúng
-                        // Admin_id lấy từ session
-                        $admin_id = $_SESSION['admin_id'];
-                        $db->query("INSERT INTO stock_adjustments (product_id, admin_id, old_stock, new_stock, qty_change, reason) 
-                                    SELECT $p_id, $admin_id, (stock_quantity + $qty), stock_quantity, -$qty, 'Xuất kho cho đơn hàng #DH-$id' 
-                                    FROM products WHERE id = $p_id");
+                        
                     }
                     
                     // Cập nhật trạng thái đơn hàng

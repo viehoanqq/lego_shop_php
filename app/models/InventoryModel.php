@@ -110,7 +110,7 @@ class InventoryModel extends Database {
             UNION ALL
             SELECT 'export' as type, o.created_at, -(od.quantity) as qty_change, CONCAT('DH-', o.id, ' - Xuất bán đơn hàng') as note 
             FROM order_details od JOIN orders o ON od.order_id = o.id 
-            WHERE od.product_id = $pid AND o.status != 'cancelled'
+            WHERE od.product_id = $pid AND o.status = 'delivered'
             UNION ALL
             SELECT 'adjust' as type, created_at, qty_change, CONCAT('Điều chỉnh - Kiểm kho: ', reason) as note 
             FROM stock_adjustments WHERE product_id = $pid
