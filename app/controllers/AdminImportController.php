@@ -63,9 +63,13 @@ class AdminImportController extends Controller {
                 $products = $data['products']; 
                 $status = $data['status'] ?? 'draft'; // Lấy trạng thái từ JS gửi lên
                 $admin_id = $_SESSION['admin_id']; 
+                // Nhận import_date từ JS, nếu trống thì lấy ngày giờ hiện tại
+                $import_date = !empty($data['import_date']) 
+               ? str_replace('T', ' ', $data['import_date']) // Chuyển chữ T thành khoảng trắng để MySQL hiểu
+               : date('Y-m-d H:i:s');
 
                 $importModel = $this->model('ImportModel'); 
-                $success = $importModel->createImportTransaction($admin_id, $supplier_id, $products, $status);
+                $success = $importModel->createImportTransaction($admin_id, $supplier_id, $products, $status, $import_date);
 
                 if ($success) {
                     echo json_encode(['success' => true]);
@@ -174,11 +178,14 @@ class AdminImportController extends Controller {
                 if (!$data || empty($data['products'])) throw new Exception("Dữ liệu không hợp lệ");
 
                 $supplier_id = intval($data['supplier_id']);
+                $import_date = !empty($data['import_date']) 
+               ? str_replace('T', ' ', $data['import_date']) // Chuyển chữ T thành khoảng trắng để MySQL hiểu
+               : date('Y-m-d H:i:s');
                 $products = $data['products'];
 
                 $importModel = $this->model('ImportModel');
                 // Gọi hàm Update Draft trong Model
-                $success = $importModel->updateDraftTransaction($id, $supplier_id, $products);
+                $success = $importModel->updateDraftTransaction($id, $supplier_id, $products, $import_date);
 
                 if ($success) {
                     echo json_encode(['success' => true]);

@@ -68,7 +68,7 @@ class ImportModel extends Database {
     }
 
     // 3. Xử lý lưu Phiếu nhập và Tính Giá Bình Quân Gia Quyền (WAC)
-    public function createImportTransaction($admin_id, $supplier_id, $products_list, $status = 'draft') {
+    public function createImportTransaction($admin_id, $supplier_id, $products_list, $status = 'draft', $import_date) {
         $db = $this->getConnection();
         $db->begin_transaction(); 
 
@@ -80,9 +80,9 @@ class ImportModel extends Database {
             }
 
             // 2. Lưu Phiếu nhập chung với biến $status
-            $sqlReceipt = "INSERT INTO import_receipts (admin_id, supplier_id, total_amount, status) VALUES (?, ?, ?, ?)";
+            $sqlReceipt = "INSERT INTO import_receipts (admin_id, supplier_id, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?)";
             $stmtR = $db->prepare($sqlReceipt);
-            $stmtR->bind_param("iiis", $admin_id, $supplier_id, $total_amount, $status);
+            $stmtR->bind_param("iiiss", $admin_id, $supplier_id, $total_amount, $status, $import_date);
             $stmtR->execute();
             $receipt_id = $db->insert_id;
 
@@ -219,7 +219,7 @@ class ImportModel extends Database {
     }
 
     // --- LƯU CHỈNH SỬA PHIẾU NHÁP ---
-    public function updateDraftTransaction($receipt_id, $supplier_id, $products_list) {
+    public function updateDraftTransaction($receipt_id, $supplier_id, $products_list, $import_date) {
         $db = $this->getConnection();
         $receipt_id = intval($receipt_id);
 
@@ -236,8 +236,8 @@ class ImportModel extends Database {
             }
 
             // 2. Cập nhật Nhà cung cấp và Tổng tiền ở bảng phiếu nhập
-            $stmtR = $db->prepare("UPDATE import_receipts SET supplier_id = ?, total_amount = ? WHERE id = ?");
-            $stmtR->bind_param("iii", $supplier_id, $total_amount, $receipt_id);
+            $stmtR = $db->prepare("UPDATE import_receipts SET supplier_id = ?, total_amount = ?, created_at = ? WHERE id = ?");
+            $stmtR->bind_param("iisi", $supplier_id, $total_amount, $import_date, $receipt_id);
             $stmtR->execute();
 
             // 3. XÓA TOÀN BỘ chi tiết cũ của phiếu này

@@ -30,7 +30,7 @@
     .btn-reset:hover { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
 </style>
 
-<div class="admin-header" style="margin-bottom: 20px; padding: 5px;">
+<div class="admin-header1" style="margin-bottom: 20px; padding: 5px;">
     <h2 style="margin:0; color: #1a202c; font-weight: 800;"><i class="fa-solid fa-clipboard-list" style="color: #3182ce;"></i> QUẢN LÝ ĐƠN HÀNG</h2>
     <small style="color: #718096; font-size: 13px;">Trạng thái và Sắp xếp sẽ tự động lọc, chọn ngày vui lòng bấm nút "Lọc"</small>
 </div>

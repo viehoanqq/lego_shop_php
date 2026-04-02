@@ -236,7 +236,7 @@ $session_error = get_flash_message('error');
     </div>
 
     <script>
-        const form = document.getElementById("categoryForm");
+        var form = document.getElementById("categoryForm");
         if (form) {
             const nameInput = document.getElementById("name");
             const descInput = document.getElementById("description");

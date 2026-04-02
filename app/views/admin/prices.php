@@ -38,7 +38,7 @@
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 </style>
 
-<div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px;">
+<div class="admin-header1" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px;">
 <div style="background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
     <form id="filterForm" action="/lego_shop_php/adminprice" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
         
@@ -73,10 +73,6 @@
 
     </form>
 </div>    
-<div>
-        <h2 style="margin:0; color: #1a202c;">💰 Quản Lý Giá Bán</h2>
-        <small style="color: #718096;">Cập nhật tỉ lệ lợi nhuận và giá bán niêm yết</small>
-    </div>
 </div>
 
 <div class="table-container">

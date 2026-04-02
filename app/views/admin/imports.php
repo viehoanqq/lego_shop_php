@@ -74,7 +74,7 @@
     </div>
 <?php endif; ?>
 
-<div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px;">
+<div class="admin-header1" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px;">
     <div>
         <h2 style="margin:0; color: #1a202c;">📦 Quản Lý Nhập Kho</h2>
         <small style="color: #718096;">Lịch sử và Lập phiếu nhập</small>
@@ -151,7 +151,7 @@
         </h3>
 
         <form id="importForm" style="margin-top: 20px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 20px; background: #f7fafc; padding: 15px; border-radius: 8px;">
+            <<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-bottom: 20px; background: #f7fafc; padding: 15px; border-radius: 8px;">
                 <div class="form-group" style="margin: 0;">
                     <label>Nhà cung cấp <span style="color:red">*</span></label>
                     <select id="supplier_id" class="form-control" required>
@@ -167,8 +167,13 @@
                     <label>Nhân viên tiếp nhận</label>
                     <input type="text" class="form-control" value="<?= $_SESSION['admin_name'] ?>" readonly style="background: #edf2f7; cursor: not-allowed; color: #4a5568; font-weight: 600;">
                 </div>
+                
+                <div class="form-group" style="margin: 0;">
+    <label>Ngày & Giờ nhập kho <span style="color:#718096; font-size:12px; font-weight:normal;">(Mặc định hiện tại)</span></label>
+    <input type="datetime-local" id="import_date" class="form-control" 
+           value="<?= isset($receipt) ? date('Y-m-d\TH:i', strtotime($receipt['created_at'])) : date('Y-m-d\TH:i') ?>">
+</div>
             </div>
-
             <<table class="lego-table" id="importTable" style="margin-bottom: 20px;">
                 <thead>
                     <tr>
@@ -287,7 +292,7 @@ function addRow() {
         // Khởi tạo thanh tìm kiếm (Đã tắt dấu x)
         function initSelect2() {
             $('.product-select').select2({
-                placeholder: "🔍 Gõ mã SKU hoặc tên LEGO để tìm...",
+                placeholder: "Gõ mã SKU hoặc tên LEGO để tìm...",
                 allowClear: false, // <-- TẮT DẤU "x" Ở ĐÂY
                 width: '100%',
                 language: { noResults: function() { return "Không tìm thấy sản phẩm nào!"; } }
@@ -375,12 +380,19 @@ function addRow() {
             if(status === 'completed') {
                 if(!confirm("Hành động này sẽ tính lại giá vốn (WAC) và cập nhật thẳng vào kho. Bạn không thể sửa phiếu sau khi hoàn tất. Xác nhận tiếp tục?")) return;
             }
-
+            // --- BẮT ĐẦU THÊM LOGIC LẤY NGÀY ---
+            let importDate = document.getElementById('import_date').value;
+            if (!importDate) {
+                // Nếu User cố tình xóa trắng ô ngày, JS sẽ tự động lấy ngày hôm nay theo giờ máy tính
+                importDate = new Date().toISOString().split('T')[0]; 
+            }
+            // --- KẾT THÚC ---
             // LỖI 2 ĐÃ FIX: Dùng mảng productsDataToSend đã được bắt lỗi thay vì map lại từ HTML
             const formData = {
                 supplier_id: supplierId,
                 status: status,
-                products: productsDataToSend
+                products: productsDataToSend,
+                import_date: importDate
             };
 
             const targetUrl = isEdit 

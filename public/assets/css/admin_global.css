@@ -113,18 +113,6 @@ a {
 }
 
 /* --- ADMIN HEADER STYLES --- */
-.admin-header {
-    height: 80px;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 30px;
-    border-bottom: 1px solid #f1f5f9;
-    position: sticky;
-    top: 0;
-    z-index: 99;
-}
 
 .header-left .page-title h1 {
     font-size: 20px;
@@ -374,20 +362,6 @@ body {
 .content {
     padding: 30px;
     flex: 1;
-}
-
-/* Đảm bảo Header luôn dính ở trên cùng và không bị đè */
-.admin-header {
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    height: 80px;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 30px;
-    border-bottom: 1px solid #f1f5f9;
 }
 
 

@@ -12,7 +12,7 @@
     .img-product { width: 50px; height: 50px; min-width: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; }
 </style>
 
-<div class="admin-header" style="margin-bottom: 20px; padding: 10px;">
+<div class="admin-header1" style="margin-bottom: 20px; padding: 10px;">
     <div>
         <h2 style="margin:0; color: #1a202c;"><i class="fa-solid fa-chart-line" style="color: #3b82f6; margin-right: 10px;"></i> Báo Cáo Nhập - Xuất - Tồn</h2>
         <small style="color: #718096;">Dữ liệu biến động kho theo khoảng thời gian và thời điểm</small>

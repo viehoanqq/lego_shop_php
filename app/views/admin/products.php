@@ -392,7 +392,7 @@ $session_error = get_flash_message('error');
 <?php endif; ?>
 
 <script>
-    const form = document.getElementById("productForm");
+    var form = document.getElementById("productForm");
     
     if(form) {
         const nameInput = document.getElementById("name");
