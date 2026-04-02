@@ -144,11 +144,24 @@ class AdminCategoryController extends Controller {
     // Hàm XÓA MỀM danh mục (MỚI)
     public function delete($id) {
         $id = intval($id);
-        if ($this->categoryModel->softDeleteCategory($id)) {
-            set_flash_message('msg', 'deleted');
+        
+        // Kiểm tra xem danh mục này có chứa sản phẩm nào không
+        if ($this->categoryModel->hasProducts($id)) {
+            // Đã có sản phẩm -> Chỉ được phép XÓA MỀM (Ẩn đi để bảo toàn dữ liệu sản phẩm)
+            if ($this->categoryModel->softDeleteCategory($id)) {
+                set_flash_message('msg', 'soft_deleted');
+            } else {
+                set_flash_message('error', 'db');
+            }
         } else {
-            set_flash_message('error', 'db');
+            // Hoàn toàn trống (chưa có sản phẩm) -> XÓA VĨNH VIỄN khỏi DB
+            if ($this->categoryModel->deleteCategoryForever($id)) {
+                set_flash_message('msg', 'deleted');
+            } else {
+                set_flash_message('error', 'db');
+            }
         }
+        
         header('Location: /lego_shop_php/admincategory');
         exit();
     }

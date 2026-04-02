@@ -51,15 +51,16 @@
         <ul class="system">
             <li class="menu-label">Sản phẩm</li>
             <li>
-                <a href="/lego_shop_php/adminproduct" class="<?= isActive('adminproduct', $current_page) ?>">
-                    <i class="fa-solid fa-cubes"></i>Sản phẩm
-                </a>
-            </li>
-            <li>
                 <a href="/lego_shop_php/admincategory" class="<?= isActive('admincategory', $current_page) ?>">
                     <i class="fa-solid fa-layer-group"></i>Danh mục
                 </a>
             </li>
+            <li>
+                <a href="/lego_shop_php/adminproduct" class="<?= isActive('adminproduct', $current_page) ?>">
+                    <i class="fa-solid fa-cubes"></i>Sản phẩm
+                </a>
+            </li>
+            
             <li>
     <a href="/lego_shop_php/adminprice" class="<?= isActive('adminprice', $current_page) ?>">
         <i class="fa-solid fa-tags"></i>Quản lý giá bán

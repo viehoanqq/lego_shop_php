@@ -161,5 +161,20 @@ class CategoryModel extends Database {
             return false;
         }
     }
+    //kiem tra danh muc co san pham hay khong truoc khi xoa
+    public function hasProducts($id) {
+        $db = $this->getConnection();
+        $sql = "SELECT COUNT(*) as total FROM products WHERE category_id = " . intval($id);
+        $result = $db->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'] > 0;
+    }
+
+    // Xóa vĩnh viễn danh mục (Hard Delete)
+    public function deleteCategoryForever($id) {
+        $db = $this->getConnection();
+        $sql = "DELETE FROM categories WHERE id = " . intval($id);
+        return $db->query($sql);
+    }
     
 }
