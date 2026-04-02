@@ -298,11 +298,11 @@ $session_error = get_flash_message('error');
                     </div>
                     
                     <div>
-                        <div class="form-group">
+                        <!-- <div class="form-group" style="display: hidden !important;">
                             <label>Giá bán (VNĐ) <span style="color:red">*</span></label>
                             <input type="number" id="selling_price" name="selling_price" class="form-control" value="<?= $product['selling_price'] ?? '0' ?>" style="font-weight: bold; color: #2b6cb0; background: <?= isset($product) ? '#edf2f7' : '#fff' ?>" <?= isset($product) ? 'readonly title="Chỉ được sửa giá qua Cập nhật lợi nhuận/Kho"' : '' ?>>
                             <small class="error-text"></small>
-                        </div>
+                        </div> -->
                         <div class="form-group" style="margin-bottom: 0;">
                             <label>Hình ảnh đại diện</label>
                             <input type="file" id="main_image" name="main_image" accept="image/*" style="display: none;" onchange="previewImage(this)">
@@ -392,7 +392,7 @@ $session_error = get_flash_message('error');
 <?php endif; ?>
 
 <script>
-    var form = document.getElementById("productForm");
+    const form = document.getElementById("productForm");
     
     if(form) {
         const nameInput = document.getElementById("name");

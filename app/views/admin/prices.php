@@ -127,9 +127,9 @@
                 </td>
                 
                 <td style="text-align: right;">
-                    <input type="number" class="form-control input-sell" value="<?= $selling_price ?>" 
+                    <input type="text" class="form-control input-sell" value="<?= number_format($selling_price, 0, '', '.') ?>" 
                            style="width: 130px; text-align: right; font-weight: bold; color: #3182ce;" 
-                           oninput="calcFromSell(<?= $p['id'] ?>)">
+                           oninput="formatCurrency(this); calcFromSell(<?= $p['id'] ?>)">
                 </td>
                 
                 <td style="text-align: center;">
@@ -153,24 +153,49 @@
 </div>
 
 <script>
+// HÀM FORMAT TIỀN TỆ KHI GÕ
+function formatCurrency(input) {
+    let rawValue = input.value.replace(/[^0-9]/g, '');
+    if (rawValue === '') {
+        input.value = '';
+        return;
+    }
+    input.value = new Intl.NumberFormat('vi-VN').format(rawValue);
+}
+
 function calcFromMargin(id) {
     const row = document.getElementById('row_' + id);
     const wac = parseFloat(row.querySelector('.wac-value').getAttribute('data-wac')) || 0;
     const margin = parseFloat(row.querySelector('.input-margin').value) || 0;
-    if (wac > 0) row.querySelector('.input-sell').value = Math.round(wac * (1 + (margin / 100)));
+    
+    if (wac > 0) {
+        // Tính giá bán mới, sau đó format có dấu chấm rồi đẩy vào input
+        const newSell = Math.round(wac * (1 + (margin / 100)));
+        row.querySelector('.input-sell').value = new Intl.NumberFormat('vi-VN').format(newSell);
+    }
 }
 
 function calcFromSell(id) {
     const row = document.getElementById('row_' + id);
     const wac = parseFloat(row.querySelector('.wac-value').getAttribute('data-wac')) || 0;
-    const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
-    if (wac > 0) row.querySelector('.input-margin').value = (((sell - wac) / wac) * 100).toFixed(1);
+    
+    // Lột dấu chấm của Giá bán trước khi đem đi trừ chia WAC
+    const rawSellString = row.querySelector('.input-sell').value.replace(/\./g, '');
+    const sell = parseFloat(rawSellString) || 0;
+    
+    if (wac > 0) {
+        row.querySelector('.input-margin').value = (((sell - wac) / wac) * 100).toFixed(1);
+    }
 }
+
 async function savePrice(id) {
     const row = document.getElementById('row_' + id);
     const btn = row.querySelector('.btn-save-price');
     const margin = parseFloat(row.querySelector('.input-margin').value) || 0;
-    const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
+    
+    // Lột dấu chấm của Giá bán để gửi về máy chủ bằng số nguyên chuẩn
+    const rawSellString = row.querySelector('.input-sell').value.replace(/\./g, '');
+    const sell = parseFloat(rawSellString) || 0;
 
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
     btn.style.background = '#718096';
