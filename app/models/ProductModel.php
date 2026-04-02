@@ -69,7 +69,7 @@ class ProductModel extends Database {
 
         if (!empty($filters['keyword'])) {
             $k = $db->real_escape_string($filters['keyword']);
-            $where .= " AND (p.name LIKE '%$k%' OR p.sku LIKE '%$k%' OR c.name LIKE '%$k%')";
+            $where .= " AND (p.name LIKE '%$k%' OR p.sku LIKE '%$k%')";
         }
         if (!empty($filters['category']) && $filters['category'] !== 'all') {
             $where .= " AND p.category_id = " . intval($filters['category']);
