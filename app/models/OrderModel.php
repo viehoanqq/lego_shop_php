@@ -38,12 +38,14 @@ class OrderModel extends Database {
     // Lấy chi tiết các sản phẩm trong 1 đơn hàng
     public function getOrderItems($order_id) {
         $db = $this->getConnection();
-        // Nối với bảng products để lấy tên và ảnh đại diện
-        $sql = "SELECT oi.*, p.name, pi.image_url 
+        
+        // SỬ DỤNG LEFT JOIN + GROUP BY ĐỂ ÉP SQL CHỈ TRẢ VỀ 1 DÒNG DUY NHẤT CHO MỖI SẢN PHẨM
+        $sql = "SELECT oi.*, p.name, MAX(pi.image_url) as image_url 
                 FROM order_details oi 
                 JOIN products p ON oi.product_id = p.id 
-                JOIN product_images pi ON p.id = pi.product_id AND pi.is_main = 1
-                WHERE oi.order_id = ?";
+                LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_main = 1
+                WHERE oi.order_id = ?
+                GROUP BY oi.product_id, oi.quantity, oi.price, p.name";
                 
         $stmt = $db->prepare($sql);
         $stmt->bind_param("i", $order_id);
@@ -174,27 +176,26 @@ class OrderModel extends Database {
             $stmt2->execute();
 
             // ==========================================
-            // 4. LOGIC HOÀN KHO (TỰ ĐỘNG CỘNG LẠI)
+            // 4. LOGIC HOÀN KHO (TỰ ĐỘNG CỘNG LẠI) KHI ADMIN ĐỔI TRẠNG THÁI TỪ đã giao thành !đã giao
             // ==========================================
-            // CHỈ hoàn kho khi: Trạng thái mới là 'cancelled' VÀ trạng thái cũ KHÁC 'cancelled'
-            if ($status === 'cancelled' && $old_status !== 'cancelled') {
-                // Lấy danh sách sản phẩm trong đơn này
+            if ($status !== 'delivered' && $old_status === 'delivered') {
                 $items = $this->getOrderItems($order_id);
+                $processed_products = []; // Rổ đánh dấu sản phẩm đã cộng
+
                 foreach ($items as $item) {
-                    $qty = (int)$item['quantity'];
                     $p_id = (int)$item['product_id'];
+                    
+                    // KIỂM TRA: Nếu sản phẩm này đã được cộng kho rồi thì BỎ QUA NGAY LẬP TỨC
+                    if (in_array($p_id, $processed_products)) {
+                        continue; 
+                    }
+
+                    $qty = (int)$item['quantity'];
                     // Cộng lại vào kho
                     $db->query("UPDATE products SET stock_quantity = stock_quantity + $qty WHERE id = $p_id");
-                }
-            }
-            // Mở rộng: Nếu Admin đổi từ Cancelled quay ngược lại Pending (Cứu đơn) -> Phải trừ kho lại
-            else if ($old_status === 'cancelled' && $status !== 'cancelled') {
-                $items = $this->getOrderItems($order_id);
-                foreach ($items as $item) {
-                    $qty = (int)$item['quantity'];
-                    $p_id = (int)$item['product_id'];
-                    // Trừ kho đi
-                    $db->query("UPDATE products SET stock_quantity = stock_quantity - $qty WHERE id = $p_id");
+                    
+                    // Ghi nhớ là đã cộng sản phẩm này rồi
+                    $processed_products[] = $p_id; 
                 }
             }
 

@@ -27,7 +27,7 @@
     .total-row.final { border-top: 2px solid #eee; padding-top: 15px; margin-top: 5px; font-size: 20px; font-weight: 800; color: #a4161a; }
 
     .btn-wrap { text-align: center; margin-top: 40px; }
-    .btn-continue { display: inline-block; background: #e03131; color: #fff; padding: 15px 35px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none; transition: 0.3s; }
+    .btn-continue { display: inline-block; background: #e03131; color: #fff; padding: 15px 35px; margin: 0 15px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none; transition: 0.3s; }
     .btn-continue:hover { background: #c92a2a; transform: translateY(-2px); }
 
     @media (max-width: 768px) { .info-grid { grid-template-columns: 1fr; } .total-section { width: 100%; } }
@@ -123,16 +123,8 @@
             </div>
             
             <div class="btn-wrap">
-                <?php if (in_array($order['status'], ['pending', 'confirmed'])): ?>
-                    <a href="/lego_shop_php/checkout/cancel_order?order_id=<?= $order['id'] ?>" class="btn-cancel-order" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');">
-                        <i class="fa-solid fa-xmark"></i> Hủy đơn hàng
-                    </a>
-                <?php elseif (in_array($order['status'], ['shipping', 'delivered'])): ?>
-                    <button class="btn-cancel-order disabled" disabled title="Đơn hàng đang được giao, không thể hủy">
-                        <i class="fa-solid fa-xmark"></i> Hủy đơn hàng
-                    </button>
-                <?php endif; ?>
-                <a href="/lego_shop_php/home" class="btn-continue"><i class="fa-solid fa-cart-shopping"></i> Tiếp tục mua sắm</a>
+                                <a href="/lego_shop_php/home" class="btn-continue"><i class="fa-solid fa-shopping-bag"></i>   Tiếp tục mua sắm</a>
+                <a href="/lego_shop_php/profile/orders" class="btn-continue"><i class="fa-solid fa-shopping-cart"></i>   Giỏ hàng của bạn</a>
             </div>
         </div>
     </div>
