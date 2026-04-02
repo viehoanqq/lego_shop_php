@@ -174,11 +174,11 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const keyword = document.getElementById("keyword")?.value || "";
             const category = document.getElementById("category")?.value || "";
-            const age = document.getElementById("age")?.value || "";
+            const pieces = document.getElementById("pieces")?.value || "";
             const pMin = rangeMin?.value || "0";
             const pMax = rangeMax?.value || "10000000";
 
-            let url = `/lego_shop_php/product/filter?keyword=${encodeURIComponent(keyword)}&category=${category}&age=${encodeURIComponent(age)}&min_price=${pMin}&max_price=${pMax}`;
+            let url = `/lego_shop_php/product/filter?keyword=${encodeURIComponent(keyword)}&category=${category}&pieces=${encodeURIComponent(pieces)}&min_price=${pMin}&max_price=${pMax}`;
             window.location.href = url;
         };
     }

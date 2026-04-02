@@ -83,14 +83,14 @@
             </div>
 
             <div class="form-group">
-              <label><i class="fa-solid fa-child"></i> Độ tuổi</label>
-              <select name="age" id="age">
-                <option value="">Mọi lứa tuổi</option>
-                <option value="4+">4+</option>
-                <option value="6+">6+</option>
-                <option value="8+">8+</option>
-                <option value="12+">12+</option>
-                <option value="18+">18+ (Người lớn)</option>
+              <label><i class="fa-solid fa-puzzle-piece"></i> Số mảnh ghép</label>
+              <select name="pieces" id="pieces">
+                <option value="">Mọi kích cỡ</option>
+                <option value="0-500">Dưới 500 mảnh (Nhỏ)</option>
+                <option value="500-1000">Từ 500 - 1.000 mảnh (Vừa)</option>
+                <option value="1000-2000">Từ 1.000 - 2.000 mảnh (Lớn)</option>
+                <option value="2000-5000">Từ 2.000 - 5.000 mảnh (Rất lớn)</option>
+                <option value="5000-99999">Trên 5.000 mảnh (Siêu khổng lồ)</option>
               </select>
             </div>
 
