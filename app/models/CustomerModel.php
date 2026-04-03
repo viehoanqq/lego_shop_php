@@ -1,9 +1,9 @@
 <?php
 class CustomerModel extends Database {
     
+    // --- SỬA 2 HÀM LẤY DANH SÁCH & ĐẾM ĐỂ HỖ TRỢ TRẠNG THÁI DELETED ---
     public function getAllCustomers($search = '', $status = '', $limit = null, $offset = null) {
         $db = $this->getConnection();
-        // ĐỔI JOIN THÀNH LEFT JOIN
         $sql = "SELECT a.id, a.phone, a.email, a.status, a.role, a.created_at, u.fullname 
                 FROM accounts a 
                 LEFT JOIN users u ON a.id = u.account_id 
@@ -11,55 +11,89 @@ class CustomerModel extends Database {
 
         if (!empty($search)) {
             $search = $db->real_escape_string($search);
-            // Dùng COALESCE để tránh lỗi nếu fullname bị NULL
             $sql .= " AND (COALESCE(u.fullname, '') LIKE '%$search%' OR a.email LIKE '%$search%' OR a.phone LIKE '%$search%')";
         }
 
-        if (!empty($status)) {
+        // Ẩn tài khoản đã xóa mềm nếu không chọn lọc cụ thể
+        if (empty($status)) {
+            $sql .= " AND a.status != 'deleted'";
+        } else {
             $status = $db->real_escape_string($status);
             $sql .= " AND a.status = '$status'";
         }
 
         $sql .= " ORDER BY a.created_at DESC";
+        if ($limit !== null && $offset !== null) { $sql .= " LIMIT " . (int)$offset . ", " . (int)$limit; }
         
-        if ($limit !== null && $offset !== null) {
-            $sql .= " LIMIT " . (int)$offset . ", " . (int)$limit;
-        }
-
         $result = $db->query($sql);
-        $customers = [];
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $customers[] = $row;
-            }
-        }
-        return $customers;
+        return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    // Thêm hàm mới để đếm tổng số khách hàng (phục vụ tính số trang)
     public function countAllCustomers($search = '', $status = '') {
         $db = $this->getConnection();
-        // ĐỔI JOIN THÀNH LEFT JOIN
-        $sql = "SELECT COUNT(*) as total 
-                FROM accounts a 
-                LEFT JOIN users u ON a.id = u.account_id 
-                WHERE 1=1";
+        $sql = "SELECT COUNT(*) as total FROM accounts a LEFT JOIN users u ON a.id = u.account_id WHERE 1=1";
 
         if (!empty($search)) {
             $search = $db->real_escape_string($search);
             $sql .= " AND (COALESCE(u.fullname, '') LIKE '%$search%' OR a.email LIKE '%$search%' OR a.phone LIKE '%$search%')";
         }
 
-        if (!empty($status)) {
+        if (empty($status)) {
+            $sql .= " AND a.status != 'deleted'";
+        } else {
             $status = $db->real_escape_string($status);
             $sql .= " AND a.status = '$status'";
         }
 
         $result = $db->query($sql);
-        $row = $result->fetch_assoc();
-        return (int)$row['total'];
+        return (int)$result->fetch_assoc()['total'];
     }
 
+    // ==========================================
+    // CÁC HÀM XỬ LÝ XÓA / KHÔI PHỤC
+    // ==========================================
+
+    // Kiểm tra xem khách hàng đã có đơn hàng nào chưa
+    public function hasTransactions($accountId) {
+        $db = $this->getConnection();
+        $accountId = intval($accountId);
+        
+        // 1. Kiểm tra xem User này có đơn hàng không (Dành cho Customer)
+        $sqlOrder = "SELECT COUNT(*) as total FROM orders o 
+                     JOIN users u ON o.user_id = u.id 
+                     WHERE u.account_id = $accountId";
+        $hasOrder = $db->query($sqlOrder)->fetch_assoc()['total'] > 0;
+
+        // 2. Kiểm tra xem Account này có tạo phiếu nhập nào không (Dành cho Admin)
+        $sqlImport = "SELECT COUNT(*) as total FROM import_receipts WHERE admin_id = $accountId";
+        $hasImport = $db->query($sqlImport)->fetch_assoc()['total'] > 0;
+
+        return ($hasOrder || $hasImport);
+    }
+
+    // Xóa vĩnh viễn (Phải xóa sạch các bảng con liên kết trước)
+    public function deleteAccountForever($accountId) {
+        $db = $this->getConnection();
+        $id = intval($accountId);
+        
+        // Nhờ DB cài đặt sẵn ON DELETE CASCADE ở các bảng: 
+        // users, carts, cart_items, product_reviews, wishlists, user_addresses
+        // Chúng ta CHỈ CẦN XÓA ACCOUNTS, MySQL sẽ tự động dọn sạch rác ở các bảng kia!
+        try {
+            $db->query("DELETE FROM accounts WHERE id = $id");
+            return true;
+        } catch (Exception $e) {
+            error_log("Lỗi Xóa Vĩnh Viễn Account: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Xóa mềm (Chuyển status thành deleted)
+    public function softDeleteAccount($accountId) {
+        $db = $this->getConnection();
+        $sql = "UPDATE accounts SET status = 'deleted' WHERE id = " . intval($accountId);
+        return $db->query($sql);
+    }
     public function updateStatus($id, $newStatus) {
         $db = $this->getConnection();
         $id = intval($id);

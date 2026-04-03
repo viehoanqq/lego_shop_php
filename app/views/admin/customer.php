@@ -8,469 +8,95 @@
         --bg-body: #f7fafc;
     }
 
-    body { background-color: var(--bg-body); color: var(--text-main); }
+    * { box-sizing: border-box; }
+    body { background-color: var(--bg-body); color: var(--text-main);}
 
-    .header-sync { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: flex-end; 
-        margin-bottom: 25px; 
-        gap: 20px;
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-    }
-
+    .header-sync { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; gap: 20px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); flex-wrap: wrap;}
     .header-left-group { flex-grow: 1; }
-    .header-left-group h2 { margin: 0; color: #1a202c; font-size: 24px; font-weight: 700; }
+    .header-left-group h2 { margin: 0 0 15px 0; color: #1a202c; font-size: 22px; font-weight: 700; }
 
-    .filter-form-sync { display: flex; gap: 10px; margin-top: 15px; align-items: center; }
+    .filter-form-sync { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;}
+    .search-wrapper-sync { position: relative; flex: 2; min-width: 250px; }
+    .search-wrapper-sync i.fa-magnifying-glass { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); z-index: 1; }
     
-/* Container giữ vị trí tương đối */
-.search-wrapper-sync {
-    position: relative;
-    flex: 2; /* Để thanh search dài hơn */
-}
-
-.search-wrapper-sync i.fa-magnifying-glass {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    z-index: 1;
-}
-
-.form-control-sync { 
-    width: 100%; 
-    padding: 10px 100px 10px 35px ; /* Trừa chỗ cho nút tìm kiếm bên phải */
-    box-sizing: border-box;
-}
-
-/* Style cho nút bấm bên trong */
-.btn-search-inside {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 6px 15px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-    height: 30px;
-    display: flex;
-    align-items: center;
-}
-
-.btn-search-inside:hover {
-    background: #2b6cb0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* Nếu bạn muốn dùng icon thay vì chữ "Tìm kiếm" */
-.btn-search-inside i {
-    font-size: 14px;
-}
-
-    .form-control-sync { 
-        width: 100%; 
-        padding: 10px 10px 10px 35px; /* Padding left lớn để trừ hao cho icon */
-        border: 1px solid #e2e8f0; 
-        border-radius: 8px; 
-        outline: none; 
-        font-size: 14px;
-        height: 40px;
-    }
+    /* ĐÃ SỬA LỖI LỌC TRẠNG THÁI HIỂN THỊ CÓ 1 CHÚT */
+    .form-control-sync { width: 100%; padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; font-size: 14px; height: 40px; transition: 0.2s;}
+    .search-input-sync { padding-left: 35px; padding-right: 90px; } /* Lớp này chỉ dành cho input search */
     .form-control-sync:focus { border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
+    
+    .btn-search-inside { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: var(--primary); color: white; border: none; padding: 6px 15px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; height: 30px; display: flex; align-items: center; }
+    .btn-search-inside:hover { background: #2b6cb0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-    .btn-refresh-sync {
-        background: #edf2f7; color: #4a5568; text-decoration: none; padding: 0 20px; 
-        border-radius: 8px; font-weight: 600; display: flex; align-items: center; 
-        gap: 8px; white-space: nowrap; transition: 0.2s; height: 40px;
-        border: 1px solid #e2e8f0;
-    }
-    .btn-refresh-sync:hover { background: #e2e8f0; color: #1a202c; }
+    /* CHUẨN HÓA FONT CHỮ NÚT THÊM */
+    .btn-add { background: #3182ce; color: white; text-decoration: none; padding: 0 20px; border-radius: 8px; font-weight: 600; font-family: inherit; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; transition: 0.2s; height: 40px;}
+    .btn-add:hover { background: #2b6cb0; transform: translateY(-1px); color: white;}
 
     /* --- TABLE & BADGES --- */
-    .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden; }
-    .custom-table { width: 100%; border-collapse: collapse; }
-    .custom-table th { background: #f8fafc; padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
-    .custom-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+    .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow-x: auto; margin-bottom: 25px;}
+    .custom-table { width: 100%; border-collapse: collapse; min-width: 800px;}
+    .custom-table th { background: #f8fafc; padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; white-space: nowrap;}
+    .custom-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; vertical-align: middle;}
 
-    .badge-custom { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    /* ĐÃ LÀM NỔI BẬT QUẢN TRỊ VIÊN VÀ ĐÃ KHÓA */
+    .badge-custom { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; letter-spacing: 0.5px;}
     .status-active { background: #f0fff4; color: #2f855a; border: 1px solid #9ae6b4; }
-    .status-locked { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
     
-    .role-admin { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+    .status-locked { background: #e53e3e; color: #fff; border: none; box-shadow: 0 2px 5px rgba(229, 62, 62, 0.3); } /* Đỏ đậm */
+    .role-admin { background: #2b6cb0; color: #fff; border: none; box-shadow: 0 2px 5px rgba(43, 108, 176, 0.3); } /* Xanh biển đậm */
+    
+    .status-deleted { background: #e2e8f0; color: #4a5568; border: 1px solid #cbd5e0; }
     .role-user { background: #f7fafc; color: #4a5568; border: 1px solid #e2e8f0; }
 
-    .btn-action { text-decoration: none; font-weight: 600; font-size: 13px; margin: 0 5px; }
-    .btn-edit { color: var(--primary); }
-    .btn-lock { color: var(--danger); }
-
-    /* Stats right */
-    .stats-right { text-align: right; min-width: 120px; }
-    .stats-label { color: #718096; font-size: 11px; font-weight: 800; text-transform: uppercase; }
-    .stats-value { color: var(--primary); font-size: 24px; font-weight: 800; line-height: 1; }
-
-
-
-    .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 30px;
-    margin-bottom: 20px;
-}
-
-.page-link {
-    padding: 8px 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #4a5568;
-    background: #fff;
-    font-weight: 600;
-    transition: 0.2s;
-}
-
-.page-link:hover {
-    background: #edf2f7;
-    border-color: #cbd5e0;
-}
-
-.page-link.active {
-    background: #3182ce;
-    color: #fff;
-    border-color: #3182ce;
-}
-
-.page-link.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-    background: #f7fafc;
-}
-
-.btn-add {
-    background: #3182ce; 
-    color: white; 
-    text-decoration: none; 
-    padding: 12px 25px; 
-    border-radius: 8px; 
-    font-weight: 600; 
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
-    white-space: nowrap;
-    transition: 0.2s;
-}
-
-.btn-add:hover {
-    background: #2b6cb0;
-    transform: translateY(-1px);
-}
-
-
-/* Màu sắc đặc trưng cho User Form */
-.form-container.user-form {
-    border-left: 5px solid #e3000b; /* Màu đỏ LEGO */
-}
-
-.password-note {
-    font-size: 12px;
-    color: #a0aec0;
-    margin-top: 5px;
-}
-
-.role-badge-select {
-    display: flex;
-    gap: 20px;
-    margin-top: 10px;
-}
-
-.role-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-
-.form-container.user-form { 
-        background: #fff;
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        margin-bottom: 30px;
-        border-left: 6px solid var(--danger-lego);
-        transition: all 0.3s ease;
-    }
-
-    /* 2. PHÂN CHIA VÙNG NHẬP LIỆU (FORM GROUP) */
-    .form-group { 
-        margin-bottom: 20px; 
-    }
+    .btn-action { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; transition: all 0.2s ease; border: 1px solid transparent; text-decoration: none; font-weight: 600; font-size: 13px; margin: 0 2px;}
+    .btn-edit { background: #ebf8ff; color: #3182ce; }
+    .btn-edit:hover { background: #bee3f8; transform: translateY(-1px); color: #2b6cb0;}
     
-    .form-group label { 
-        display: block; 
-        margin-bottom: 8px; 
-        font-weight: 700; 
-        color: var(--text-label);
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+    .btn-status-toggle.is-locking { background: #fff5f5; color: #e53e3e; }
+    .btn-status-toggle.is-locking:hover { background: #e53e3e; color: #fff; }
+    .btn-status-toggle.is-unlocking { background: #f0fff4; color: #38a169; border: 1px solid #9ae6b4; }
+    .btn-status-toggle.is-unlocking:hover { background: #38a169; color: #fff; }
+    
+    .btn-delete { background: #fff5f5; color: #c53030; }
+    .btn-delete:hover { background: #e53e3e; color: #fff; }
 
-    .form-input { 
-        width: 100%; 
-        padding: 12px 15px; 
-        border: 1px solid var(--border-color); 
-        border-radius: 8px; 
-        outline: none;
-        background-color: var(--bg-field);
-        font-size: 15px;
-        color: var(--text-dark);
-        transition: all 0.2s ease;
-        box-sizing: border-box;
-    }
+    /* ===== ALERT ===== */
+    #status-alert-container { position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; }
+    .alert-box { display: flex; align-items: center; gap: 15px; padding: 15px 20px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); font-weight: 600; color: #fff; animation: slideInRight 0.5s ease; }
+    .success-js { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); border-left: 5px solid #276749; }
+    .error-js { background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%); border-left: 5px solid #9b2c2c; }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
 
-    .form-input:focus { 
-        background-color: #fff;
-        border-color: var(--primary); 
-        box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.1); 
-    }
+    /* ===== PAGINATION ===== */
+    .pagination { display: flex; justify-content: center; gap: 8px; margin: 30px 0; }
+    .page-link { padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #4a5568; background: #fff; font-weight: 600; transition: 0.2s; }
+    .page-link:hover { background: #edf2f7; border-color: #cbd5e0; color: #1a202c;}
+    .page-link.active { background: #3182ce; color: #fff; border-color: #3182ce; }
+    .page-link.disabled { opacity: 0.5; pointer-events: none; background: #f7fafc; }
 
-    /* 3. VÙNG PHÂN QUYỀN & LỰA CHỌN (ROLE & STATUS) */
-    .role-badge-select {
-        display: flex;
-        gap: 15px;
-        margin-top: 10px;
-        background: #f1f5f9;
-        padding: 10px;
-        border-radius: 10px;
-    }
+    /* ===== FORM NÂNG CẤP (ĐÃ XÓA VIỀN ĐỎ BÊN TRÁI) ===== */
+    .form-container.user-form { background: #fff; padding: 35px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: none; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 700; color: #4a5568; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input { width: 100%; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; background-color: #f8fafc; font-size: 15px; color: #1a202c; transition: all 0.2s ease; box-sizing: border-box; font-family: inherit;}
+    .form-input:focus { background-color: #fff; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.1); }
+    
+    .role-badge-select { display: flex; gap: 15px; margin-top: 10px; background: #f1f5f9; padding: 12px; border-radius: 10px; }
+    .role-option { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px 10px; border-radius: 6px; transition: 0.2s; }
+    .role-option:hover { background: rgba(255, 255, 255, 0.5); }
+    .role-option input[type="radio"] { accent-color: var(--primary); width: 18px; height: 18px; cursor: pointer;}
+    .password-note { font-size: 12px; color: #718096; margin-top: 8px; background: #fffaf0; padding: 8px 12px; border-radius: 6px; border-left: 3px solid #ed8936;}
 
-    .role-option {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        padding: 5px 10px;
-        border-radius: 6px;
-        transition: 0.2s;
-    }
-
-    .role-option:hover {
-        background: rgba(255, 255, 255, 0.5);
-    }
-
-    .role-option input[type="radio"] {
-        accent-color: var(--primary);
-        width: 18px;
-        height: 18px;
-    }
-
-    .password-note {
-        font-size: 12px;
-        color: #718096;
-        margin-top: 8px;
-        background: #fffaf0;
-        padding: 5px 10px;
-
-    }
-
-    /* 4. VÙNG NÚT BẤM (ACTION AREA) */
-    .btn-submit { 
-        background: var(--primary); 
-        color: white !important; 
-        padding: 14px 30px; 
-        border: none; 
-        border-radius: 10px; 
-        cursor: pointer; 
-        font-weight: 800; 
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
-        transition: all 0.3s ease;
-    }
-
-    .btn-submit:hover { 
-        background: var(--primary-dark); 
-        transform: translateY(-2px); 
-        box-shadow: 0 6px 15px rgba(49, 130, 206, 0.4);
-    }
-
-    .btn-cancel-link {
-        margin-left: 20px;
-        text-decoration: none;
-        color: #718096;
-        font-weight: 600;
-        font-size: 14px;
-        transition: 0.2s;
-    }
-
-    .btn-cancel-link:hover {
-        color: var(--text-dark);
-        text-decoration: underline;
-    }
-
-    /* Hiệu ứng phân biệt 2 cột */
-    @media (min-width: 768px) {
-        .form-container form > div:first-child {
-            border-bottom: none;
-        }
-    }
-
-    #status-alert-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        min-width: 300px;
-    }
-
-    .alert-box {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 15px 20px;
-        border-radius: 12px;
-        margin-bottom: 10px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        font-weight: 600;
-        animation: slideInRight 0.5s ease;
-        color: #fff;
-    }
-
-    .success-js {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        border-left: 5px solid #276749;
-    }
-
-    .error-js {
-        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-        border-left: 5px solid #9b2c2c;
-    }
-
-    .alert-box i {
-        font-size: 20px;
-    }
-
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(100px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-/* Style chung cho nút thao tác để cân bằng kích thước */
-.btn-action {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-}
-
-/* Nút Sửa (giữ phong cách cũ của bạn nhưng làm gọn hơn) */
-.btn-edit {
-    background: #ebf8ff;
-    color: #3182ce ;
-}
-.btn-edit:hover {
-    background: #bee3f8;
-    transform: translateY(-1px);
-}
-
-/* NÚT KHÓA/MỞ KHÓA RIÊNG BIỆT */
-.btn-status-toggle {
-    min-width: 75px; /* Cố định độ rộng để không nhảy chữ */
-    justify-content: center;
-    font-weight: 700;
-}
-
-/* Trạng thái khi chuẩn bị KHÓA (Nút hiện màu đỏ nhạt) */
-.btn-status-toggle.is-locking {
-    background: #fff5f5;
-    color: #e53e3e ;
-}
-.btn-status-toggle.is-locking:hover {
-    background: #e53e3e;
-    color: #fff;
-}
-
-/* Trạng thái khi chuẩn bị MỞ (Nút hiện màu xanh nhạt) */
-.btn-status-toggle.is-unlocking {
-    background: #f0fff4;
-    color: #38a169 ;
-    border: 1px solid #9ae6b4;
-}
-.btn-status-toggle.is-unlocking:hover {
-    background: #38a169;
-    color: #fff ;
-}
-
-/* Hiệu ứng icon */
-.btn-status-toggle i {
-    font-size: 12px;
-}
-
-.btn-search-inside {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 6px 15px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-    height: 30px;
-    display: flex;
-    align-items: center;
-}
-
-.btn-search-inside:hover {
-    background: #2b6cb0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* Nếu bạn muốn dùng icon thay vì chữ "Tìm kiếm" */
-.btn-search-inside i {
-    font-size: 14px;
-}
-
-.error-text {
-    color: #e53e3e;
-    font-size: 12px;
-    margin-top: 4px;
-}
-
-.input-error {
-    border-color: #e53e3e ;
-}
-
-.input-success {
-    border-color: #38a169 ;
-}
-
-
+    .btn-submit { background: var(--primary); color: white; padding: 14px 30px; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3); transition: all 0.3s ease; font-family: inherit;}
+    .btn-submit:hover { background: #2b6cb0; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(49, 130, 206, 0.4); }
+    .btn-cancel-link { margin-left: 20px; text-decoration: none; color: #718096; font-weight: 600; font-size: 14px; transition: 0.2s; }
+    .btn-cancel-link:hover { color: #1a202c; text-decoration: underline; }
+    
+    .error-text { color: #e53e3e; font-size: 12px; margin-top: 6px; display: block; min-height: 18px;}
+    .input-error { border-color: #e53e3e !important; background: #fff5f5 !important;}
+    .input-success { border-color: #38a169 !important; }
 </style>
 
 <?php 
-// Lấy thông báo từ session
 $session_msg = get_flash_message('msg');
 $session_error = get_flash_message('error');
 ?>
@@ -482,8 +108,13 @@ $session_error = get_flash_message('error');
                 <i class="fa-solid fa-circle-check"></i>
                 <span>
                     <?php
-                        if($session_msg == 'success') echo "Thêm thành viên mới thành công!";
-                        if($session_msg == 'updated') echo "Đã cập nhật thông tin thành viên!";
+                        if($session_msg == 'success') echo "Thêm người dùng mới thành công!";
+                        if($session_msg == 'updated') echo "Đã cập nhật thông tin người dùng!";
+                        if($session_msg == 'deleted') echo "Đã xóa vĩnh viễn tài khoản người dùng!";
+                        if($session_msg == 'soft_deleted') echo "Tài khoản đã có giao dịch, đã được Tạm Ẩn!";
+                        if($session_msg == 'hidden') echo "Đã KHÓA tài khoản!";
+                        if($session_msg == 'unlocked') echo "Đã MỞ KHÓA tài khoản!";
+                        if($session_msg == 'restored') echo "Khôi phục tài khoản thành công!";
                     ?>
                 </span>
             </div>
@@ -494,8 +125,9 @@ $session_error = get_flash_message('error');
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span>
                     <?php
-                        if($session_error == 'exists_email') echo "Email này đã được sử dụng!";
+                        if($session_error == 'exists_email') echo "Email này đã được đăng ký!";
                         if($session_error == 'exists_phone') echo "Số điện thoại này đã được sử dụng!";
+                        if($session_error == 'cannot_delete_self') echo "Lỗi: Bạn không thể tự xóa tài khoản của chính mình!";
                         if($session_error == 'empty') echo "Vui lòng điền đầy đủ các trường bắt buộc!";
                         if($session_error == 'db') echo "Lỗi hệ thống: Không thể xử lý dữ liệu.";
                     ?>
@@ -505,132 +137,38 @@ $session_error = get_flash_message('error');
     </div>
 <?php endif; ?>
 
-<div class="header-sync">
+<?php if(!isset($is_form) || $is_form === false): ?>
+
+    <div class="header-sync">
         <div class="header-left-group">
-            <h2><i class="fa-solid fa-user-group"></i>  Quản lý Khách hàng</h2>
             
             <form action="/lego_shop_php/admincustomer/index" method="GET" class="filter-form-sync">
                 <div class="search-wrapper-sync">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" name="search" class="form-control-sync" 
+                    <input type="text" name="search" class="form-control-sync search-input-sync" 
                            placeholder="Tìm tên, email hoặc số điện thoại..." 
                            value="<?= htmlspecialchars($search ?? '') ?>">
-                    <button type="submit" class="btn-search-inside"> Tìm kiếm </button>
+                    <button type="submit" class="btn-search-inside">Tìm kiếm</button>
                 </div>
 
-                <select name="status" class="form-control-sync" onchange="this.form.submit()" style="flex: 1; cursor: pointer; padding-left: 12px;">
-                    <option value="">-- Tất cả trạng thái --</option>
+                <select name="status" class="form-control-sync" onchange="this.form.submit()" style="flex: unset; width: 170px; cursor: pointer;">
+                    <option value="">Tất cả trạng thái</option>
                     <option value="active" <?= ($status ?? '') === 'active' ? 'selected' : '' ?>>Đang hoạt động</option>
                     <option value="locked" <?= ($status ?? '') === 'locked' ? 'selected' : '' ?>>Đã khóa</option>
+                    <option value="deleted" <?= ($status ?? '') === 'deleted' ? 'selected' : '' ?>>Đã bị ẩn (Xóa mềm)</option>
                 </select>
             </form>
         </div>
-
-        <?php if(!isset($is_form) || $is_form === false): ?>
-            <a href="/lego_shop_php/admincustomer/add" class="btn-add">
-                <i class="fa-solid fa-plus"></i> Thêm người dùng
-            </a>
-        <?php endif; ?>
-</div>
-
-<?php if (isset($is_form) && $is_form == true): ?>
-        <div class="form-container user-form">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
-                <i class="fa-solid fa-user-gear" style="color: #e3000b; font-size: 24px;"></i>
-                <h3 style="margin:0; color: #1a202c; font-weight: 800;">
-                    <?= (isset($customer) && $customer) ? 'CHỈNH SỬA THÀNH VIÊN' : 'THÊM NGƯỜI DÙNG MỚI' ?>
-                </h3>
-            </div>
-            
-                <form action="/lego_shop_php/admincustomer/<?= (!empty($customer) && isset($customer['id'])) ? 'update/'.$customer['id'] : 'store' ?>" method="POST">    
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
-        <div>
-            <div class="form-group">
-                <label>Họ và tên <span style="color:red">*</span></label>
-                <input type="text" id="fullname" name="fullname" class="form-input" 
-                    placeholder="Nhập tên khách hàng..."
-                    value="<?= $customer['fullname'] ?? '' ?>" required>
-                <small class="error-text"></small>
-            </div>
-
-            <div class="form-group">
-                <label>Số điện thoại <span style="color:red">*</span></label>
-                <input type="text" id="phone" name="phone" class="form-input" 
-                    placeholder="Ví dụ: 0961xxxxxx"
-                    value="<?= $customer['phone'] ?? '' ?>" required>
-                    <small class="error-text"></small>
-            </div>
-
-            <div class="form-group">
-                <label>Địa chỉ Email <span style="color:red">*</span></label>
-                <input type="email" id="email" name="email" class="form-input" 
-                    placeholder="name@example.com"
-                    value="<?= $customer['email'] ?? '' ?>" required>
-                    <small class="error-text"></small>
-            </div>
-        </div>
-
-        <div>
-            <div class="form-group">
-                <label>Mật khẩu <?= (!empty($customer)) ? '(Để trống nếu không đổi)' : '<span style="color:red">*</span>' ?></label>
-                <input type="password" id="password" name="password" class="form-input" 
-                    placeholder="********" 
-                    <?= (!empty($customer)) ? '' : 'required' ?>>
-                <?php if(!empty($customer)): ?>
-                    <p class="password-note">Lưu ý: Chỉ nhập khi muốn thay đổi mật khẩu mới.</p>
-                <?php endif; ?>
-                <small class="error-text"></small>
-            </div>
-
-            <div class="form-group">
-                <label>Nhập lại mật khẩu <span style="color:red">*</span></label>
-                <input type="password" id="confirm_password" name="confirm_password" class="form-input" 
-                    placeholder="Nhập lại mật khẩu">
-                <small class="error-text"></small>
-            </div>
-
-            <div class="form-group">
-                <label>Phân quyền hệ thống</label>
-                <div class="role-badge-select">
-                    <label class="role-option">
-                        <input type="radio" name="role" value="customer" <?= (empty($customer) || (isset($customer['role']) && $customer['role'] == 'customer')) ? 'checked' : '' ?>>
-                        <span class="badge-custom role-user">Khách hàng</span>
-                    </label>
-                    <label class="role-option">
-                        <input type="radio" name="role" value="admin" <?= (isset($customer['role']) && $customer['role'] == 'admin') ? 'checked' : '' ?>>
-                        <span class="badge-custom role-admin">Quản trị viên</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Trạng thái tài khoản</label>
-                <select name="status" class="form-input">
-                    <option value="active" <?= (isset($customer['status']) && $customer['status'] == 'active') ? 'selected' : '' ?>>Đang hoạt động</option>
-                    <option value="locked" <?= (isset($customer['status']) && $customer['status'] == 'locked') ? 'selected' : '' ?>>Khóa tài khoản</option>
-                </select>
-            </div>
-        </div>
+        <a href="/lego_shop_php/admincustomer/add" class="btn-add">
+            <i class="fa-solid fa-plus"></i> Thêm người dùng
+        </a>
     </div>
-
-    <div style="margin-top: 15px; padding-top: 20px; border-top: 1px solid #edf2f7; display: flex; align-items: center;">
-        <button type="submit" class="btn-submit">
-            <i class="fa-solid fa-floppy-disk"></i> 
-            <?= (!empty($customer)) ? 'CẬP NHẬT THÔNG TIN' : 'LƯU NGƯỜI DÙNG' ?>
-        </button>
-        <a href="/lego_shop_php/admincustomer" class="btn-cancel-link">Quay lại danh sách</a>
-    </div>
-</form>
-        </div>
-<?php endif; ?>
-    
 
     <div class="table-container">
         <table class="custom-table">
             <thead>
                 <tr>
-                    <th class="ps-4">Mã số</th>
+                    <th style="padding-left: 20px;">Mã số</th>
                     <th>Thành viên</th>
                     <th>Liên hệ</th>
                     <th>Quyền hạn</th>
@@ -641,30 +179,25 @@ $session_error = get_flash_message('error');
             </thead>
             <tbody>
                 <?php if (empty($customers)): ?>
-                    <tr><td colspan="7" class="text-center py-5 text-muted">Chưa có dữ liệu người dùng.</td></tr>
+                    <tr><td colspan="7" style="text-align: center; padding: 50px; color: #a0aec0;"><i class="fa-regular fa-folder-open" style="font-size: 30px; margin-bottom: 10px; display: block;"></i> Chưa có dữ liệu người dùng.</td></tr>
                 <?php else: ?>
                     <?php foreach ($customers as $user): ?>
-                    <tr>
-                        <td class="ps-4">
-                            <span class="fw-bold text-muted" style="">
+                    <?php $is_deleted = ($user['status'] === 'deleted'); ?>
+                    <tr style="<?= $is_deleted ? 'opacity: 0.5; background: #f8fafc;' : '' ?>">
+                        <td style="padding-left: 20px;">
+                            <span style="font-weight: 700; color: #a0aec0;">
                                 CUS-<?= str_pad($user['id'], 4, '0', STR_PAD_LEFT) ?>
                             </span>
                         </td>
                         <td>
-                            <div class="d-flex align-items-center">
-
-                                <div class="fw-bold text-dark"><?= htmlspecialchars($user['fullname'] ?: 'Người dùng mới') ?></div>
-                            </div>
+                            <div style="font-weight: 700; color: #1a202c;"><?= htmlspecialchars($user['fullname'] ?: 'Chưa cập nhật') ?></div>
                         </td>
                         <td>
-                            <div style=" color: #4a5568; "><i class="fa-regular fa-envelope me-1 opacity-50" style="margin-right: 10px;"></i><?= $user['email'] ?></div>
-                            <div style=" color: #a0aec0; "><i class="fa-solid fa-phone me-1 opacity-50" style="margin-right: 10px;"></i><?= $user['phone'] ?></div>
+                            <div style="color: #4a5568; margin-bottom: 4px;"><i class="fa-solid fa-envelope" style="color: #cbd5e1; width: 18px;"></i> <?= $user['email'] ?></div>
+                            <div style="color: #718096; font-size: 13px;"><i class="fa-solid fa-phone" style="color: #cbd5e1; width: 18px;"></i> <?= $user['phone'] ?></div>
                         </td>
                         <td>
-                            <?php 
-                            $role = $user['role'] ?? 'customer'; 
-                            if ($role === 'admin'): 
-                            ?>
+                            <?php if (($user['role'] ?? '') === 'admin'): ?>
                                 <span class="badge-custom role-admin">Quản trị viên</span>
                             <?php else: ?> 
                                 <span class="badge-custom role-user">Khách hàng</span>
@@ -673,31 +206,38 @@ $session_error = get_flash_message('error');
                         <td>
                             <?php if ($user['status'] === 'active'): ?>
                                 <span class="badge-custom status-active">Hoạt động</span>
-                            <?php else: ?>
+                            <?php elseif ($user['status'] === 'locked'): ?>
                                 <span class="badge-custom status-locked">Đã khóa</span>
+                            <?php else: ?>
+                                <span class="badge-custom status-deleted"><i class="fa-solid fa-eye-slash"></i> Đã bị ẩn</span>
                             <?php endif; ?>
                         </td>
-                        <td class="text-muted" style="">
+                        <td style="color: #718096; font-size: 13px;">
                             <?= date('d/m/Y', strtotime($user['created_at'])) ?>
                         </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a href="/lego_shop_php/admincustomer/edit/<?= $user['id'] ?>?search=<?= urlencode($search) ?>&status=<?= $status ?>&page=<?= $currentPage ?>" 
-                                    class="btn-action btn-edit" title="Sửa">
-                                        <i class="fa-solid fa-pen-to-square"></i> Sửa
+                        <td style="text-align: center; white-space: nowrap;">
+                            <div style="display: flex; justify-content: center; gap: 5px;">
+                                <?php if($is_deleted): ?>
+                                    <a href="/lego_shop_php/admincustomer/restore/<?= $user['id'] ?>" class="btn-action btn-edit" style="color: #38a169; background: #f0fff4;" title="Khôi phục" onclick="return confirm('Bạn muốn khôi phục tài khoản này?')">
+                                        <i class="fa-solid fa-rotate-left"></i> Khôi phục
                                     </a>
-                                <?php 
-                                    $isLocked = ($user['status'] !== 'active');
-                                    $toggleLabel = $isLocked ? 'Mở' : 'Khóa';
-                                    $toggleIcon = $isLocked ? 'fa-unlock' : 'fa-lock';
-                                    $statusClass = $isLocked ? 'is-unlocking' : 'is-locking';
-                                ?>
-                                <a href="/lego_shop_php/admincustomer/toggleStatus/<?= $user['id'] ?>" 
-                                class="btn-action btn-status-toggle <?= $statusClass ?>" 
-                                onclick="return confirm('Xác nhận <?= mb_strtolower($toggleLabel) ?> tài khoản này?')">
-                                    <i class="fa-solid <?= $toggleIcon ?>"></i>
-                                    <span><?= $toggleLabel ?></span>
-                                </a>
+                                <?php else: ?>
+                                    <a href="/lego_shop_php/admincustomer/edit/<?= $user['id'] ?>?search=<?= urlencode($search ?? '') ?>&status=<?= $status ?? '' ?>&page=<?= $currentPage ?? 1 ?>" class="btn-action btn-edit" title="Chỉnh sửa">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+
+                                    <?php 
+                                        $isLocked = ($user['status'] !== 'active');
+                                        $statusClass = $isLocked ? 'is-unlocking' : 'is-locking';
+                                    ?>
+                                    <a href="/lego_shop_php/admincustomer/toggleStatus/<?= $user['id'] ?>" class="btn-action btn-status-toggle <?= $statusClass ?>" onclick="return confirm('Xác nhận <?= $isLocked ? 'MỞ KHÓA' : 'KHÓA' ?> tài khoản này?')">
+                                        <i class="fa-solid <?= $isLocked ? 'fa-unlock' : 'fa-lock' ?>"></i>
+                                    </a>
+
+                                    <a href="/lego_shop_php/admincustomer/delete/<?= $user['id'] ?>" class="btn-action btn-delete" title="Xóa" onclick="return confirm('CẢNH BÁO: Xóa tài khoản này?\n\nNếu người dùng đã có đơn hàng, hệ thống sẽ chỉ TẠM ẨN để bảo lưu dữ liệu kế toán.')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </td>
                     </tr>
@@ -708,193 +248,201 @@ $session_error = get_flash_message('error');
     </div>
 
     <?php 
-        // --- LOGIC XỬ LÝ URL PHÂN TRANG GIỐNG CATEGORY ---
-        $baseUrl = "/lego_shop_php/admincustomer/";
-        
-        if (isset($currentAction) && $currentAction === 'add') {
-            $baseUrl .= "add";
-        } elseif (isset($currentAction) && $currentAction === 'edit') {
-            $baseUrl .= "edit/" . ($editId ?? '');
-        } else {
-            $baseUrl .= "index";
-        }
-
-        // Giữ lại bộ lọc tìm kiếm và trạng thái
+        $baseUrl = "/lego_shop_php/admincustomer/index";
         $queryString = "?search=" . urlencode($search ?? '') . "&status=" . ($status ?? '');
     ?>
 
     <?php if (isset($totalPages) && $totalPages > 1): ?>
         <div class="pagination">
-            <a href="<?= $baseUrl . $queryString ?>&page=<?= $currentPage - 1 ?>" 
-            class="page-link <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+            <a href="<?= $baseUrl . $queryString ?>&page=<?= $currentPage - 1 ?>" class="page-link <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
                 <i class="fa-solid fa-chevron-left"></i>
             </a>
 
             <?php 
-            // Hiển thị tối đa 5 trang để tránh bị tràn giao diện nếu có quá nhiều user
             $start = max(1, $currentPage - 2);
             $end = min($totalPages, $currentPage + 2);
-            
             for ($i = $start; $i <= $end; $i++): ?>
-                <a href="<?= $baseUrl . $queryString ?>&page=<?= $i ?>" 
-                class="page-link <?= ($currentPage == $i) ? 'active' : '' ?>">
+                <a href="<?= $baseUrl . $queryString ?>&page=<?= $i ?>" class="page-link <?= ($currentPage == $i) ? 'active' : '' ?>">
                     <?= $i ?>
                 </a>
             <?php endfor; ?>
 
-            <a href="<?= $baseUrl . $queryString ?>&page=<?= $currentPage + 1 ?>" 
-            class="page-link <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+            <a href="<?= $baseUrl . $queryString ?>&page=<?= $currentPage + 1 ?>" class="page-link <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
         </div>
     <?php endif; ?>
-</div>
+
+<?php else: ?>
+
+    <div class="form-container user-form">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
+            <i class="fa-solid <?= (isset($customer) && $customer) ? 'fa-user-pen' : 'fa-user-plus' ?>" style="color: #e3000b; font-size: 28px;"></i>
+            <h3 style="margin:0; color: #1a202c; font-weight: 800; font-size: 22px;">
+                <?= (isset($customer) && $customer) ? 'CHỈNH SỬA THÔNG TIN: <span style="color: #3182ce;">' . htmlspecialchars($customer['fullname']) . '</span>' : 'THÊM NGƯỜI DÙNG MỚI' ?>
+            </h3>
+        </div>
+        
+        <form action="/lego_shop_php/admincustomer/<?= (!empty($customer) && isset($customer['id'])) ? 'update/'.$customer['id'] : 'store' ?>" method="POST">    
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <div class="form-group">
+                        <label>Họ và tên <span style="color:red">*</span></label>
+                        <input type="text" id="fullname" name="fullname" class="form-input" placeholder="VD: Nguyễn Văn A..." value="<?= $customer['fullname'] ?? '' ?>">
+                        <small class="error-text"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số điện thoại <span style="color:red">*</span></label>
+                        <input type="text" id="phone" name="phone" class="form-input" placeholder="VD: 0987654321" value="<?= $customer['phone'] ?? '' ?>">
+                        <small class="error-text"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Địa chỉ Email <span style="color:red">*</span></label>
+                        <input type="text" id="email" name="email" class="form-input" placeholder="name@example.com" value="<?= $customer['email'] ?? '' ?>">
+                        <small class="error-text"></small>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="form-group">
+                        <label>Mật khẩu <?= (!empty($customer)) ? '(Để trống nếu không đổi)' : '<span style="color:red">*</span>' ?></label>
+                        <input type="password" id="password" name="password" class="form-input" placeholder="********">
+                        <?php if(!empty($customer)): ?>
+                            <div class="password-note"><i class="fa-solid fa-circle-info" style="margin-right: 5px;"></i> Lưu ý: Chỉ nhập khi muốn thay đổi mật khẩu mới cho người dùng.</div>
+                        <?php endif; ?>
+                        <small class="error-text"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nhập lại mật khẩu <?= (!empty($customer)) ? '' : '<span style="color:red">*</span>' ?></label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-input" placeholder="Nhập lại mật khẩu">
+                        <small class="error-text"></small>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Phân quyền hệ thống</label>
+                            <div class="role-badge-select">
+                                <label class="role-option">
+                                    <input type="radio" name="role" value="customer" <?= (empty($customer) || (isset($customer['role']) && $customer['role'] == 'customer')) ? 'checked' : '' ?>>
+                                    <span class="badge-custom role-user">Khách hàng</span>
+                                </label>
+                                <label class="role-option">
+                                    <input type="radio" name="role" value="admin" <?= (isset($customer['role']) && $customer['role'] == 'admin') ? 'checked' : '' ?>>
+                                    <span class="badge-custom role-admin">Admin</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Trạng thái tài khoản</label>
+                            <select name="status" class="form-input" style="height: 48px; background: #f1f5f9; border-color: transparent;">
+                                <option value="active" <?= (isset($customer['status']) && $customer['status'] == 'active') ? 'selected' : '' ?>>Đang hoạt động</option>
+                                <option value="locked" <?= (isset($customer['status']) && $customer['status'] == 'locked') ? 'selected' : '' ?>>Khóa (Tạm ngừng)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 25px; border-top: 1px solid #edf2f7; display: flex; align-items: center;">
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-floppy-disk"></i> 
+                    <?= (!empty($customer)) ? 'CẬP NHẬT TÀI KHOẢN' : 'TẠO MỚI NGƯỜI DÙNG' ?>
+                </button>
+                <a href="/lego_shop_php/admincustomer" class="btn-cancel-link">Hủy bỏ / Quay lại</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.querySelector(".form-container form");
+        const fullname = document.getElementById("fullname");
+        const phone = document.getElementById("phone");
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirm_password");
+        const isEditMode = <?= (!empty($customer)) ? 'true' : 'false' ?>;
+
+        function showError(input, message) {
+            input.classList.add("input-error");
+            input.classList.remove("input-success");
+            input.nextElementSibling.innerText = message;
+        }
+
+        function showSuccess(input) {
+            input.classList.remove("input-error");
+            input.classList.add("input-success");
+            input.nextElementSibling.innerText = "";
+        }
+
+        function validateFullname() {
+            const value = fullname.value.trim();
+            if (value === "") { showError(fullname, "Không được để trống"); return false; }
+            if (value.length < 3) { showError(fullname, "Tối thiểu 3 ký tự"); return false; }
+            showSuccess(fullname); return true;
+        }
+
+        function validatePhone() {
+            const value = phone.value.trim();
+            const regex = /^0[0-9]{9}$/;
+            if (value === "") { showError(phone, "Không được để trống"); return false; }
+            if (!regex.test(value)) { showError(phone, "SĐT phải 10 số và bắt đầu bằng 0"); return false; }
+            showSuccess(phone); return true;
+        }
+
+        function validateEmail() {
+            const value = email.value.trim();
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (value === "") { showError(email, "Không được để trống"); return false; }
+            if (!regex.test(value)) { showError(email, "Email không hợp lệ"); return false; }
+            showSuccess(email); return true;
+        }
+
+        function validatePassword() {
+            const value = password.value;
+            if (isEditMode && value === "") { showSuccess(password); return true; }
+            if (value === "") { showError(password, "Vui lòng nhập mật khẩu"); return false; }
+            if (value.length < 6) { showError(password, "Tối thiểu 6 ký tự"); return false; }
+            showSuccess(password); return true;
+        }
+
+        function validateConfirmPassword() {
+            const pass = password.value;
+            const confirm = confirmPassword.value;
+            if (isEditMode && pass === "" && confirm === "") { showSuccess(confirmPassword); return true; }
+            if (confirm === "") { showError(confirmPassword, "Vui lòng xác nhận mật khẩu"); return false; }
+            if (pass !== confirm) { showError(confirmPassword, "Mật khẩu không khớp"); return false; }
+            showSuccess(confirmPassword); return true;
+        }
+
+        fullname.addEventListener("input", validateFullname);
+        phone.addEventListener("input", validatePhone);
+        email.addEventListener("input", validateEmail);
+        password.addEventListener("input", () => { validatePassword(); validateConfirmPassword(); });
+        confirmPassword.addEventListener("input", validateConfirmPassword);
+
+        form.addEventListener("submit", function(e) {
+            const vName = validateFullname();
+            const vPhone = validatePhone();
+            const vEmail = validateEmail();
+            const vPass = validatePassword();
+            const vConf = validateConfirmPassword();
+
+            if (!(vName && vPhone && vEmail && vPass && vConf)) {
+                e.preventDefault();
+                alert("⚠️ Vui lòng kiểm tra lại các trường bị báo đỏ trước khi lưu!");
+                const firstError = document.querySelector(".input-error");
+                if(firstError) firstError.focus();
+            }
+        });
+    </script>
+<?php endif; ?>
 
 <script>
-    const confirmPassword = document.getElementById("confirm_password");
-    const form = document.querySelector(".form-container form");
-    const fullname = document.getElementById("fullname");
-    const phone = document.getElementById("phone");
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-
-    confirmPassword.addEventListener("input", validateConfirmPassword);
-
-    form.addEventListener("submit", function(e) {
-        const isValid =
-            validateFullname() &&
-            validatePhone() &&
-            validateEmail() &&
-            validatePassword() &&
-            validateConfirmPassword();
-
-        if (!isValid) {
-            e.preventDefault();
-        }
-    });
-
-    // ===== VALIDATE CONFIRM =====
-    function validateConfirmPassword() {
-        const pass = password.value;
-        const confirm = confirmPassword.value;
-
-        // Nếu đang edit và không nhập password → bỏ qua
-        if (pass === "" && confirm === "") {
-            showSuccess(confirmPassword);
-            return true;
-        }
-
-        if (confirm === "") {
-            showError(confirmPassword, "Vui lòng nhập lại mật khẩu");
-            return false;
-        }
-
-        if (pass !== confirm) {
-            showError(confirmPassword, "Mật khẩu không khớp");
-            return false;
-        }
-
-        showSuccess(confirmPassword);
-        return true;
-    }
-
-    // ===== UI =====
-    function showError(input, message) {
-        input.classList.add("input-error");
-        input.classList.remove("input-success");
-        input.nextElementSibling.innerText = message;
-    }
-
-    function showSuccess(input) {
-        input.classList.remove("input-error");
-        input.classList.add("input-success");
-        input.nextElementSibling.innerText = "";
-    }
-
-    // ===== VALIDATE =====
-
-    // 1. FULLNAME
-    function validateFullname() {
-        const value = fullname.value.trim();
-
-        if (value === "") {
-            showError(fullname, "Không được để trống");
-            return false;
-        }
-
-        if (value.length < 3) {
-            showError(fullname, "Tối thiểu 3 ký tự");
-            return false;
-        }
-
-        showSuccess(fullname);
-        return true;
-    }
-
-    // 2. PHONE
-    function validatePhone() {
-        const value = phone.value.trim();
-        const regex = /^0[0-9]{9}$/;
-
-        if (value === "") {
-            showError(phone, "Không được để trống");
-            return false;
-        }
-
-        if (!regex.test(value)) {
-            showError(phone, "SĐT phải 10 số và bắt đầu bằng 0");
-            return false;
-        }
-
-        showSuccess(phone);
-        return true;
-    }
-
-    // 3. EMAIL
-    function validateEmail() {
-        const value = email.value.trim();
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (value === "") {
-            showError(email, "Không được để trống");
-            return false;
-        }
-
-        if (!regex.test(value)) {
-            showError(email, "Email không hợp lệ");
-            return false;
-        }
-
-        showSuccess(email);
-        return true;
-    }
-
-    // 4. PASSWORD
-    function validatePassword() {
-        const value = password.value;
-
-        // Nếu là edit thì cho phép bỏ trống
-        if (value === "") {
-            showSuccess(password);
-            return true;
-        }
-
-        if (value.length < 6) {
-            showError(password, "Tối thiểu 6 ký tự");
-            return false;
-        }
-
-        showSuccess(password);
-        return true;
-    }
-
-    // ===== REALTIME =====
-    fullname.addEventListener("input", validateFullname);
-    phone.addEventListener("input", validatePhone);
-    email.addEventListener("input", validateEmail);
-    password.addEventListener("input", validatePassword);
-
-    // Tự động ẩn thông báo sau 4 giây
     setTimeout(() => {
         const alert = document.querySelector('.alert-box');
         if (alert) {

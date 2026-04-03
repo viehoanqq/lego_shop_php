@@ -1,5 +1,5 @@
 <style>
-    /* CSS GIAO DIỆN BẢNG */
+    /* ===== CSS GIAO DIỆN BẢNG ===== */
     .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); max-height: 70vh; overflow-y: auto; margin-top: 10px; }
     .lego-table { width: 100%; border-collapse: separate; border-spacing: 0; }
     .lego-table th { position: sticky; top: 0; z-index: 10; background: #f8fafc; padding: 15px; text-align: left; color: #64748b; font-size: 13px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
@@ -10,7 +10,7 @@
     .btn-action { text-decoration: none; padding: 6px 12px; border-radius: 6px; transition: 0.2s; font-weight: 600; color: #3182ce; background: transparent; border: 1px solid #3182ce; display: inline-flex; align-items: center; gap: 5px;}
     .btn-action:hover { background: #ebf8ff; }
 
-    /* BỘ LỌC */
+    /* ===== BỘ LỌC ===== */
     .filter-bar { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; border: 1px solid #edf2f7; }
     .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 160px; }
     .filter-group label { font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -28,6 +28,58 @@
 
     .btn-reset { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; box-sizing: border-box; transition: 0.2s; }
     .btn-reset:hover { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
+
+    /* ====================================================
+       STYLE BADGE TRẠNG THÁI MỚI (Solid Shadow + Outline) 
+       ==================================================== */
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        letter-spacing: 0.5px;
+    }
+
+    /* Đã hủy (Solid Red + Shadow) giống nút "Đã khóa" */
+    .badge-solid-red {
+        background: #e53e3e;
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(229, 62, 62, 0.35);
+        border: 1px solid transparent;
+    }
+
+    /* Đang giao (Solid Blue + Shadow) giống nút "Quản trị viên" */
+    .badge-solid-blue {
+        background: #2b6cb0;
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(43, 108, 176, 0.35);
+        border: 1px solid transparent;
+    }
+
+    /* Giao thành công (Outline Green) giống nút "Hoạt động" */
+    .badge-outline-green {
+        background: #ffffff;
+        color: #059669;
+        border: 1px solid #6ee7b7;
+    }
+
+    /* Chờ xử lý (Outline Orange) */
+    .badge-outline-orange {
+        background: #ffffff;
+        color: #d97706;
+        border: 1px solid #fcd34d;
+    }
+
+    /* Đã xác nhận (Outline Blue) giống nút "Khách hàng" nhưng đổi màu Text xanh */
+    .badge-outline-blue {
+        background: #ffffff;
+        color: #3182ce;
+        border: 1px solid #90cdf4;
+    }
 </style>
 
 <div class="admin-header1" style="margin-bottom: 20px; padding: 5px;">
@@ -93,7 +145,6 @@ $grouped_orders = [];
 
 if ($is_grouped_by_ward && !empty($orders)) {
     foreach ($orders as $item) {
-        // Gom theo 3 cấp độ để giải quyết triệt để vấn đề trùng tên Phường ở các Thành phố khác nhau
         $city = !empty($item['shipping_city']) ? $item['shipping_city'] : 'Chưa rõ TP';
         $district = !empty($item['shipping_district']) ? $item['shipping_district'] : 'Chưa rõ Quận';
         $ward = !empty($item['shipping_ward']) ? $item['shipping_ward'] : 'Chưa rõ Phường';
@@ -102,17 +153,16 @@ if ($is_grouped_by_ward && !empty($orders)) {
         $grouped_orders[$full_location][] = $item;
     }
 } else {
-    // Nếu không chọn sắp xếp theo Phường, gom tất cả vào 1 mảng duy nhất để in ra 1 bảng như bình thường
     $grouped_orders['Tất cả đơn hàng'] = $orders;
 }
 
-// Cấu hình hiển thị trạng thái
+// Cấu hình hiển thị trạng thái bằng các Class CSS mới
 $status_map = [
-    'pending'   => ['label' => 'Chờ xử lý', 'bg' => '#fef3c7', 'color' => '#d97706', 'icon' => 'fa-hourglass-half'],
-    'confirmed' => ['label' => 'Đã xác nhận', 'bg' => '#e0e7ff', 'color' => '#3182ce', 'icon' => 'fa-box'],
-    'shipping'  => ['label' => 'Đang giao', 'bg' => '#e0e7ff', 'color' => '#3182ce', 'icon' => 'fa-truck-fast'],
-    'delivered' => ['label' => 'Thành công', 'bg' => '#d1fae5', 'color' => '#059669', 'icon' => 'fa-check-double'],
-    'cancelled' => ['label' => 'Đã hủy', 'bg' => '#fee2e2', 'color' => '#e53e3e', 'icon' => 'fa-ban']
+    'pending'   => ['label' => 'Chờ xử lý', 'class' => 'badge-outline-orange', 'icon' => 'fa-hourglass-half'],
+    'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'badge-outline-blue', 'icon' => 'fa-box'],
+    'shipping'  => ['label' => 'Đang giao', 'class' => 'badge-solid-blue', 'icon' => 'fa-truck-fast'],
+    'delivered' => ['label' => 'Thành công', 'class' => 'badge-outline-green', 'icon' => 'fa-check-double'],
+    'cancelled' => ['label' => 'Đã hủy', 'class' => 'badge-solid-red', 'icon' => 'fa-ban']
 ];
 $payment_map = [
     'cash'     => 'COD',
@@ -150,8 +200,7 @@ $payment_map = [
                     <?php foreach ($ward_orders as $item): 
                         $st = $item['status'] ?? 'pending';
                         $st_lbl = $status_map[$st]['label'] ?? 'Không xác định';
-                        $st_bg = $status_map[$st]['bg'] ?? '#f1f5f9';
-                        $st_color = $status_map[$st]['color'] ?? '#64748b';
+                        $st_class = $status_map[$st]['class'] ?? 'badge-outline-orange'; // Mặc định class
                         $st_icon = $status_map[$st]['icon'] ?? 'fa-circle-question';
                     ?>
                     <tr>
@@ -178,7 +227,7 @@ $payment_map = [
                             </span>
                         </td>
                         <td style="text-align: center;">
-                            <span style="background: <?= $st_bg ?>; color: <?= $st_color ?>; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(0,0,0,0.05);">
+                            <span class="status-badge <?= $st_class ?>">
                                 <i class="fa-solid <?= $st_icon ?>"></i> <?= $st_lbl ?>
                             </span>
                         </td>

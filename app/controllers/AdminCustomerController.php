@@ -47,7 +47,49 @@ class AdminCustomerController extends Controller {
             'status'  => $filters['status']
         ]));
     }
+    // --- HÀM XÓA TÀI KHOẢN (CÓ KIỂM TRA LỊCH SỬ) ---
+    public function delete($id) {
+        $id = intval($id);
+        
+        // Tránh Admin tự xóa chính mình
+        if ($id == $_SESSION['admin_id']) {
+            set_flash_message('error', 'cannot_delete_self');
+            header("Location: /lego_shop_php/admincustomer");
+            exit();
+        }
 
+        // BƯỚC 1: KIỂM TRA GIAO DỊCH (Gồm cả Đơn mua và Phiếu nhập)
+        if ($this->customerModel->hasTransactions($id)) {
+            // Đã có giao dịch -> Bắt buộc Xóa mềm (Ẩn)
+            if ($this->customerModel->softDeleteAccount($id)) {
+                set_flash_message('msg', 'soft_deleted');
+            } else {
+                set_flash_message('error', 'db');
+            }
+        } else {
+            // Chưa có bất kỳ giao dịch nào -> Xóa vĩnh viễn
+            if ($this->customerModel->deleteAccountForever($id)) {
+                set_flash_message('msg', 'deleted');
+            } else {
+                set_flash_message('error', 'db');
+            }
+        }
+
+        header("Location: /lego_shop_php/admincustomer");
+        exit();
+    }
+    // --- HÀM KHÔI PHỤC TÀI KHOẢN ---
+    public function restore($id) {
+        $id = intval($id);
+        // Khôi phục về trạng thái 'locked' để an toàn
+        if ($this->customerModel->updateStatus($id, 'locked')) {
+            set_flash_message('msg', 'restored');
+        } else {
+            set_flash_message('error', 'db');
+        }
+        header("Location: /lego_shop_php/admincustomer");
+        exit();
+    }
     public function toggleStatus($id) {
         $account = $this->customerModel->getAccountById($id);
         if ($account) {
