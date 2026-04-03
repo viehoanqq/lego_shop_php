@@ -423,6 +423,14 @@
             $result = $db->query($sql);
             return ($result && $result->num_rows > 0);
         }
+        public function isNameExists($name, $exclude_id = null) {
+            $db = $this->getConnection();
+            $name = $db->real_escape_string(trim($name));
+            $sql = "SELECT id FROM products WHERE name = '$name'";
+            if ($exclude_id) $sql .= " AND id != " . intval($exclude_id);
+            $result = $db->query($sql);
+            return ($result && $result->num_rows > 0);
+        }
 
         // Thay đổi trạng thái (Dùng cho cả Ẩn và Xóa mềm)
         // Lưu hoặc Sửa đánh giá (Luôn set status = pending)

@@ -228,6 +228,10 @@ class AdminProductController extends Controller {
                 set_flash_message('error', 'empty');
                 header('Location: /lego_shop_php/adminproduct/add'); exit();
             }
+            if ($this->productModel->isNameExists($data['name'])) {
+                set_flash_message('error', 'name_exists');
+                header('Location: /lego_shop_php/adminproduct/add'); exit();
+            }
             if ($this->productModel->isSkuExists($data['sku'])) {
                 set_flash_message('error', 'sku_exists');
                 header('Location: /lego_shop_php/adminproduct/add'); exit();
@@ -271,6 +275,10 @@ class AdminProductController extends Controller {
                 'release_year'  => !empty($_POST['release_year']) ? intval($_POST['release_year']) : null,
                 'theme_story'   => trim($_POST['theme_story'] ?? '')
             ];
+            if ($this->productModel->isNameExists($data['name'], $id)) {
+                set_flash_message('error', 'name_exists');
+                header('Location: /lego_shop_php/adminproduct/edit/'.$id); exit();
+            }
 
             if ($this->productModel->isSkuExists($data['sku'], $id)) {
                 set_flash_message('error', 'sku_exists');

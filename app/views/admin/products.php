@@ -101,6 +101,7 @@ $session_error = get_flash_message('error');
                     <?php
                         switch($session_error) {
                             case 'empty':          echo "Vui lòng điền đầy đủ các trường bắt buộc!"; break;
+                            case 'name_exists':    echo "Lỗi: Tên sản phẩm này đã tồn tại trong hệ thống!"; break;
                             case 'db':             echo "Lỗi hệ thống: Không thể xử lý dữ liệu."; break;
                             case 'sku_exists':     echo "Lỗi: Mã SKU này đã tồn tại!"; break;
                             case 'already_hidden': echo "Sản phẩm này đã bị khóa!"; break;

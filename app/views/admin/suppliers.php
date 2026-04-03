@@ -14,6 +14,7 @@
     
     .badge-active { background: #d1fae5; color: #059669; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
     .badge-locked { background: #fee2e2; color: #e53e3e; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .badge-hidden { background: #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
     
     .form-container { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 25px; }
     .form-group { margin-bottom: 15px; }
@@ -28,6 +29,12 @@
     .alert-box { padding: 15px; border-radius: 8px; margin-bottom: 10px; color: #fff; font-weight: 600; display: flex; gap: 10px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
     .success-js { background: #38a169; }
     .error-js { background: #e53e3e; }
+
+    .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; margin-bottom: 20px;}
+    .page-link { padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #4a5568; background: #fff; font-weight: 600; transition: 0.2s; }
+    .page-link:hover { background: #edf2f7; }
+    .page-link.active { background: #3182ce; color: #fff; border-color: #3182ce; }
+    .page-link.disabled { color: #a0aec0; pointer-events: none; background: #f8fafc; }
 </style>
 
 <?php 
@@ -41,12 +48,24 @@ if($session_msg || $session_error): ?>
                 <?php 
                     if ($session_msg == 'deleted') echo "Đã xóa vĩnh viễn Nhà cung cấp.";
                     elseif ($session_msg == 'soft_deleted') echo "Nhà cung cấp đã có giao dịch, đã TẠM ẨN.";
+                    elseif ($session_msg == 'restored') echo "Khôi phục Nhà cung cấp thành công!";
                     else echo "Thao tác thành công!";
                 ?>
             </div>
         <?php endif; ?>
         <?php if($session_error): ?>
-            <div class="alert-box error-js"><i class="fa-solid fa-triangle-exclamation"></i> Có lỗi xảy ra, vui lòng kiểm tra lại!</div>
+            <div class="alert-box error-js">
+                <i class="fa-solid fa-triangle-exclamation"></i> 
+                <span>
+                    <?php 
+                        if ($session_error == 'empty') echo "Vui lòng nhập đầy đủ các trường bắt buộc!";
+                        elseif ($session_error == 'name_exists') echo "Lỗi: Tên Nhà cung cấp này đã tồn tại trong hệ thống!";
+                        elseif ($session_error == 'phone_exists') echo "Lỗi: Số điện thoại này đã được sử dụng cho một Nhà cung cấp khác!";
+                        elseif ($session_error == 'email_exists') echo "Lỗi: Email này đã được đăng ký trong hệ thống!";
+                        else echo "Có lỗi xảy ra, vui lòng kiểm tra lại!";
+                    ?>
+                </span>
+            </div>
         <?php endif; ?>
     </div>
 <?php endif; ?>
@@ -57,10 +76,11 @@ if($session_msg || $session_error): ?>
             <h2><i class="fa-solid fa-handshake" style="color: #3182ce;"></i> Quản lý Nhà cung cấp</h2>
             <form action="/lego_shop_php/adminsupplier" method="GET" class="search-form">
                 <input type="text" name="keyword" class="form-control" placeholder="Tìm tên, SĐT, Email..." value="<?= htmlspecialchars($filters['keyword'] ?? '') ?>" style="width: 250px;">
-                <select name="status" class="form-control" onchange="this.form.submit()" style="width: 150px; cursor: pointer;">
+                <select name="status" class="form-control" onchange="this.form.submit()" style="width: 180px; cursor: pointer;">
                     <option value="all">Tất cả trạng thái</option>
                     <option value="active" <?= ($filters['status'] == 'active') ? 'selected' : '' ?>>Đang hợp tác</option>
                     <option value="locked" <?= ($filters['status'] == 'locked') ? 'selected' : '' ?>>Tạm ngừng</option>
+                    <option value="deleted" <?= ($filters['status'] == 'deleted') ? 'selected' : '' ?>>Đã bị ẩn (Xóa mềm)</option>
                 </select>
                 <button type="submit" style="display:none;"></button>
             </form>
@@ -82,7 +102,8 @@ if($session_msg || $session_error): ?>
             <tbody>
                 <?php if(!empty($suppliers)): ?>
                     <?php foreach($suppliers as $s): ?>
-                        <tr style="<?= $s['status'] == 'locked' ? 'opacity: 0.7; background: #f8fafc;' : '' ?>">
+                        <?php $is_hidden = ($s['status'] == 'deleted'); ?>
+                        <tr style="<?= $s['status'] == 'locked' ? 'opacity: 0.8; background: #f8fafc;' : '' ?> <?= $is_hidden ? 'opacity: 0.6; background: #f1f5f9;' : '' ?>">
                             <td>
                                 <strong style="color: #1e293b; font-size: 15px;"><?= htmlspecialchars($s['name']) ?></strong><br>
                                 <span style="color: #94a3b8; font-size: 12px;">ID: #SUP-<?= $s['id'] ?></span>
@@ -97,20 +118,28 @@ if($session_msg || $session_error): ?>
                             <td>
                                 <?php if($s['status'] == 'active'): ?>
                                     <span class="badge-active">Đang hợp tác</span>
-                                <?php else: ?>
+                                <?php elseif($s['status'] == 'locked'): ?>
                                     <span class="badge-locked">Tạm ngừng</span>
+                                <?php else: ?>
+                                    <span class="badge-hidden"><i class="fa-solid fa-eye-slash"></i> Đã bị ẩn</span>
                                 <?php endif; ?>
                             </td>
                             <td style="text-align: center; white-space: nowrap;">
-                                <a href="/lego_shop_php/adminsupplier/edit/<?= $s['id'] ?>" style="color: #3182ce; margin-right: 12px; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-pen"></i> Sửa</a>
-                                
-                                <a href="/lego_shop_php/adminsupplier/toggleStatus/<?= $s['id'] ?>" style="color: <?= $s['status'] == 'active' ? '#dd6b20' : '#38a169' ?>; margin-right: 12px; text-decoration: none; font-weight: 600;" onclick="return confirm('Xác nhận thay đổi trạng thái đối tác này?')">
-                                    <i class="fa-solid <?= $s['status'] == 'active' ? 'fa-lock' : 'fa-lock-open' ?>"></i> <?= $s['status'] == 'active' ? 'Ngừng' : 'Mở lại' ?>
-                                </a>
+                                <?php if($is_hidden): ?>
+                                    <a href="/lego_shop_php/adminsupplier/restore/<?= $s['id'] ?>" style="color: #38a169; text-decoration: none; font-weight: 600;" onclick="return confirm('Bạn muốn khôi phục nhà cung cấp này?')">
+                                        <i class="fa-solid fa-rotate-left"></i> Khôi phục
+                                    </a>
+                                <?php else: ?>
+                                    <a href="/lego_shop_php/adminsupplier/edit/<?= $s['id'] ?>" style="color: #3182ce; margin-right: 12px; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-pen"></i> Sửa</a>
+                                    
+                                    <a href="/lego_shop_php/adminsupplier/toggleStatus/<?= $s['id'] ?>" style="color: <?= $s['status'] == 'active' ? '#dd6b20' : '#38a169' ?>; margin-right: 12px; text-decoration: none; font-weight: 600;" onclick="return confirm('Xác nhận thay đổi trạng thái đối tác này?')">
+                                        <i class="fa-solid <?= $s['status'] == 'active' ? 'fa-lock' : 'fa-lock-open' ?>"></i> <?= $s['status'] == 'active' ? 'Ngừng' : 'Mở lại' ?>
+                                    </a>
 
-                                <a href="/lego_shop_php/adminsupplier/delete/<?= $s['id'] ?>" style="color: #e53e3e; text-decoration: none; font-weight: 600;" onclick="return confirm('Bạn có chắc muốn xóa Nhà cung cấp này? Nếu đã có giao dịch, hệ thống sẽ chỉ ẩn đi để bảo lưu dữ liệu.')">
-                                    <i class="fa-solid fa-trash"></i> Xóa
-                                </a>
+                                    <a href="/lego_shop_php/adminsupplier/delete/<?= $s['id'] ?>" style="color: #e53e3e; text-decoration: none; font-weight: 600;" onclick="return confirm('Bạn có chắc muốn xóa Nhà cung cấp này? Nếu đã có giao dịch, hệ thống sẽ chỉ ẩn đi để bảo lưu dữ liệu.')">
+                                        <i class="fa-solid fa-trash"></i> Xóa
+                                    </a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -120,6 +149,21 @@ if($session_msg || $session_error): ?>
             </tbody>
         </table>
     </div>
+
+    <?php if (isset($totalPages) && $totalPages > 1): ?>
+        <div class="pagination">
+            <a href="?keyword=<?= urlencode($filters['keyword']) ?>&status=<?= $filters['status'] ?>&page=<?= $currentPage - 1 ?>" 
+               class="page-link <?= ($currentPage <= 1) ? 'disabled' : '' ?>"><i class="fa-solid fa-chevron-left"></i></a>
+
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <a href="?keyword=<?= urlencode($filters['keyword']) ?>&status=<?= $filters['status'] ?>&page=<?= $i ?>" 
+                   class="page-link <?= ($currentPage == $i) ? 'active' : '' ?>"><?= $i ?></a>
+            <?php endfor; ?>
+
+            <a href="?keyword=<?= urlencode($filters['keyword']) ?>&status=<?= $filters['status'] ?>&page=<?= $currentPage + 1 ?>" 
+               class="page-link <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>"><i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+    <?php endif; ?>
 
 <?php else: ?>
     <div class="form-container">
@@ -168,21 +212,18 @@ if($session_msg || $session_error): ?>
         const emailInput = document.getElementById("email");
         const addressInput = document.getElementById("address");
 
-        // Hàm hiển thị lỗi
         function showError(input, message) {
             input.classList.add("input-error");
             input.classList.remove("input-success");
             input.nextElementSibling.innerText = message;
         }
 
-        // Hàm xóa lỗi (Thành công)
         function showSuccess(input) {
             input.classList.remove("input-error");
             input.classList.add("input-success");
             input.nextElementSibling.innerText = "";
         }
 
-        // 1. Kiểm tra Tên
         function validateName() {
             const value = nameInput.value.trim();
             if (value === "") { showError(nameInput, "Tên nhà cung cấp không được để trống!"); return false; }
@@ -190,16 +231,14 @@ if($session_msg || $session_error): ?>
             showSuccess(nameInput); return true;
         }
 
-        // 2. Kiểm tra Số điện thoại
         function validatePhone() {
             const value = phoneInput.value.trim();
             const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
             if (value === "") { showError(phoneInput, "Số điện thoại không được để trống!"); return false; }
-            if (!phoneRegex.test(value)) { showError(phoneInput, "Định dạng SĐT không hợp lệ (Bắt đầu bằng 0 và gồm 10 số)!"); return false; }
+            if (!phoneRegex.test(value)) { showError(phoneInput, "Định dạng SĐT không hợp lệ!"); return false; }
             showSuccess(phoneInput); return true;
         }
 
-        // 3. Kiểm tra Email (Tùy chọn, nhưng nếu nhập thì phải đúng chuẩn)
         function validateEmail() {
             const value = emailInput.value.trim();
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -209,34 +248,28 @@ if($session_msg || $session_error): ?>
             showSuccess(emailInput); return true;
         }
 
-        // 4. Kiểm tra Địa chỉ (Tùy chọn)
         function validateAddress() {
             const value = addressInput.value.trim();
             if (value !== "" && value.length < 5) {
-                showError(addressInput, "Địa chỉ quá ngắn, vui lòng nhập rõ hơn."); return false;
+                showError(addressInput, "Địa chỉ quá ngắn."); return false;
             }
             showSuccess(addressInput); return true;
         }
 
-        // Bắt sự kiện gõ phím để báo lỗi ngay lập tức
         nameInput.addEventListener("input", validateName);
         phoneInput.addEventListener("input", validatePhone);
         emailInput.addEventListener("input", validateEmail);
         addressInput.addEventListener("input", validateAddress);
 
-        // Bắt sự kiện khi bấm nút Submit
         form.addEventListener("submit", function(e) {
             const isNameValid = validateName();
             const isPhoneValid = validatePhone();
             const isEmailValid = validateEmail();
             const isAddressValid = validateAddress();
 
-            // Nếu có bất kỳ lỗi nào -> Chặn form không cho gửi
             if (!(isNameValid && isPhoneValid && isEmailValid && isAddressValid)) {
                 e.preventDefault(); 
                 alert("⚠️ Vui lòng kiểm tra và sửa lại các trường bị báo đỏ trước khi lưu!");
-                
-                // Cuộn trang lên chỗ bị lỗi
                 const firstError = document.querySelector(".input-error");
                 if(firstError) firstError.focus();
             }
@@ -245,7 +278,6 @@ if($session_msg || $session_error): ?>
 <?php endif; ?>
 
 <script>
-    // Ẩn thông báo góc phải sau 4 giây
     setTimeout(() => {
         let alerts = document.querySelectorAll('.alert-box');
         alerts.forEach(el => { el.style.transition = "opacity 0.5s ease"; el.style.opacity = "0"; setTimeout(() => el.style.display = 'none', 500); });

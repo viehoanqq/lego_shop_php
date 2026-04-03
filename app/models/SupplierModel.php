@@ -4,16 +4,19 @@ class SupplierModel extends Database {
     // Lấy danh sách có phân trang và tìm kiếm
     public function getSuppliers($keyword = '', $status = 'all', $limit = 10, $offset = 0) {
         $db = $this->getConnection();
-        $where = "WHERE 1=1 AND status != 'deleted'"; // Ẩn những nhà cung cấp đã xóa mềm
+        $where = "WHERE 1=1";
+
+        // Nếu xem tất cả thì ẩn xóa mềm. Nếu cố tình lọc 'deleted' thì hiện xóa mềm.
+        if ($status === 'all') {
+            $where .= " AND status != 'deleted'";
+        } else {
+            $s = $db->real_escape_string($status);
+            $where .= " AND status = '$s'";
+        }
 
         if (!empty($keyword)) {
             $k = $db->real_escape_string(trim($keyword));
             $where .= " AND (name LIKE '%$k%' OR phone LIKE '%$k%' OR email LIKE '%$k%')";
-        }
-
-        if ($status !== 'all') {
-            $s = $db->real_escape_string($status);
-            $where .= " AND status = '$s'";
         }
 
         $sql = "SELECT * FROM suppliers $where ORDER BY id DESC LIMIT $offset, $limit";
@@ -21,23 +24,34 @@ class SupplierModel extends Database {
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    // Đếm tổng số lượng để phân trang
+    // Đếm tổng số lượng (Cập nhật hỗ trợ lọc deleted)
     public function countSuppliers($keyword = '', $status = 'all') {
         $db = $this->getConnection();
-        $where = "WHERE 1=1 and status != 'deleted'"; // Ẩn những nhà cung cấp đã xóa mềm
+        $where = "WHERE 1=1";
+
+        if ($status === 'all') {
+            $where .= " AND status != 'deleted'";
+        } else {
+            $s = $db->real_escape_string($status);
+            $where .= " AND status = '$s'";
+        }
 
         if (!empty($keyword)) {
             $k = $db->real_escape_string(trim($keyword));
             $where .= " AND (name LIKE '%$k%' OR phone LIKE '%$k%' OR email LIKE '%$k%')";
         }
-        if ($status !== 'all') {
-            $s = $db->real_escape_string($status);
-            $where .= " AND status = '$s'";
-        }
 
         $sql = "SELECT COUNT(*) as total FROM suppliers $where";
         $result = $db->query($sql);
         return $result ? $result->fetch_assoc()['total'] : 0;
+    }
+
+    // THÊM MỚI: Hàm khôi phục nhà cung cấp
+    public function restoreSupplier($id) {
+        $db = $this->getConnection();
+        // Khôi phục về trạng thái 'locked' để an toàn, Admin cần thì tự mở lại
+        $sql = "UPDATE suppliers SET status = 'locked' WHERE id = " . intval($id);
+        return $db->query($sql);
     }
 
     // Lấy 1 nhà cung cấp theo ID
@@ -101,6 +115,36 @@ class SupplierModel extends Database {
         $db = $this->getConnection();
         $sql = "UPDATE suppliers SET status = 'deleted' WHERE id = " . intval($id);
         return $db->query($sql);
+    }
+    public function isNameExists($name, $exclude_id = null) {
+        $db = $this->getConnection();
+        $name = $db->real_escape_string(trim($name));
+        $sql = "SELECT id FROM suppliers WHERE name = '$name'";
+        if ($exclude_id) $sql .= " AND id != " . intval($exclude_id);
+        
+        $result = $db->query($sql);
+        return ($result && $result->num_rows > 0);
+    }
+
+    public function isPhoneExists($phone, $exclude_id = null) {
+        $db = $this->getConnection();
+        $phone = $db->real_escape_string(trim($phone));
+        $sql = "SELECT id FROM suppliers WHERE phone = '$phone'";
+        if ($exclude_id) $sql .= " AND id != " . intval($exclude_id);
+        
+        $result = $db->query($sql);
+        return ($result && $result->num_rows > 0);
+    }
+
+    public function isEmailExists($email, $exclude_id = null) {
+        if (empty($email)) return false; // Cho phép email trống
+        $db = $this->getConnection();
+        $email = $db->real_escape_string(trim($email));
+        $sql = "SELECT id FROM suppliers WHERE email = '$email'";
+        if ($exclude_id) $sql .= " AND id != " . intval($exclude_id);
+        
+        $result = $db->query($sql);
+        return ($result && $result->num_rows > 0);
     }
 }
 ?>

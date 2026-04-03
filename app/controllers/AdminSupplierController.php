@@ -77,12 +77,27 @@ class AdminSupplierController extends Controller {
 
             if (empty($data['name']) || empty($data['phone'])) {
                 set_flash_message('error', 'empty');
+                header('Location: /lego_shop_php/adminsupplier/add'); exit;
+            }
+
+            // --- KIỂM TRA TRÙNG LẶP LÚC THÊM MỚI ---
+            if ($this->supplierModel->isNameExists($data['name'])) {
+                set_flash_message('error', 'name_exists');
+                header('Location: /lego_shop_php/adminsupplier/add'); exit;
+            }
+            if ($this->supplierModel->isPhoneExists($data['phone'])) {
+                set_flash_message('error', 'phone_exists');
+                header('Location: /lego_shop_php/adminsupplier/add'); exit;
+            }
+            if (!empty($data['email']) && $this->supplierModel->isEmailExists($data['email'])) {
+                set_flash_message('error', 'email_exists');
+                header('Location: /lego_shop_php/adminsupplier/add'); exit;
+            }
+
+            if ($this->supplierModel->insertSupplier($data)) {
+                set_flash_message('msg', 'success');
             } else {
-                if ($this->supplierModel->insertSupplier($data)) {
-                    set_flash_message('msg', 'success');
-                } else {
-                    set_flash_message('error', 'db');
-                }
+                set_flash_message('error', 'db');
             }
             header('Location: /lego_shop_php/adminsupplier'); exit;
         }
@@ -90,6 +105,7 @@ class AdminSupplierController extends Controller {
 
     public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $id = intval($id);
             $data = [
                 'name'    => trim($_POST['name'] ?? ''),
                 'phone'   => trim($_POST['phone'] ?? ''),
@@ -99,6 +115,20 @@ class AdminSupplierController extends Controller {
 
             if (empty($data['name']) || empty($data['phone'])) {
                 set_flash_message('error', 'empty');
+                header('Location: /lego_shop_php/adminsupplier/edit/'.$id); exit;
+            }
+
+            // --- KIỂM TRA TRÙNG LẶP LÚC SỬA (BỎ QUA ID HIỆN TẠI) ---
+            if ($this->supplierModel->isNameExists($data['name'], $id)) {
+                set_flash_message('error', 'name_exists');
+                header('Location: /lego_shop_php/adminsupplier/edit/'.$id); exit;
+            }
+            if ($this->supplierModel->isPhoneExists($data['phone'], $id)) {
+                set_flash_message('error', 'phone_exists');
+                header('Location: /lego_shop_php/adminsupplier/edit/'.$id); exit;
+            }
+            if (!empty($data['email']) && $this->supplierModel->isEmailExists($data['email'], $id)) {
+                set_flash_message('error', 'email_exists');
                 header('Location: /lego_shop_php/adminsupplier/edit/'.$id); exit;
             }
 
@@ -143,6 +173,17 @@ class AdminSupplierController extends Controller {
             }
         }
         
+        header('Location: /lego_shop_php/adminsupplier');
+        exit;
+    }
+    // THÊM HÀM MỚI: Khôi phục
+    public function restore($id) {
+        $id = intval($id);
+        if ($this->supplierModel->restoreSupplier($id)) {
+            set_flash_message('msg', 'restored');
+        } else {
+            set_flash_message('error', 'db');
+        }
         header('Location: /lego_shop_php/adminsupplier');
         exit;
     }
