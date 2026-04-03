@@ -15,7 +15,7 @@
         padding: 10px; 
     }
     
-    /* CARDS THỐNG KÊ MỚI */
+    /* CARDS THỐNG KÊ */
     .stat-top { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 30px; }
     
     .stat-card { 
@@ -31,7 +31,6 @@
         text-decoration: none; 
         color: inherit; 
     }
-    a.stat-card { cursor: pointer; }
     a.stat-card:hover { 
         transform: translateY(-4px); 
         box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.08), 0 8px 10px -6px rgba(59, 130, 246, 0.04); 
@@ -39,8 +38,6 @@
     }
     
     .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-    
-    /* Đồng nhất 1 tone màu xanh cho TẤT CẢ icon - Xóa Gradient cũ */
     .stat-icon { 
         width: 54px; height: 54px; 
         border-radius: 14px; 
@@ -50,7 +47,7 @@
     }
     
     .stat-info h3 { font-size: 14px; color: #64748b; font-weight: 600; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;}
-    .stat-value { font-size: 32px; font-weight: 800; color: #444444; line-height: 1.2;} /* Text số cũng màu xanh */
+    .stat-value { font-size: 32px; font-weight: 800; color: #444444; line-height: 1.2;} 
     .stat-note { font-size: 13px; font-weight: 600; color: #64748b; display: flex; align-items: center; gap: 6px; margin-top: auto;}
 
     /* KHU VỰC CHART VÀ STATUS */
@@ -88,7 +85,7 @@
     .bar-delivered { background: #3b82f6; } 
     .bar-shipping { background: #93c5fd; } 
     .bar-pending { background: #e2e8f0; } 
-    .bar-cancelled { background: #ffdcdc; } /* Thanh màu đỏ cho Hủy */
+    .bar-cancelled { background: #ffdcdc; } 
     
     .bar-legend { display: flex; flex-direction: column; gap: 16px; }
     .bar-legend-item { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: #475569; align-items: center;}
@@ -105,15 +102,37 @@
     .mini-table tr.clickable-row { cursor: pointer; transition: 0.2s; }
     .mini-table tr.clickable-row:hover { background-color: #f8fafc; }
     .mini-table td { padding: 18px 12px; border-bottom: 1px solid #f8fafc; vertical-align: middle; color: #1e293b; font-size: 14px; font-weight: 600;}
-    .mini-table tr:last-child td { border-bottom: none; }
-    
-    .badge-status { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;}
+
+    /* ====================================================
+       STYLE BADGE ĐỒNG BỘ TRẠNG THÁI (Solid Shadow vs Outline)
+       ==================================================== */
+    .badge-status-dashboard { 
+        padding: 6px 12px; 
+        border-radius: 20px; 
+        font-size: 11px; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 120px; 
+        letter-spacing: 0.5px;
+        gap: 6px;
+    }
+
+    /* NHÓM QUAN TRỌNG (Solid + Shadow) */
+    .badge-solid-red { background: #e53e3e; color: #ffffff; box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3); border: 1px solid transparent; }
+    .badge-solid-orange { background: #dd6b20; color: #ffffff; box-shadow: 0 4px 10px rgba(221, 107, 32, 0.3); border: 1px solid transparent; }
+
+    /* NHÓM BÌNH THƯỜNG / ĐÃ XONG (Outline) */
+    .badge-outline-green { background: #ffffff; color: #2f855a; border: 1px solid #6ee7b7; }
+    .badge-outline-blue { background: #ffffff; color: #3182ce; border: 1px solid #90cdf4; }
+    .badge-outline-teal { background: #ffffff; color: #319795; border: 1px solid #81e6d9; }
     
     @media(max-width: 900px) { .dashboard-middle { grid-template-columns: 1fr; } }
 </style>
 
 <div class="dashboard-wrapper">
-    
     <div class="stat-top">
         <a href="/lego_shop_php/adminorder?search=&status=all&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem tất cả đơn hôm nay">
             <div class="stat-header">
@@ -132,7 +151,6 @@
                     <h3>Doanh thu hôm nay</h3>
                     <div class="stat-value"><?= number_format($tong_thu_nhap, 0, ',', '.') ?>đ</div>
                 </div>
-                
             </div>
             <div class="stat-note"><i class="fa-solid fa-check-circle" style="color: #94a3b8;"></i> Từ các đơn đã giao thành công</div>
         </div>
@@ -143,7 +161,6 @@
                     <h3>Đơn hàng bị hủy</h3>
                     <div class="stat-value"><?= number_format($don_huy_tra) ?> <span style="font-size: 16px; color: #94a3b8; font-weight: 600;">đơn</span></div>
                 </div>
-                
             </div>
             <div class="stat-note"><i class="fa-solid fa-triangle-exclamation" style="color: #94a3b8;"></i> Click để kiểm tra</div>
         </a>
@@ -218,18 +235,18 @@
                         <th>Khách hàng</th>
                         <th>Thanh toán</th>
                         <th>Tổng tiền</th>
-                        <th>Trạng thái</th>
+                        <th style="text-align: center;">Trạng thái</th>
                         <th style="text-align: right;">Thời gian</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php 
                         $badge_map = [
-                            'pending'   => ['lbl' => 'Chờ xử lý',   'bg' => '#f8fafc', 'col' => '#64748b', 'icon' => 'fa-solid fa-hourglass-half'],
-                            'confirmed' => ['lbl' => 'Đã xác nhận', 'bg' => '#e0e7ff', 'col' => '#3730a3', 'icon' => 'fa-solid fa-box-open'],
-                            'shipping'  => ['lbl' => 'Đang giao',   'bg' => '#dbeafe', 'col' => '#1e40af', 'icon' => 'fa-solid fa-truck-fast'],
-                            'delivered' => ['lbl' => 'Thành công',  'bg' => '#eff6ff', 'col' => '#2563eb', 'icon' => 'fa-solid fa-check-double'],
-                            'cancelled' => ['lbl' => 'Đã hủy',      'bg' => '#fef2f2', 'col' => '#ef4444', 'icon' => 'fa-solid fa-ban']
+                            'pending'   => ['lbl' => 'Chờ xử lý',   'class' => 'badge-solid-orange', 'icon' => 'fa-hourglass-half'],
+                            'confirmed' => ['lbl' => 'Đã xác nhận', 'class' => 'badge-outline-teal', 'icon' => 'fa-box-open'],
+                            'shipping'  => ['lbl' => 'Đang giao',   'class' => 'badge-outline-blue', 'icon' => 'fa-truck-fast'],
+                            'delivered' => ['lbl' => 'Thành công',  'class' => 'badge-outline-green', 'icon' => 'fa-check-double'],
+                            'cancelled' => ['lbl' => 'Đã hủy',      'class' => 'badge-solid-red', 'icon' => 'fa-ban']
                         ];
                     ?>
                     
@@ -250,9 +267,9 @@
                                 <?= ($pm == 'cash' ? 'Tiền mặt' : 'Chuyển khoản') ?>
                             </td>
                             <td style="font-weight: 800; font-size: 15px; color: #1e293b;"><?= number_format($don['tong_tien'], 0, ',', '.') ?>đ</td>
-                            <td>
-                                <span class="badge-status" style="background: <?= $badge['bg'] ?>; color: <?= $badge['col'] ?>;">
-                                    <i class="<?= $badge['icon'] ?>"></i> <?= $badge['lbl'] ?>
+                            <td style="text-align: center;">
+                                <span class="badge-status-dashboard <?= $badge['class'] ?>">
+                                    <i class="fa-solid <?= $badge['icon'] ?>"></i> <?= $badge['lbl'] ?>
                                 </span>
                             </td>
                             <td style="text-align: right; color: #64748b; font-size: 13px; font-weight: 600;"><i class="fa-regular fa-clock"></i> <?= $don['thoi_gian'] ?></td>

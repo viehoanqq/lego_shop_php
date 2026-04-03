@@ -13,6 +13,7 @@
     flex-direction: column;
     gap: 20px;
     margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
 }
 
 .header-title h2 {
@@ -38,7 +39,7 @@
 
 .search-group input {
     width: 100%;
-    padding: 12px 110px 12px 45px; /* chừa chỗ cho button */
+    padding: 12px 110px 12px 45px; 
     border-radius: 10px;
     border: 1px solid #e2e8f0;
     font-size: 14px;
@@ -58,7 +59,6 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 2;
-
     background: #3182ce;
     color: white;
     border: none;
@@ -72,11 +72,6 @@
     align-items: center;
 }
 
-.search-group .btn-search-inside:hover {
-    background: #2b6cb0;
-}
-
-/* icon */
 .search-group i {
     position: absolute;
     left: 12px;
@@ -85,7 +80,6 @@
     color: #a0aec0;
 }
 
-/* select */
 .filter-input {
     padding: 10px 15px;
     border: 1px solid #e2e8f0;
@@ -100,6 +94,7 @@
     background: white;
     border-radius: 16px;
     overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
 .lego-table {
@@ -111,20 +106,20 @@
     background-color: #f8fafc;
     padding: 16px;
     text-align: left;
+    color: #64748b;
+    font-size: 13px;
+    text-transform: uppercase;
 }
 
 .lego-table td {
-    padding: 20px 8px;
-    padding-left: 4px;
+    padding: 20px 16px;
     border-bottom: 1px solid #edf2f7;
-}
-
-.lego-table td div {
-    margin-left: 0;
+    vertical-align: middle;
 }
 
 .star-rating {
     color: #ecc94b;
+    margin-bottom: 5px;
 }
 
 .user-avatar {
@@ -139,21 +134,35 @@
     font-weight: bold;
 }
 
+/* ====================================================
+   STYLE BADGE TRẠNG THÁI THEO CHUẨN MỚI
+   ==================================================== */
 .status-badge {
-    padding: 4px 12px;
-    border-radius: 99px;
-    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
     font-weight: 700;
+    text-transform: uppercase;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 100px; /* Ép kích thước bằng nhau */
+    letter-spacing: 0.5px;
 }
 
+/* Hiển thị (Outline Green) */
 .status-approved {
-    background-color: #f0fff4;
+    background-color: #ffffff;
     color: #2f855a;
+    border: 1px solid #9ae6b4;
 }
 
+/* Đang Ẩn (Solid Red + Shadow) */
 .status-hidden {
-    background-color: #fff5f5;
-    color: #c53030;
+    background-color: #e53e3e;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
+    border: 1px solid transparent;
 }
 
 .action-btn {
@@ -165,6 +174,8 @@
     border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
+    margin: 0 2px;
+    transition: 0.2s;
 }
 
 .btn-toggle {
@@ -177,11 +188,9 @@
     color: white;
 }
 
-/* ===== DELETE BUTTON ===== */
 .btn-delete {
     background-color: #fff5f5;
     color: #e53e3e;
-    transition: all 0.2s ease;
 }
 
 .btn-delete:hover {
@@ -207,6 +216,13 @@
     margin-bottom: 10px;
     color: #fff;
     font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
 .success-js { background: #38a169; }
@@ -221,15 +237,14 @@ $session_error = get_flash_message('error');
 
 <?php if($session_msg || $session_error): ?>
 <div id="status-alert-container">
-
     <?php if($session_msg): ?>
         <div class="alert-box success-js">
             <i class="fa-solid fa-circle-check"></i>
             <span>
                 <?php
                     switch($session_msg) {
-                        case 'deleted':  echo "Đã xóa thành công!"; break;
-                        case 'updated':  echo "Cập nhật thành công!"; break;
+                        case 'deleted':  echo "Đã xóa đánh giá thành công!"; break;
+                        case 'updated':  echo "Đã cập nhật trạng thái hiển thị!"; break;
                         default:         echo "Thao tác thành công!";
                     }
                 ?>
@@ -244,48 +259,39 @@ $session_error = get_flash_message('error');
                 <?php
                     switch($session_error) {
                         case 'notfound': echo "Không tìm thấy dữ liệu!"; break;
-                        case 'db':       echo "Lỗi hệ thống!"; break;
-                        default:         echo "Có lỗi xảy ra!";
+                        case 'db':       echo "Lỗi kết nối cơ sở dữ liệu!"; break;
+                        default:         echo "Có lỗi xảy ra, vui lòng thử lại!";
                     }
                 ?>
             </span>
         </div>
     <?php endif; ?>
-
 </div>
 <?php endif; ?>
 
 <div class="review-management-container">
     <div class="header">
         <div class="header-title">
-            <h2><i class="fa-solid fa-star" style="color: #ecc94b;"></i> Quản lý Đánh giá</h2>
-            <p>Hiện có <?= count($reviews) ?> phản hồi từ khách hàng trong hệ thống.</p>
-
             <form action="/lego_shop_php/adminreview" method="GET" 
                   style="display: flex; gap: 12px; margin-top: 20px; width: 100%; align-items: center;">
 
-                <!-- SEARCH -->
                 <div class="search-group">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" name="keyword" 
                            value="<?= htmlspecialchars($keyword ?? '') ?>" 
                            placeholder="Tìm theo tên khách hàng hoặc sản phẩm...">
                     
-                    <button type="submit" class="btn-search-inside">
-                        Tìm kiếm
-                    </button>
+                    <button type="submit" class="btn-search-inside">Tìm kiếm</button>
                 </div>
 
-                <!-- FILTER -->
                 <select name="rating" class="filter-input" onchange="this.form.submit()">
-                    <option value="">Tất cả sao</option>
+                    <option value="">Tất cả mức sao</option>
                     <?php for($i=5; $i>=1; $i--): ?>
                         <option value="<?= $i ?>" <?= (isset($rating) && $rating == $i) ? 'selected' : '' ?>>
                             <?= $i ?> Sao
                         </option>
                     <?php endfor; ?>
                 </select>
-
             </form>
         </div>
     </div>
@@ -306,20 +312,20 @@ $session_error = get_flash_message('error');
                     <?php foreach ($reviews as $r): ?>
                     <tr>
                         <td>
-                            <div style="display: flex; gap: 12px;">
+                            <div style="display: flex; gap: 12px; align-items: center;">
                                 <div class="user-avatar">
                                     <?= mb_substr($r['fullname'], 0, 1) ?: 'U' ?>
                                 </div>
                                 <div>
-                                    <div><?= htmlspecialchars($r['fullname']) ?></div>
-                                    <small><?= date('d/m/Y H:i', strtotime($r['created_at'])) ?></small>
+                                    <div style="font-weight: 700; color: #2d3748;"><?= htmlspecialchars($r['fullname']) ?></div>
+                                    <small style="color: #a0aec0;"><?= date('d/m/Y H:i', strtotime($r['created_at'])) ?></small>
                                 </div>
                             </div>
                         </td>
 
                         <td>
-                            <b><?= htmlspecialchars($r['product_name']) ?></b><br>
-                            <small>ID: #<?= $r['product_id'] ?></small>
+                            <div style="font-weight: 600; color: #3182ce;"><?= htmlspecialchars($r['product_name']) ?></div>
+                            <small style="color: #a0aec0;">ID: #<?= $r['product_id'] ?></small>
                         </td>
 
                         <td>
@@ -328,32 +334,39 @@ $session_error = get_flash_message('error');
                                     <i class="<?= $i <= $r['rating'] ? 'fa-solid' : 'fa-regular' ?> fa-star"></i>
                                 <?php endfor; ?>
                             </div>
-                            <?= nl2br(htmlspecialchars($r['comment'])) ?>
+                            <div style="color: #4a5568; line-height: 1.5; font-size: 14px;">
+                                <?= nl2br(htmlspecialchars($r['comment'])) ?>
+                            </div>
                         </td>
 
                         <td style="text-align:center;">
                             <span class="status-badge <?= $r['status']=='approved'?'status-approved':'status-hidden' ?>">
-                                <?= $r['status']=='approved'?'Hiển thị':'Ẩn' ?>
+                                <?= $r['status']=='approved'?'Hiển thị':'Đang Ẩn' ?>
                             </span>
                         </td>
 
                         <td style="text-align:center;">
-                            <a href="/lego_shop_php/adminreview/toggleStatus?id=<?= $r['id'] ?>&status=<?= $r['status'] ?>" 
-                               class="action-btn btn-toggle">
-                                <i class="fa-solid <?= $r['status']=='approved'?'fa-eye-slash':'fa-eye' ?>"></i>
-                            </a>
-                            <a href="/lego_shop_php/adminreview/delete/<?= $r['id'] ?>" 
-                                class="action-btn btn-delete"
-                                onclick="return confirm('Bạn có chắc muốn xóa đánh giá này không?')"
-                                title="Xóa">
+                            <div style="display: flex; justify-content: center; gap: 4px;">
+                                <a href="/lego_shop_php/adminreview/toggleStatus?id=<?= $r['id'] ?>&status=<?= $r['status'] ?>" 
+                                   class="action-btn btn-toggle" title="<?= $r['status']=='approved'?'Ẩn đánh giá':'Hiện đánh giá' ?>">
+                                    <i class="fa-solid <?= $r['status']=='approved'?'fa-eye-slash':'fa-eye' ?>"></i>
+                                </a>
+                                <a href="/lego_shop_php/adminreview/delete/<?= $r['id'] ?>" 
+                                    class="action-btn btn-delete"
+                                    onclick="return confirm('Bạn có chắc muốn xóa đánh giá này không? Thao tác này không thể hoàn tác!')"
+                                    title="Xóa vĩnh viễn">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="5" style="text-align:center;">Không có dữ liệu</td>
+                        <td colspan="5" style="text-align:center; padding: 50px; color: #a0aec0;">
+                            <i class="fa-regular fa-face-frown" style="font-size: 30px; display: block; margin-bottom: 10px;"></i>
+                            Không tìm thấy đánh giá nào.
+                        </td>
                     </tr>
                 <?php endif; ?>
             </tbody>

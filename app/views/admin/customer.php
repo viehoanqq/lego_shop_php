@@ -38,7 +38,18 @@
     .custom-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; vertical-align: middle;}
 
     /* ĐÃ LÀM NỔI BẬT QUẢN TRỊ VIÊN VÀ ĐÃ KHÓA */
-    .badge-custom { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; letter-spacing: 0.5px;}
+    .badge-custom { 
+        padding: 6px 12px; 
+        border-radius: 20px; 
+        font-size: 11px; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        display: inline-flex;       /* Chuyển sang flex để căn giữa */
+        justify-content: center;    /* Căn giữa chữ bên trong nút */
+        align-items: center;
+        min-width: 120px;           /* Ép kích thước tất cả các nút đều bằng 120px */
+        letter-spacing: 0.5px;
+    }
     .status-active { background: #f0fff4; color: #2f855a; border: 1px solid #9ae6b4; }
     
     .status-locked { background: #e53e3e; color: #fff; border: none; box-shadow: 0 2px 5px rgba(229, 62, 62, 0.3); } /* Đỏ đậm */

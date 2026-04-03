@@ -30,7 +30,7 @@
     .btn-reset:hover { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
 
     /* ====================================================
-       STYLE BADGE TRẠNG THÁI MỚI (Solid Shadow + Outline) 
+       STYLE BADGE TRẠNG THÁI (Phân chia Solid & Outline) 
        ==================================================== */
     .status-badge {
         padding: 6px 16px;
@@ -39,52 +39,48 @@
         font-weight: 700;
         text-transform: uppercase;
         display: inline-flex;
+        justify-content: center;
         align-items: center;
+        min-width: 130px; /* Đảm bảo bằng nhau */
         gap: 6px;
         letter-spacing: 0.5px;
     }
 
-    /* Đã hủy (Solid Red + Shadow) giống nút "Đã khóa" */
+    /* NHÓM 1: TRẠNG THÁI QUAN TRỌNG CẦN CHÚ Ý (Solid + Shadow) */
     .badge-solid-red {
         background: #e53e3e;
         color: #ffffff;
         box-shadow: 0 4px 10px rgba(229, 62, 62, 0.35);
         border: 1px solid transparent;
     }
-
-    /* Đang giao (Solid Blue + Shadow) giống nút "Quản trị viên" */
-    .badge-solid-blue {
-        background: #2b6cb0;
+    .badge-solid-orange {
+        background: #dd6b20;
         color: #ffffff;
-        box-shadow: 0 4px 10px rgba(43, 108, 176, 0.35);
+        box-shadow: 0 4px 10px rgba(221, 107, 32, 0.35);
         border: 1px solid transparent;
     }
 
-    /* Giao thành công (Outline Green) giống nút "Hoạt động" */
+    /* NHÓM 2: TRẠNG THÁI BÌNH THƯỜNG / ĐÃ XONG (Outline + Chữ màu) */
     .badge-outline-green {
         background: #ffffff;
         color: #059669;
         border: 1px solid #6ee7b7;
     }
-
-    /* Chờ xử lý (Outline Orange) */
-    .badge-outline-orange {
-        background: #ffffff;
-        color: #d97706;
-        border: 1px solid #fcd34d;
-    }
-
-    /* Đã xác nhận (Outline Blue) giống nút "Khách hàng" nhưng đổi màu Text xanh */
     .badge-outline-blue {
         background: #ffffff;
         color: #3182ce;
         border: 1px solid #90cdf4;
     }
+    .badge-outline-teal {
+        background: #ffffff;
+        color: #319795;
+        border: 1px solid #81e6d9;
+    }
 </style>
 
 <div class="admin-header1" style="margin-bottom: 20px; padding: 5px;">
-    <h2 style="margin:0; color: #1a202c; font-weight: 800;"><i class="fa-solid fa-clipboard-list" style="color: #3182ce;"></i> QUẢN LÝ ĐƠN HÀNG</h2>
-    <small style="color: #718096; font-size: 13px;">Trạng thái và Sắp xếp sẽ tự động lọc, chọn ngày vui lòng bấm nút "Lọc"</small>
+    
+    
 </div>
 
 <form method="GET" action="/lego_shop_php/adminorder" class="filter-bar" id="filterForm">
@@ -158,11 +154,14 @@ if ($is_grouped_by_ward && !empty($orders)) {
 
 // Cấu hình hiển thị trạng thái bằng các Class CSS mới
 $status_map = [
-    'pending'   => ['label' => 'Chờ xử lý', 'class' => 'badge-outline-orange', 'icon' => 'fa-hourglass-half'],
-    'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'badge-outline-blue', 'icon' => 'fa-box'],
-    'shipping'  => ['label' => 'Đang giao', 'class' => 'badge-solid-blue', 'icon' => 'fa-truck-fast'],
-    'delivered' => ['label' => 'Thành công', 'class' => 'badge-outline-green', 'icon' => 'fa-check-double'],
-    'cancelled' => ['label' => 'Đã hủy', 'class' => 'badge-solid-red', 'icon' => 'fa-ban']
+    // Quan trọng cần xử lý -> Nổi khối
+    'pending'   => ['label' => 'Chờ xử lý', 'class' => 'badge-solid-orange', 'icon' => 'fa-hourglass-half'],
+    'cancelled' => ['label' => 'Đã hủy', 'class' => 'badge-solid-red', 'icon' => 'fa-ban'],
+    
+    // Đang tiến hành hoặc đã xong -> Viền mảnh
+    'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'badge-outline-teal', 'icon' => 'fa-box'],
+    'shipping'  => ['label' => 'Đang giao', 'class' => 'badge-outline-blue', 'icon' => 'fa-truck-fast'],
+    'delivered' => ['label' => 'Thành công', 'class' => 'badge-outline-green', 'icon' => 'fa-check-double']
 ];
 $payment_map = [
     'cash'     => 'COD',

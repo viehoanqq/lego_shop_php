@@ -191,7 +191,7 @@
                 <div class="filter-highlight-box">
                     <span style="font-size: 13px; font-weight: 700; color: #ffffff;">Tồn dưới :</span>
                     <input type="number" name="custom_threshold" placeholder="Nhập số lượng..." value="<?= htmlspecialchars($_GET['custom_threshold'] ?? '') ?>" min="0">
-                    <button type="submit" class="btn-filter-action" style="background: #2b6cb0; height: 32px; padding: 0 15px; border-radius: 6px;">
+                    <button type="submit" class="btn-filter-action" style="background: #ffffff; color: #e53e3e;height: 32px; padding: 0 15px; border-radius: 6px;">
                         Lọc <i class="fa-solid fa-filter"></i>
                     </button>
                 </div>
@@ -240,7 +240,7 @@
                             <?php elseif ($p['stock_quantity'] <= $p['min_stock_level']): ?>
                                 <span class="stock-badge stock-low"><i class="fa-solid fa-triangle-exclamation"></i> SẮP HẾT</span>
                             <?php else: ?>
-                                <span class="stock-badge" style="background: #2f855a; color: #ffffff; border: 1px solid #2f855a; width: 120px; height: auto; text-align: center; font-size: 13px"><i class="fa-solid fa-check"></i> CÒN HÀNG</span>
+                                <span class="stock-badge" style="background: #bbffdd; color: #050000; border: 1px solid #bbffdd; width: 120px; height: auto; text-align: center; font-size: 13px"><i class="fa-solid fa-check"></i> CÒN HÀNG</span>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -353,7 +353,7 @@
 </div>
 
 <script>
-    const productsData = <?= json_encode($all_products ?? []) ?>;
+    var productsData = <?= json_encode($all_products ?? []) ?>;
 
     // --- 1. JS XỬ LÝ TABS ---
     function switchTab(tabId) {
@@ -363,7 +363,7 @@
         document.getElementById(`tab-${tabId}`).classList.add('active');
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
+    var urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('custom_threshold') || urlParams.has('keyword') || urlParams.get('tab') === 'alerts') {
         switchTab('alerts');
     }

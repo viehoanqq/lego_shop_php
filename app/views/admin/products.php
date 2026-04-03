@@ -21,13 +21,14 @@
 
     .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); max-height: 70vh; overflow-y: auto; }
     .lego-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-    .lego-table th { position: sticky; top: 0; z-index: 10; background: #f8fafc; padding: 14px; text-align: left; font-size: 12px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e2e8f0; }
-    .lego-table td { padding: 14px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .lego-table th { position: sticky; top: 0; z-index: 10; background: #f8fafc; padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
+    .lego-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .table-container::-webkit-scrollbar { width: 6px; }
+    .table-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
 
     .product-cell { display: flex; align-items: center; gap: 12px; }
     .img-product { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0; }
     .price-tag { color: #2b6cb0; font-weight: 700; }
-    .status-pill { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
 
     .stock-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
     .stock-low { background: #fff5f5; color: #c53030; }
@@ -35,6 +36,45 @@
     .stock-empty { background: #fff5f5; color: #c53030; }
     .btn-action { text-decoration: none; padding: 6px; border-radius: 6px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center;}
     .btn-action:hover { background: #f1f5f9; }
+
+    /* ====================================================
+       STYLE BADGE TRẠNG THÁI (Đồng bộ Visual Hierarchy) 
+       ==================================================== */
+    .status-pill {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 110px; /* Kích thước bằng nhau */
+        letter-spacing: 0.5px;
+    }
+
+    /* Đang bán (Outline Green) */
+    .status-active-ui {
+        background: #ffffff;
+        color: #2f855a;
+        border: 1px solid #6ee7b7;
+    }
+
+    /* Tạm khóa (Solid Orange + Shadow) */
+    .status-locked-ui {
+        background: #dd6b20;
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(221, 107, 32, 0.3);
+        border: 1px solid transparent;
+    }
+
+    /* Đã bị ẩn (Solid Red + Shadow) */
+    .status-hidden-ui {
+        background: #e53e3e;
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
+        border: 1px solid transparent;
+    }
 
     /* ===== ALERT ===== */
     #status-alert-container { position: fixed; top: 20px; right: 20px; z-index: 9999; width: 320px; }
@@ -119,7 +159,6 @@ $session_error = get_flash_message('error');
 <?php if(!isset($is_form) || $is_form === false): ?>
     <div class="header">
         <div class="header-left">
-            <h2><i class="fa-solid fa-boxes-stacked" style="color: #3182ce;"></i> Quản lý Sản Phẩm</h2>
             <form action="/lego_shop_php/adminproduct" method="GET" class="search-form">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -154,7 +193,7 @@ $session_error = get_flash_message('error');
                     <th>Giá bán</th>
                     <th>Thông số</th>
                     <th>Tồn kho</th>
-                    <th>Trạng thái</th>
+                    <th style="text-align: center;">Trạng thái</th>
                     <th style="text-align: center;">Thao tác</th>
                 </tr>
             </thead>
@@ -185,22 +224,22 @@ $session_error = get_flash_message('error');
                                 <span class="stock-badge stock-ok">Còn: <?= $p['stock_quantity'] ?></span>
                             <?php endif; ?>
                         </td>
-                        <td>
+                        <td style="text-align: center;">
                             <?php if($p['status'] == 1): ?>
-                                <span style="color: #38a169; font-size: 13px; font-weight: 600;"><span class="status-pill" style="background:#48bb78"></span>Đang bán</span>
+                                <span class="status-pill status-active-ui">Đang bán</span>
                             <?php elseif($p['status'] == 2): ?>
-                                <span style="color: #dd6b20; font-size: 13px; font-weight: 600;"><span class="status-pill" style="background:#ed8936"></span>Tạm khóa</span>
+                                <span class="status-pill status-locked-ui">Tạm khóa</span>
                             <?php elseif($p['status'] == 3): ?>
-                                <span style="color: #718096; font-size: 13px; font-weight: 600;"><span class="status-pill" style="background:#a0aec0"></span>Đã bị ẩn</span>
+                                <span class="status-pill status-hidden-ui">Đã bị ẩn</span>
                             <?php endif; ?>
                         </td>
                         <td>
                             <div style="display: flex; gap: 8px; justify-content: center;">
-                                <a href="/lego_shop_php/adminproduct/edit/<?= $p['id'] ?>" class="btn-action" title="Chỉnh sửa" style="color: #3182ce;">
+                                <a href="/lego_shop_php/adminproduct/edit/<?= $p['id'] ?>" class="btn-action" title="Chỉnh sửa" style="color: #3182ce; border-color: #3182ce;">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
                                 <?php if($p['status'] == 3): ?>
-                                    <a href="/lego_shop_php/adminproduct/restore/<?= $p['id'] ?>" class="btn-action" style="color: #38a169;" title="Khôi phục bán lại" onclick="return confirm('Bạn muốn khôi phục sản phẩm này?')">
+                                    <a href="/lego_shop_php/adminproduct/restore/<?= $p['id'] ?>" class="btn-action" style="color: #38a169; border-color: #38a169;" title="Khôi phục bán lại" onclick="return confirm('Bạn muốn khôi phục sản phẩm này?')">
                                         <i class="fa-solid fa-rotate-left"></i>
                                     </a>
                                 <?php else: ?>
@@ -209,10 +248,10 @@ $session_error = get_flash_message('error');
                                         $btnIcon  = $isActive ? 'fa-eye-slash' : 'fa-eye';
                                         $btnColor = $isActive ? '#dd6b20' : '#38a169'; 
                                     ?>
-                                    <a href="/lego_shop_php/adminproduct/toggleStatus/<?= $p['id'] ?>?current=<?= $p['status'] ?>" class="btn-action" style="color: <?= $btnColor ?>;" title="<?= $isActive ? 'Ẩn / Khóa' : 'Hiện / Mở bán' ?>">
+                                    <a href="/lego_shop_php/adminproduct/toggleStatus/<?= $p['id'] ?>?current=<?= $p['status'] ?>" class="btn-action" style="color: <?= $btnColor ?>; border-color: <?= $btnColor ?>;" title="<?= $isActive ? 'Ẩn / Khóa' : 'Hiện / Mở bán' ?>">
                                         <i class="fa-solid <?= $btnIcon ?>"></i>
                                     </a>
-                                    <a href="/lego_shop_php/adminproduct/delete/<?= $p['id'] ?>" class="btn-action" style="color: #e53e3e;" onclick="return confirm('Bạn có chắc muốn xóa/ẩn sản phẩm này?')">
+                                    <a href="/lego_shop_php/adminproduct/delete/<?= $p['id'] ?>" class="btn-action" style="color: #e53e3e; border-color: #e53e3e;" onclick="return confirm('Bạn có chắc muốn xóa/ẩn sản phẩm này?')">
                                         <i class="fa-solid fa-trash"></i>
                                     </a>
                                 <?php endif; ?>
@@ -244,26 +283,21 @@ $session_error = get_flash_message('error');
         </h3>
         
         <form id="productForm" action="<?= isset($product) ? '/lego_shop_php/adminproduct/update/'.$product['id'] : '/lego_shop_php/adminproduct/store' ?>" method="POST" enctype="multipart/form-data">
-            
             <div style="display: flex; gap: 25px; flex-wrap: wrap;">
-                
                 <div style="flex: 2; min-width: 400px;">
                     <div class="section-block">
                         <h4 class="section-title-form">1. Thông tin chung</h4>
-                        
                         <div class="form-group">
                             <label>Tên sản phẩm LEGO <span style="color:red">*</span></label>
                             <input type="text" id="name" name="name" class="form-control" value="<?= htmlspecialchars($product['name'] ?? '') ?>" placeholder="VD: Millennium Falcon">
                             <small class="error-text"></small>
                         </div>
-
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <div class="form-group">
                                 <label>Mã SKU <span style="color:red">*</span></label>
                                 <input type="text" id="sku" name="sku" class="form-control" value="<?= htmlspecialchars($product['sku'] ?? '') ?>" placeholder="VD: SW-75192">
                                 <small class="error-text"></small>
                             </div>
-                            
                             <div class="form-group">
                                 <label>Dòng LEGO (Danh mục) <span style="color:red">*</span></label>
                                 <select name="category_id" id="category_id" class="form-control">
@@ -275,7 +309,6 @@ $session_error = get_flash_message('error');
                                 <small class="error-text"></small>
                             </div>
                         </div>
-
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <?php if(!isset($product)): ?>
                             <div class="form-group">
@@ -287,7 +320,6 @@ $session_error = get_flash_message('error');
                             </div>
                             <?php endif; ?>
                         </div>
-
                         <div class="form-group" style="margin-bottom: 0;">
                             <label>Mô tả tổng quan</label>
                             <textarea name="description" class="form-control" rows="3" placeholder="Nhập mô tả sản phẩm..."><?= htmlspecialchars($product['description'] ?? '') ?></textarea>
@@ -297,10 +329,8 @@ $session_error = get_flash_message('error');
                             <textarea name="theme_story" class="form-control" rows="2" placeholder="Nhập câu chuyện đằng sau bộ LEGO này..."><?= htmlspecialchars($product['theme_story'] ?? '') ?></textarea>
                         </div>
                     </div>
-
                     <div class="section-block" style="background: #fffbeb; border-color: #fde68a;">
                         <h4 class="section-title-form" style="color: #92400e; border-color: #fde68a;">2. Chi tiết kỹ thuật</h4>
-                        
                         <?php 
                             $dim = $product['dimensions'] ?? '';
                             $l = ''; $w = ''; $h = '';
@@ -312,7 +342,6 @@ $session_error = get_flash_message('error');
                             }
                             $age = isset($product['age_range']) ? intval($product['age_range']) : '';
                         ?>
-
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
                             <div class="form-group">
                                 <label>Số mảnh ghép <span style="color:red">*</span></label>
@@ -328,7 +357,6 @@ $session_error = get_flash_message('error');
                                 <label>Năm phát hành</label>
                                 <input type="number" id="release_year" name="release_year" class="form-control" value="<?= $product['release_year'] ?? date('Y') ?>">
                             </div>
-                            
                             <div class="form-group">
                                 <label>Hãng sản xuất</label>
                                 <input type="text" name="manufacturer" class="form-control" value="<?= htmlspecialchars($product['manufacturer'] ?? 'The LEGO Group') ?>">
@@ -338,7 +366,6 @@ $session_error = get_flash_message('error');
                                 <input type="text" name="material" class="form-control" value="<?= htmlspecialchars($product['material'] ?? 'Nhựa ABS an toàn') ?>">
                             </div>
                         </div>
-                        
                         <div class="form-group" style="margin-top: 15px; margin-bottom: 0;">
                             <label>Kích thước (Dài x Rộng x Cao) - cm</label>
                             <div style="display: flex; gap: 5px;">
@@ -349,12 +376,9 @@ $session_error = get_flash_message('error');
                         </div>
                     </div>
                 </div>
-
                 <div style="flex: 1; min-width: 300px;">
-                    
                     <div class="section-block" style="background: #f0fff4; border-color: #c6f6d5;">
                         <h4 class="section-title-form" style="color: #276749; border-color: #c6f6d5;">3. Lợi nhuận & Cấu hình</h4>
-
                         <div class="form-group" style="margin-bottom: 0;">
                             <label>Tỉ lệ lợi nhuận mong muốn (%)</label>
                             <div style="display: flex;">
@@ -365,7 +389,6 @@ $session_error = get_flash_message('error');
                                        <?= isset($product) ? 'readonly title="Vui lòng sang trang Quản lý Giá bán để thay đổi"' : '' ?>>
                                 <span class="input-group-text">%</span>
                             </div>
-                            
                             <?php if(isset($product)): ?>
                                 <small style="color:#e53e3e; margin-top:6px; font-weight: 600;">
                                     <i class="fa-solid fa-lock" style="margin-right: 4px;"></i> Đã khóa. Vui lòng cập nhật qua <a href="/lego_shop_php/adminprice" style="color: #3182ce; text-decoration: underline;">Quản lý Giá bán</a>.
@@ -375,7 +398,6 @@ $session_error = get_flash_message('error');
                             <?php endif; ?>
                         </div>
                     </div>
-
                     <div class="section-block">
                         <h4 class="section-title-form">4. Hình ảnh đại diện</h4>
                         <div class="form-group" style="margin-bottom: 0;">
@@ -396,9 +418,7 @@ $session_error = get_flash_message('error');
                         </div>
                     </div>
                 </div>
-
             </div>
-            
             <div style="display: flex; gap: 12px; margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
                 <button type="submit" class="btn-submit"><i class="fa-solid fa-floppy-disk"></i> Lưu toàn bộ thông tin</button>
                 <a href="/lego_shop_php/adminproduct" style="padding: 10px 20px; color: #475569; text-decoration: none; font-weight: 600; background: #edf2f7; border-radius: 8px;">Quay lại</a>
@@ -413,7 +433,7 @@ $session_error = get_flash_message('error');
         alerts.forEach(el => {
             el.style.transition = "opacity 0.5s ease";
             el.style.opacity = "0";
-            setTimeout(() => el.style.display = 'none', 500);
+            setTimeout(() => el.remove(), 500);
         });
     }, 5000);
 
@@ -448,7 +468,6 @@ $session_error = get_flash_message('error');
             input.nextElementSibling.innerText = "";
         }
 
-        // Báo lỗi real-time khi gõ/nhập liệu
         function validateName() {
             if (nameInput.value.trim() === "") { showError(nameInput, "Tên không được trống!"); return false; }
             else { showSuccess(nameInput); return true; }
@@ -476,7 +495,6 @@ $session_error = get_flash_message('error');
             else { showSuccess(ageInput); return true; }
         }
 
-        // Gắn sự kiện để kiểm tra liên tục
         nameInput.addEventListener("input", validateName);
         skuInput.addEventListener("input", validateSku);
         piecesInput.addEventListener("input", validatePieces);
@@ -484,7 +502,6 @@ $session_error = get_flash_message('error');
         ageInput.addEventListener("input", validateAge);
 
         form.addEventListener("submit", function(e) {
-            // Chạy kiểm tra một lượt tất cả
             const vName = validateName();
             const vSku = validateSku();
             const vPieces = validatePieces();
@@ -492,7 +509,6 @@ $session_error = get_flash_message('error');
             const vAge = validateAge();
 
             if (!(vName && vSku && vPieces && vCat && vAge)) {
-                // CHẶN SUBMIT NẾU LỖI -> Không bị load lại trang, giữ nguyên Form
                 e.preventDefault(); 
                 alert("⚠️ Vui lòng kiểm tra lại các trường bị báo đỏ!");
                 const firstError = document.querySelector(".input-error");

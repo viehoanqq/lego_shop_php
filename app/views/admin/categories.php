@@ -105,7 +105,6 @@ $session_error = get_flash_message('error');
     
     <div class="header">
         <div class="header-left-group" style="flex: 1; display: flex; flex-direction: column;">
-            <h2><i class="fa-solid fa-layer-group" style="color: #3182ce; margin-right: 8px;"></i> Quản lý Danh mục</h2>
             <form action="/lego_shop_php/admincategory" method="GET" class="filter-form">
                 <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
