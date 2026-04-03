@@ -79,6 +79,7 @@ $session_error = get_flash_message('error');
                         if($session_msg == 'unlocked') echo "Đã mở khóa danh mục thành công!";
                         if($session_msg == 'deleted') echo "Đã xóa vĩnh viễn danh mục trống!";
                         if($session_msg == 'soft_deleted') echo "Danh mục đang có SP nên đã TẠM ẨN!";
+                        if($session_msg == 'restored') echo "Đã khôi phục danh mục thành công!";
                     ?>
                 </span>
             </div>
@@ -102,7 +103,7 @@ $session_error = get_flash_message('error');
 <?php if(!isset($is_form) || $is_form === false): ?>
     
     <div class="header">
-        <div class="header-left-group">
+        <div class="header-left-group" style="flex: 1; display: flex; flex-direction: column;">
             <h2><i class="fa-solid fa-layer-group" style="color: #3182ce; margin-right: 8px;"></i> Quản lý Danh mục</h2>
             <form action="/lego_shop_php/admincategory" method="GET" class="filter-form">
                 <div class="search-wrapper">
@@ -110,10 +111,11 @@ $session_error = get_flash_message('error');
                     <input type="text" name="keyword" class="form-control" placeholder="Nhập tên danh mục cần tìm..." value="<?= htmlspecialchars($filters['keyword'] ?? '') ?>">
                     <button type="submit" class="btn-search-inside">Tìm kiếm</button>
                 </div>
-                <select name="status" class="form-control" onchange="this.form.submit()" style="flex: unset; width: 160px; cursor: pointer; padding-left: 15px;">
+                <select name="status" class="form-control" onchange="this.form.submit()" style="flex: unset; width: 180px; cursor: pointer; padding-left: 15px;">
                     <option value="all" <?= ($filters['status'] == 'all') ? 'selected' : '' ?>>Tất cả trạng thái</option>
                     <option value="active" <?= ($filters['status'] == 'active') ? 'selected' : '' ?>>Đang hoạt động</option>
                     <option value="locked" <?= ($filters['status'] == 'locked') ? 'selected' : '' ?>>Đã khóa</option>
+                    <option value="hidden" <?= ($filters['status'] == 'hidden') ? 'selected' : '' ?>>Đã bị ẩn (Xóa mềm)</option>
                 </select>
             </form>
         </div>
@@ -123,20 +125,29 @@ $session_error = get_flash_message('error');
     <div class="category-grid">
         <?php if(!empty($categories)): ?>
             <?php foreach ($categories as $cat): ?>
-                <div class="card-cat" style="cursor: pointer; <?= $cat['status'] == 'locked' ? 'opacity: 0.8; background: #f8fafc;' : '' ?>" 
+                <?php 
+                    $is_hidden = ($cat['status'] == 'hidden');
+                    $is_locked = ($cat['status'] == 'locked');
+                    $opacity = $is_hidden ? '0.6' : ($is_locked ? '0.8' : '1');
+                    $bg = ($is_hidden || $is_locked) ? '#f8fafc' : '#fff';
+                    $grayscale = $is_hidden ? 'grayscale(1)' : ($is_locked ? 'grayscale(0.5)' : 'none');
+                ?>
+                <div class="card-cat" style="cursor: pointer; opacity: <?= $opacity ?>; background: <?= $bg ?>;" 
                      onclick="window.location.href='/lego_shop_php/admincategory/edit/<?= $cat['id'] ?>'">
                     
                     <div class="cat-img-wrapper">
-                        <?php if($cat['status'] == 'locked'): ?>
+                        <?php if($is_hidden): ?>
+                            <span class="cat-badge" style="background: #718096; color: #fff;"><i class="fa-solid fa-eye-slash"></i> ĐÃ ẨN</span>
+                        <?php elseif($is_locked): ?>
                             <span class="cat-badge" style="background: #e53e3e; color: #fff;"><i class="fa-solid fa-lock"></i> ĐÃ KHÓA</span>
                         <?php else: ?>
                             <span class="cat-badge" style="background: rgba(15, 23, 42, 0.7); color: #fff; backdrop-filter: blur(4px);">
-                                <i class="fa-solid fa-cube"></i> <?= $cat['product_count'] ?> SP
+                                <i class="fa-solid fa-cube"></i> <?= $cat['product_count'] ?? 0 ?> SP
                             </span>
                         <?php endif; ?>
 
                         <img src="/lego_shop_php/public/assets/images/<?= !empty($cat['image_url']) ? $cat['image_url'] : 'default.jpg' ?>" 
-                             class="cat-img" style="<?= $cat['status'] == 'locked' ? 'filter: grayscale(1); opacity: 0.8;' : '' ?>"
+                             class="cat-img" style="filter: <?= $grayscale ?>;"
                              onerror="this.src='https://placehold.co/300x180?text=LEGO'">
                     </div>
 
@@ -150,13 +161,17 @@ $session_error = get_flash_message('error');
                             <div style="display: flex; gap: 5px;">
                                 <a href="/lego_shop_php/admincategory/edit/<?= $cat['id'] ?>" class="btn-edit" style="color: #3182ce;"><i class="fa-solid fa-pen-to-square"></i></a>
 
-                                <?php if($cat['status'] == 'locked'): ?>
-                                    <a href="/lego_shop_php/admincategory/unlock/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #38a169;" title="Mở khóa"><i class="fa-solid fa-lock-open"></i></a>
+                                <?php if($is_hidden): ?>
+                                    <a href="/lego_shop_php/admincategory/restore/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #38a169;" title="Khôi phục danh mục" onclick="return confirm('Bạn muốn khôi phục danh mục này?')"><i class="fa-solid fa-rotate-left"></i></a>
                                 <?php else: ?>
-                                    <a href="/lego_shop_php/admincategory/lock/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #dd6b20;" title="Khóa danh mục" onclick="return confirm('Khóa danh mục này sẽ TẠM ẨN tất cả sản phẩm bên trong?')"><i class="fa-solid fa-lock"></i></a>
+                                    <?php if($is_locked): ?>
+                                        <a href="/lego_shop_php/admincategory/unlock/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #38a169;" title="Mở khóa"><i class="fa-solid fa-lock-open"></i></a>
+                                    <?php else: ?>
+                                        <a href="/lego_shop_php/admincategory/lock/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #dd6b20;" title="Khóa danh mục" onclick="return confirm('Khóa danh mục này sẽ TẠM ẨN tất cả sản phẩm bên trong?')"><i class="fa-solid fa-lock"></i></a>
+                                    <?php endif; ?>
+                                    
+                                    <a href="/lego_shop_php/admincategory/delete/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #e53e3e;" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa/ẩn danh mục này khỏi hệ thống?')"><i class="fa-solid fa-trash"></i></a>
                                 <?php endif; ?>
-                                
-                                <a href="/lego_shop_php/admincategory/delete/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #e53e3e;" title="Xóa" onclick="return confirm('Bạn có chắc muốn XÓA danh mục này khỏi hệ thống?')"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </div>
                     </div>
@@ -186,7 +201,6 @@ $session_error = get_flash_message('error');
     <?php endif; ?>
 
 <?php else: ?>
-    
     <div class="form-container">
         <h3 style="margin-top:0; color: #1e293b; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9;">
             <i class="fa-solid <?= isset($category) ? 'fa-pen-to-square' : 'fa-folder-plus' ?>" style="color: #3182ce; margin-right: 10px;"></i>
@@ -267,16 +281,13 @@ $session_error = get_flash_message('error');
                 showSuccess(descInput); return true;
             }
 
-            // Lắng nghe sự kiện gõ phím
             nameInput.addEventListener("input", validateName);
             descInput.addEventListener("input", validateDescription);
 
-            // Chặn gửi Form nếu có lỗi
             form.addEventListener("submit", function(e) {
                 const isNameValid = validateName();
                 const isDescValid = validateDescription();
 
-                // Lưu ý: Đã sửa từ '&' thành '&&'
                 if (!(isNameValid && isDescValid)) {
                     e.preventDefault();
                     alert("⚠️ Vui lòng kiểm tra lại các trường bị báo đỏ trước khi lưu!");

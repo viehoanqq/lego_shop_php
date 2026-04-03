@@ -199,7 +199,6 @@ class AdminProductController extends Controller {
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
-            // Xử lý upload ảnh an toàn
             $uploaded_image = null;
             if (isset($_FILES['main_image']) && $_FILES['main_image']['error'] === UPLOAD_ERR_OK) {
                 $uploaded_image = $this->uploadFile($_FILES['main_image']);
@@ -208,10 +207,11 @@ class AdminProductController extends Controller {
             $data = [
                 'name'          => trim($_POST['name'] ?? ''),
                 'sku'           => strtoupper(trim($_POST['sku'] ?? '')),
-                'selling_price' => intval($_POST['selling_price'] ?? 0),
                 'category_id'   => intval($_POST['category_id'] ?? 0),
                 'description'   => trim($_POST['description'] ?? ''),
-                'main_image'    => $uploaded_image, // Trả về Tên file hoặc Null
+                'status'        => intval($_POST['status'] ?? 1), // <-- Chỉ có lúc Tạo mới
+                'profit_margin' => (floatval($_POST['profit_margin'] ?? 30) / 100), 
+                'main_image'    => $uploaded_image,
                 
                 'pieces'        => intval($_POST['pieces'] ?? 0),
                 'manufacturer'  => trim($_POST['manufacturer'] ?? ''),
@@ -242,14 +242,13 @@ class AdminProductController extends Controller {
             }
             exit();
         }
-    }   
+    }
     // ==========================================
     // CẬP NHẬT SẢN PHẨM (Cập nhật 2 bảng cùng lúc)
     // ==========================================
    public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
-            // Bắt file ảnh mới nếu Admin có tải lên
             $uploaded_image = null;
             if (isset($_FILES['main_image']) && $_FILES['main_image']['error'] === UPLOAD_ERR_OK) {
                 $uploaded_image = $this->uploadFile($_FILES['main_image']);
@@ -258,7 +257,6 @@ class AdminProductController extends Controller {
             $data = [
                 'name'          => trim($_POST['name'] ?? ''),
                 'sku'           => strtoupper(trim($_POST['sku'] ?? '')),
-                'selling_price' => intval($_POST['selling_price'] ?? 0),
                 'category_id'   => intval($_POST['category_id'] ?? 0),
                 'description'   => trim($_POST['description'] ?? ''),
                 'main_image'    => $uploaded_image,
@@ -289,7 +287,6 @@ class AdminProductController extends Controller {
             exit();
         }
     }
-
     
     // public function delete($id) {
     //     $productModel = $this->model("ProductModel");
@@ -314,7 +311,7 @@ class AdminProductController extends Controller {
     //     exit();
     // }
 
-    public function delete($id) {
+   public function delete($id) {
         $productModel = $this->model("ProductModel");
         $id = intval($id);
 
@@ -327,9 +324,10 @@ class AdminProductController extends Controller {
                 set_flash_message('error', 'db');
             }
         } else {
-            // TRƯỜNG HỢP B: Đã có lịch sử -> Không được xóa, chỉ được Khóa
-            if ($productModel->hideProduct($id)) {
-                set_flash_message('error', 'hidden_due_to_history');
+            // TRƯỜNG HỢP B: Đã có lịch sử -> Đổi trạng thái sang 3 (Đã bị ẩn/Xóa mềm)
+            // LƯU Ý: Chỗ này gọi 'msg' để nó hiện Box Thành Công màu Xanh (kèm thông báo "Tự động Ẩn do có lịch sử")
+            if ($productModel->updateStatus($id, 3)) {
+                set_flash_message('msg', 'hidden_due_to_history');
             } else {
                 set_flash_message('error', 'db');
             }
@@ -339,6 +337,17 @@ class AdminProductController extends Controller {
         exit();
     }
 
+    public function restore($id) {
+        $id = intval($id);
+        // Khôi phục từ Xóa mềm (3) về trạng thái Tạm khóa (2) để Admin an toàn kiểm tra trước khi mở bán
+        if ($this->productModel->updateStatus($id, 2)) {
+            set_flash_message('msg', 'updated');
+        } else {
+            set_flash_message('error', 'db');
+        }
+        header("Location: /lego_shop_php/adminproduct");
+        exit();
+    }
 
     private function uploadFile($file) {
         $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'image/gif'];

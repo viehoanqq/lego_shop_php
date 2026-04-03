@@ -337,16 +337,16 @@
             $db->begin_transaction(); 
             
             try {
-                // 1. Insert bảng products
-                $sql = "INSERT INTO products (name, sku, category_id, selling_price, stock_quantity, description, status) 
-                        VALUES (?, ?, ?, ?, 0, ?, 1)";
+                // Ép cứng Giá = 0, Tồn = 0. Có insert status và profit_margin
+                $sql = "INSERT INTO products (name, sku, category_id, selling_price, stock_quantity, description, status, profit_margin) 
+                        VALUES (?, ?, ?, 0, 0, ?, ?, ?)";
                 $stmt = $db->prepare($sql);
-                $stmt->bind_param("ssiis", $data['name'], $data['sku'], $data['category_id'], $data['selling_price'], $data['description']);
+                // ssisid: string, string, int, string, int, double
+                $stmt->bind_param("ssisid", $data['name'], $data['sku'], $data['category_id'], $data['description'], $data['status'], $data['profit_margin']);
                 $stmt->execute();
                 
                 $product_id = $db->insert_id;
 
-                // 2. Insert bảng product_details
                 $sqlDetails = "INSERT INTO product_details (product_id, pieces, manufacturer, material, dimensions, age_range, release_year, theme_story) 
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmtDetails = $db->prepare($sqlDetails);
@@ -356,7 +356,6 @@
                 );
                 $stmtDetails->execute();
 
-                // 3. LƯU ẢNH (Bắt buộc lưu 1 dòng để giữ chỗ)
                 $image_to_save = !empty($data['main_image']) ? $data['main_image'] : 'default.jpg';
                 $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
                 $stmtImg = $db->prepare($sqlImg);
@@ -380,13 +379,13 @@
             try {
                 $id = intval($id);
                 
-                // 1. Update bảng products
-                $sql = "UPDATE products SET name=?, sku=?, selling_price=?, category_id=?, description=? WHERE id=?";
+                // Loại bỏ selling_price, status, profit_margin khỏi câu UPDATE
+                $sql = "UPDATE products SET name=?, sku=?, category_id=?, description=? WHERE id=?";
                 $stmt = $db->prepare($sql);
-                $stmt->bind_param("ssiisi", $data['name'], $data['sku'], $data['selling_price'], $data['category_id'], $data['description'], $id);
+                // ssisi: string, string, int, string, int
+                $stmt->bind_param("ssisi", $data['name'], $data['sku'], $data['category_id'], $data['description'], $id);
                 $stmt->execute();
 
-                // 2. Update bảng product_details
                 $sqlDetails = "UPDATE product_details SET 
                             pieces = ?, manufacturer = ?, material = ?, dimensions = ?, 
                             age_range = ?, release_year = ?, theme_story = ? 
@@ -398,12 +397,8 @@
                 );
                 $stmtDetails->execute();
 
-                // 3. Update Image CHỈ KHI Admin có tải ảnh mới lên
                 if (!empty($data['main_image'])) {
-                    // Xóa cờ main của ảnh cũ
                     $db->query("UPDATE product_images SET is_main = 0 WHERE product_id = $id");
-                    
-                    // Thêm ảnh mới
                     $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
                     $stmtImg = $db->prepare($sqlImg);
                     $stmtImg->bind_param("is", $id, $data['main_image']);
@@ -504,15 +499,6 @@
             $result = $db->query($sql);
             return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
         }
-        // Hàm 2: Chỉ khóa (ẩn) sản phẩm
-        public function hideProduct($id) {
-            $db = $this->getConnection();
-            $id = intval($id);
-            // Giả sử status = 0 là trạng thái bị khóa/ẩn
-            $sql = "UPDATE products SET status = 2 WHERE id = $id";
-            return $db->query($sql);
-        }
-
         
         //Cập nhật trạng thái sản phẩm có kiểm tra trạng thái Danh mục
         public function updateStatusWithTaskCheck($id, $status) {

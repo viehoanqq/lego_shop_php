@@ -165,6 +165,17 @@ class AdminCategoryController extends Controller {
         header('Location: /lego_shop_php/admincategory');
         exit();
     }
+    public function restore($id) {
+        $id = intval($id);
+        // Khi khôi phục, đưa danh mục về trạng thái 'locked' để an toàn, Admin muốn mở bán thì phải bấm nút Mở khóa sau.
+        if ($this->categoryModel->updateStatus($id, 'locked')) {
+            set_flash_message('msg', 'restored');
+        } else {
+            set_flash_message('error', 'db');
+        }
+        header('Location: /lego_shop_php/admincategory');
+        exit();
+    }
     private function handleUpload($file) {
         if (isset($file) && $file['error'] == 0) {
             $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -174,4 +185,6 @@ class AdminCategoryController extends Controller {
         }
         return null;
     }
+    
+    
 }

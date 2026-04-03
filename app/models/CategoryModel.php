@@ -77,53 +77,67 @@ class CategoryModel extends Database {
     // 1. CHẶN HIỂN THỊ DANH MỤC ĐÃ XÓA MỀM
     public function getAdminCategoriesWithCount($keyword = '', $status = 'all', $limit = 6, $offset = 0) {
         $db = $this->getConnection();
-        // Đổi WHERE 1=1 thành WHERE c.status != 'deleted'
-        $sql = "SELECT c.*, COUNT(p.id) as product_count 
-                FROM categories c 
-                LEFT JOIN products p ON c.id = p.category_id AND p.status = 1
-                WHERE c.status != 'deleted'"; 
+        
+        // Mặc định lấy tất cả trừ những cái đã bị ẩn (nếu filter = all)
+        if ($status == 'all') {
+            $whereClause = "WHERE c.status != 'hidden'";
+        } else {
+            // Nếu có lọc trạng thái cụ thể (gồm cả 'hidden') thì lọc theo status đó
+            $safe_status = $db->real_escape_string($status);
+            $whereClause = "WHERE c.status = '$safe_status'";
+        }
 
         if (!empty($keyword)) {
-            $keyword = $db->real_escape_string($keyword);
-            $sql .= " AND c.name LIKE '%$keyword%'";
-        }
-        if ($status !== 'all') {
-            $status = $db->real_escape_string($status);
-            $sql .= " AND c.status = '$status'";
+            $safe_keyword = $db->real_escape_string($keyword);
+            $whereClause .= " AND c.name LIKE '%$safe_keyword%'";
         }
 
-        $sql .= " GROUP BY c.id ORDER BY c.id DESC LIMIT $offset, $limit";
+        // Đếm số lượng sản phẩm TRONG danh mục (kể cả sản phẩm bị khóa nhưng không tính SP bị xóa mềm)
+        $sql = "SELECT c.*, COUNT(p.id) as product_count 
+                FROM categories c 
+                LEFT JOIN products p ON c.id = p.category_id AND p.status != 3
+                $whereClause 
+                GROUP BY c.id 
+                ORDER BY c.id DESC 
+                LIMIT $offset, $limit";
+                
         $result = $db->query($sql);
         return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    // Hàm đếm tổng số bản ghi
+    // Đếm tổng số bản ghi (Dùng cho phân trang)
     public function countAdminCategories($keyword = '', $status = 'all') {
         $db = $this->getConnection();
-        $sql = "SELECT COUNT(*) as total FROM categories WHERE status != 'deleted'"; 
         
+        if ($status == 'all') {
+            $whereClause = "WHERE status != 'hidden'"; 
+        } else {
+            $safe_status = $db->real_escape_string($status);
+            $whereClause = "WHERE status = '$safe_status'";
+        }
+
         if (!empty($keyword)) {
-            $keyword = $db->real_escape_string($keyword);
-            $sql .= " AND name LIKE '%$keyword%'";
+            $safe_keyword = $db->real_escape_string($keyword);
+            $whereClause .= " AND name LIKE '%$safe_keyword%'";
         }
-        if ($status !== 'all') {
-            $status = $db->real_escape_string($status);
-            $sql .= " AND status = '$status'";
-        }
+
+        $sql = "SELECT COUNT(*) as total FROM categories $whereClause";
         $result = $db->query($sql);
         $row = $result->fetch_assoc();
         return $row['total'] ?? 0;
     }
 
     // 3. THÊM HÀM XÓA MỀM VÀO CUỐI FILE
+    // THÊM HÀM XÓA MỀM VÀO CUỐI FILE (Cập nhật từ 'deleted' thành 'hidden')
     public function softDeleteCategory($id) {
         $db = $this->getConnection();
         $id = intval($id);
         
         $db->begin_transaction();
         try {
-            // Chuyển trạng thái danh mục thành 'deleted' (Ẩn khỏi bảng)
-            $db->query("UPDATE categories SET status = 'deleted' WHERE id = $id");
+            // Chuyển trạng thái danh mục thành 'hidden' (Ẩn khỏi bảng)
+            $db->query("UPDATE categories SET status = 'hidden' WHERE id = $id");
+            
             // Tự động Khóa (status = 2) tất cả sản phẩm thuộc danh mục này để không bán nhầm
             $db->query("UPDATE products SET status = 2 WHERE category_id = $id");
             
