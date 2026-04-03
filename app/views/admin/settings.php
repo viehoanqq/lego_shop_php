@@ -26,7 +26,6 @@
 
 <div class="settings-wrapper">
     <div class="page-header">
-        <h2><i class="fa-solid fa-gear" style="color: #3b82f6;"></i> Cài đặt Hệ thống</h2>
     </div>
 
     <?php if(isset($_GET['msg']) && $_GET['msg'] == 'success'): ?>
