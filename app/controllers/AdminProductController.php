@@ -275,6 +275,15 @@ class AdminProductController extends Controller {
                 'release_year'  => !empty($_POST['release_year']) ? intval($_POST['release_year']) : null,
                 'theme_story'   => trim($_POST['theme_story'] ?? '')
             ];
+            if (empty($data['name']) || empty($data['sku']) || empty($data['category_id']) || 
+                empty($_POST['pieces']) || empty($_POST['age_range']) || 
+                empty($_POST['length']) || empty($_POST['width']) || empty($_POST['height'])) {
+                
+                set_flash_message('error', 'empty');
+                // Chỗ này tùy hàm mà nó redirect về add hay edit nhé
+                header('Location: /lego_shop_php/adminproduct/' . (isset($id) ? 'edit/'.$id : 'add')); 
+                exit();
+            }
             if ($this->productModel->isNameExists($data['name'], $id)) {
                 set_flash_message('error', 'name_exists');
                 header('Location: /lego_shop_php/adminproduct/edit/'.$id); exit();

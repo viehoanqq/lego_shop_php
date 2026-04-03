@@ -36,7 +36,7 @@
     .btn-action { text-decoration: none; padding: 6px; border-radius: 6px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center;}
     .btn-action:hover { background: #f1f5f9; }
 
-    /* ===== ALERT KHÔI PHỤC ĐẦY ĐỦ ===== */
+    /* ===== ALERT ===== */
     #status-alert-container { position: fixed; top: 20px; right: 20px; z-index: 9999; width: 320px; }
     .alert-box { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 10px; margin-bottom: 10px; color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     .success-js { background: #38a169; }
@@ -55,7 +55,7 @@
     .btn-submit { background: #38a169; color: #fff; padding: 10px 18px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;}
     .btn-submit:hover { background: #2f855a; transform: translateY(-1px); }
     .error-text { color: #e53e3e; font-size: 12px; margin-top: 4px; min-height: 18px; }
-    .input-error { border-color: #e53e3e !important; }
+    .input-error { border-color: #e53e3e !important; background: #fff5f5; }
     
     .image-upload-box { width: 100%; height: 200px; border: 2px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-direction: column; cursor: pointer; overflow: hidden; position: relative; background: #f8fafc; transition: 0.2s; }
     .image-upload-box:hover { border-color: #3182ce; background: #ebf8ff; }
@@ -86,7 +86,7 @@ $session_error = get_flash_message('error');
                             case 'show':    echo "Đã mở khóa sản phẩm!"; break;
                             case 'hidden':  echo "Đã khóa sản phẩm khỏi cửa hàng!"; break;
                             case 'deleted': echo "Đã xóa sản phẩm vĩnh viễn thành công!"; break;
-                            case 'hidden_due_to_history': echo "Sản phẩm có lịch sử nên đã được tự động Ẩn thay vì Xóa!"; break;
+                            case 'hidden_due_to_history': echo "Sản phẩm có lịch sử nên đã tự động Ẩn thay vì Xóa!"; break;
                             default:        echo "Thao tác thành công!"; break;
                         }
                     ?>
@@ -263,25 +263,23 @@ $session_error = get_flash_message('error');
                                 <input type="text" id="sku" name="sku" class="form-control" value="<?= htmlspecialchars($product['sku'] ?? '') ?>" placeholder="VD: SW-75192">
                                 <small class="error-text"></small>
                             </div>
+                            
                             <div class="form-group">
-                                <label>Dòng LEGO (Danh mục)</label>
-                                <select name="category_id" class="form-control">
+                                <label>Dòng LEGO (Danh mục) <span style="color:red">*</span></label>
+                                <select name="category_id" id="category_id" class="form-control">
+                                    <option value="">-- Chọn danh mục --</option>
                                     <?php foreach($categories as $cat): ?>
                                         <option value="<?= $cat['id'] ?>" <?= (isset($product) && $product['category_id'] == $cat['id']) ? 'selected' : '' ?>><?= htmlspecialchars($cat['name']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                                <small class="error-text"></small>
                             </div>
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group">
-                                <label>Đơn vị tính</label>
-                                <input type="text" name="unit" class="form-control" value="<?= htmlspecialchars($product['unit'] ?? 'Hộp') ?>" placeholder="Hộp, Bộ, Cái...">
-                            </div>
-                            
                             <?php if(!isset($product)): ?>
                             <div class="form-group">
-                                <label>Hiện trạng lúc tạo <span style="color:red">*</span></label>
+                                <label>Hiện trạng lúc tạo</label>
                                 <select name="status" class="form-control">
                                     <option value="1">Hiển thị (Đang bán)</option>
                                     <option value="2">Ẩn (Tạm khóa không bán)</option>
@@ -312,7 +310,7 @@ $session_error = get_flash_message('error');
                                     $l = trim($parts[0]); $w = trim($parts[1]); $h = trim($parts[2]);
                                 }
                             }
-                            $age = isset($product['age_range']) ? intval($product['age_range']) : 18;
+                            $age = isset($product['age_range']) ? intval($product['age_range']) : '';
                         ?>
 
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
@@ -322,8 +320,9 @@ $session_error = get_flash_message('error');
                                 <small class="error-text"></small>
                             </div>
                             <div class="form-group">
-                                <label>Độ tuổi (+)</label>
-                                <input type="number" id="age_range" name="age_range" class="form-control" value="<?= $age ?>" min="1" max="99">
+                                <label>Độ tuổi (+) <span style="color:red">*</span></label>
+                                <input type="number" id="age_range" name="age_range" class="form-control" value="<?= $age ?>" min="1" max="99" placeholder="VD: 18">
+                                <small class="error-text"></small>
                             </div>
                             <div class="form-group">
                                 <label>Năm phát hành</label>
@@ -343,9 +342,9 @@ $session_error = get_flash_message('error');
                         <div class="form-group" style="margin-top: 15px; margin-bottom: 0;">
                             <label>Kích thước (Dài x Rộng x Cao) - cm</label>
                             <div style="display: flex; gap: 5px;">
-                                <input type="number" name="length" class="form-control" placeholder="Dài" value="<?= $l ?>" style="text-align: center;">
-                                <input type="number" name="width" class="form-control" placeholder="Rộng" value="<?= $w ?>" style="text-align: center;">
-                                <input type="number" name="height" class="form-control" placeholder="Cao" value="<?= $h ?>" style="text-align: center;">
+                                <input type="number" id="length" name="length" class="form-control" placeholder="Dài" value="<?= $l ?>" style="text-align: center;" min="0.1" step="any">
+                                <input type="number" id="width" name="width" class="form-control" placeholder="Rộng" value="<?= $w ?>" style="text-align: center;" min="0.1" step="any">
+                                <input type="number" id="height" name="height" class="form-control" placeholder="Cao" value="<?= $h ?>" style="text-align: center;" min="0.1" step="any">
                             </div>
                         </div>
                     </div>
@@ -437,6 +436,8 @@ $session_error = get_flash_message('error');
         const nameInput = document.getElementById("name");
         const skuInput = document.getElementById("sku");
         const piecesInput = document.getElementById("pieces");
+        const catInput = document.getElementById("category_id");
+        const ageInput = document.getElementById("age_range");
 
         function showError(input, message) {
             input.classList.add("input-error");
@@ -447,22 +448,56 @@ $session_error = get_flash_message('error');
             input.nextElementSibling.innerText = "";
         }
 
-        form.addEventListener("submit", function(e) {
-            let valid = true;
-            
-            if (nameInput.value.trim() === "") { showError(nameInput, "Tên không được trống!"); valid = false; } else { showSuccess(nameInput); }
-            
+        // Báo lỗi real-time khi gõ/nhập liệu
+        function validateName() {
+            if (nameInput.value.trim() === "") { showError(nameInput, "Tên không được trống!"); return false; }
+            else { showSuccess(nameInput); return true; }
+        }
+
+        function validateSku() {
             const skuVal = skuInput.value.trim();
-            if (skuVal === "") { showError(skuInput, "SKU không được trống!"); valid = false; } 
-            else if (!/^[A-Z0-9\-]+$/.test(skuVal)) { showError(skuInput, "SKU chỉ chứa chữ IN HOA, số, dấu -"); valid = false; }
-            else { showSuccess(skuInput); }
-            
-            if (piecesInput.value === "" || parseInt(piecesInput.value) < 0) { showError(piecesInput, "Số mảnh ghép không hợp lệ!"); valid = false; } else { showSuccess(piecesInput); }
-            
-            if (!valid) {
+            if (skuVal === "") { showError(skuInput, "SKU không được trống!"); return false; } 
+            else if (!/^[A-Z0-9\-]+$/.test(skuVal)) { showError(skuInput, "SKU chỉ chứa chữ IN HOA, số, dấu -"); return false; }
+            else { showSuccess(skuInput); return true; }
+        }
+
+        function validatePieces() {
+            if (piecesInput.value === "" || parseInt(piecesInput.value) < 0) { showError(piecesInput, "Số mảnh ghép không hợp lệ!"); return false; }
+            else { showSuccess(piecesInput); return true; }
+        }
+
+        function validateCat() {
+            if (catInput.value.trim() === "") { showError(catInput, "Vui lòng chọn danh mục!"); return false; }
+            else { showSuccess(catInput); return true; }
+        }
+
+        function validateAge() {
+            if (ageInput.value === "" || parseInt(ageInput.value) < 1) { showError(ageInput, "Độ tuổi không hợp lệ!"); return false; }
+            else { showSuccess(ageInput); return true; }
+        }
+
+        // Gắn sự kiện để kiểm tra liên tục
+        nameInput.addEventListener("input", validateName);
+        skuInput.addEventListener("input", validateSku);
+        piecesInput.addEventListener("input", validatePieces);
+        catInput.addEventListener("change", validateCat);
+        ageInput.addEventListener("input", validateAge);
+
+        form.addEventListener("submit", function(e) {
+            // Chạy kiểm tra một lượt tất cả
+            const vName = validateName();
+            const vSku = validateSku();
+            const vPieces = validatePieces();
+            const vCat = validateCat();
+            const vAge = validateAge();
+
+            if (!(vName && vSku && vPieces && vCat && vAge)) {
+                // CHẶN SUBMIT NẾU LỖI -> Không bị load lại trang, giữ nguyên Form
                 e.preventDefault(); 
-                alert("Vui lòng kiểm tra lại các trường bị báo đỏ!");
+                alert("⚠️ Vui lòng kiểm tra lại các trường bị báo đỏ!");
+                const firstError = document.querySelector(".input-error");
+                if(firstError) firstError.focus();
             }
         });
     }
-</script>   
+</script>

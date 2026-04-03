@@ -1,5 +1,5 @@
 <style>
-    /* ===== RESET TỔNG THỂ ===== */
+    /* ===== CÁC CSS CŨ VÀ MỚI ===== */
     * { box-sizing: border-box; margin: 0; padding: 0 }
 
     /* ===== HEADER & TÌM KIẾM ===== */
@@ -93,6 +93,7 @@ $session_error = get_flash_message('error');
                         if($session_error == 'cat_is_locked') echo "Không được mở sản phẩm khi danh mục đang khóa.";
                         if($session_error == 'db') echo "Lỗi hệ thống: Không thể xử lý dữ liệu.";
                         if($session_error == 'empty') echo "Vui lòng không để trống các trường bắt buộc!";
+                        if($session_error == 'name_exists') echo "Lỗi: Tên danh mục này đã tồn tại trong hệ thống!"; // Thông báo lỗi mới
                     ?>
                 </span>
             </div>
@@ -159,7 +160,7 @@ $session_error = get_flash_message('error');
                             <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">ID: #CAT-<?= $cat['id'] ?></span>
                             
                             <div style="display: flex; gap: 5px;">
-                                <a href="/lego_shop_php/admincategory/edit/<?= $cat['id'] ?>" class="btn-edit" style="color: #3182ce;"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <a href="/lego_shop_php/admincategory/edit/<?= $cat['id'] ?>" class="btn-edit" style="color: #3182ce;" title="Chỉnh sửa"><i class="fa-solid fa-pen-to-square"></i></a>
 
                                 <?php if($is_hidden): ?>
                                     <a href="/lego_shop_php/admincategory/restore/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #38a169;" title="Khôi phục danh mục" onclick="return confirm('Bạn muốn khôi phục danh mục này?')"><i class="fa-solid fa-rotate-left"></i></a>
@@ -201,6 +202,7 @@ $session_error = get_flash_message('error');
     <?php endif; ?>
 
 <?php else: ?>
+    
     <div class="form-container">
         <h3 style="margin-top:0; color: #1e293b; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9;">
             <i class="fa-solid <?= isset($category) ? 'fa-pen-to-square' : 'fa-folder-plus' ?>" style="color: #3182ce; margin-right: 10px;"></i>

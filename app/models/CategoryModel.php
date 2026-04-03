@@ -190,5 +190,14 @@ class CategoryModel extends Database {
         $sql = "DELETE FROM categories WHERE id = " . intval($id);
         return $db->query($sql);
     }
-    
+    public function isNameExists($name, $exclude_id = null) {
+        $db = $this->getConnection();
+        $name = $db->real_escape_string(trim($name));
+        $sql = "SELECT id FROM categories WHERE name = '$name'";
+        if ($exclude_id) {
+            $sql .= " AND id != " . intval($exclude_id);
+        }
+        $result = $db->query($sql);
+        return ($result && $result->num_rows > 0);
+    }
 }

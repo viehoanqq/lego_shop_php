@@ -60,10 +60,25 @@ class AdminCategoryController extends Controller {
 
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $name = trim($_POST['name'] ?? '');
+            
+            if (empty($name)) {
+                set_flash_message('error', 'empty');
+                header('Location: /lego_shop_php/admincategory/add');
+                exit();
+            }
+
+            // Kiểm tra trùng tên
+            if ($this->categoryModel->isNameExists($name)) {
+                set_flash_message('error', 'name_exists');
+                header('Location: /lego_shop_php/admincategory/add');
+                exit();
+            }
+
             $image = $this->handleUpload($_FILES['image_url']);
             $data = [
-                'name' => $_POST['name'],
-                'description' => $_POST['description'],
+                'name' => $name,
+                'description' => trim($_POST['description'] ?? ''),
                 'image_url' => $image ?: 'default.jpg'
             ];
             
@@ -96,12 +111,28 @@ class AdminCategoryController extends Controller {
 
     public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $id = intval($id);
+            $name = trim($_POST['name'] ?? '');
+
+            if (empty($name)) {
+                set_flash_message('error', 'empty');
+                header('Location: /lego_shop_php/admincategory/edit/'.$id);
+                exit();
+            }
+
+            // Kiểm tra trùng tên (loại trừ chính nó)
+            if ($this->categoryModel->isNameExists($name, $id)) {
+                set_flash_message('error', 'name_exists');
+                header('Location: /lego_shop_php/admincategory/edit/'.$id);
+                exit();
+            }
+
             $old_data = $this->categoryModel->getCategoryById($id);
             $image = $this->handleUpload($_FILES['image_url']) ?: $old_data['image_url'];
             
             $data = [
-                'name' => $_POST['name'],
-                'description' => $_POST['description'],
+                'name' => $name,
+                'description' => trim($_POST['description'] ?? ''),
                 'image_url' => $image
             ];
 
