@@ -51,8 +51,29 @@ class AdminInventoryController extends Controller {
     // API Lấy Thẻ Kho (Lịch sử)
     public function getStockCardAjax() {
         header('Content-Type: application/json');
-        $pid = $_GET['product_id'] ?? 0;
-        echo json_encode(['success' => true, 'data' => $this->InventoryModel->getStockCard($pid)]);
+        $product_id = isset($_GET['product_id']) ? intval($_GET['product_id']) : 0;
+        $target_date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d'); // Mặc định là hôm nay
+
+        if ($product_id <= 0) {
+            echo json_encode(['success' => false]);
+            exit;
+        }
+
+        $inventoryModel = $this->model('InventoryModel'); // Thay bằng tên Model thực tế của bạn
+        
+        // Bạn cần viết thêm các hàm này trong Model để tính toán
+        $opening_stock = $inventoryModel->calculateStockAtTime($product_id, $target_date . ' 00:00:00');
+        $closing_stock = $inventoryModel->calculateStockAtTime($product_id, $target_date . ' 23:59:59');
+        $transactions = $inventoryModel->getTransactionsByDate($product_id, $target_date);
+
+        echo json_encode([
+            'success' => true,
+            'data' => [
+                'opening_stock' => $opening_stock,
+                'closing_stock' => $closing_stock,
+                'transactions' => $transactions
+            ]
+        ]);
         exit;
     }
 

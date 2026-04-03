@@ -57,6 +57,6 @@ class AdminModel extends Database {
         $db = $this->getConnection();
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
         $sql = "UPDATE accounts SET password = '$hashed_password' WHERE id = '$admin_id'";
-        return $db->query($sql);
+        return $db->query($sql);    
     }
 }

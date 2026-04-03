@@ -24,9 +24,9 @@
     .btn-search-inside:hover { background: #2b6cb0; }
     
     .form-control { height: 42px; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 12px; background: #fff; transition: 0.2s; }
-    .form-control:focus { border-color: #3182ce; box-shadow: 0 0 0 2px rgba(49,130,206,0.15); }
-    .btn-filter-action { height: 42px; padding: 0 16px; border-radius: 10px; border: none; background: #3182ce; color: #fff; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
-    .btn-filter-action:hover { background: #2b6cb0; }
+    .form-control:focus { border-color: #ff7c18; box-shadow: 0 0 0 2px rgba(49,130,206,0.15); }
+    .btn-filter-action { height: 42px; padding: 0 16px; border-radius: 10px; border: none; background: #ff7c18; color: #fff; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+    .btn-filter-action:hover { background: #ff7c18; }
     
     .table-container { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
     .lego-table { width: 100%; border-collapse: collapse; }
@@ -36,9 +36,29 @@
     .lego-table tbody tr:hover { background: #f9fafb; }
     .product-cell { display: flex; align-items: center; gap: 12px; }
     .img-product { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1px solid #e2e8f0; }
-    .stock-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .stock-low { background: #fffaf0; color: #dd6b20; border: 1px solid #fbd38d; }
-    .stock-empty { background: #fff5f5; color: #e53e3e; border: 1px solid #feb2b2; }
+    /* --- CSS CẢNH BÁO TỒN KHO & LỌC --- */
+    .stock-badge { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+    .stock-low { background: #dd6b20; color: #fff; box-shadow: 0 3px 8px rgba(221, 107, 32, 0.3); }
+    .stock-empty { background: #e53e3e; color: #fff; box-shadow: 0 3px 8px rgba(229, 62, 62, 0.3); text-transform: uppercase; animation: pulseRed 1.5s infinite; }
+    
+    @keyframes pulseRed {
+        0% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7); }
+        70% { box-shadow: 0 0 0 6px rgba(229, 62, 62, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0); }
+    }
+
+    .filter-highlight-box {
+        display: flex; align-items: center; gap: 10px; 
+        background: #ff7c18; border: 1px solid #ff7c18; 
+        padding: 5px 5px 5px 15px; border-radius: 10px;
+        margin-left: 10px;
+    }
+    .filter-highlight-box input {
+        border: 1px solid #cbd5e1; background: #ffffff; height: 32px; border-radius: 6px; width: 120px; padding: 0 10px; outline: none;
+    }
+    .filter-highlight-box input:focus { border-color: #000000; box-shadow: 0 0 0 2px rgba(49,130,206,0.15); }
+    .stock-low { background: #dd6b20; color: #ffffff; border: 1px solid #fbd38d;width: 120px; height: auto; text-align: center; font-size: 13px; }
+    .stock-empty { background: #e53e3e; color: #ffffff; border: 1px solid #feb2b2; width: 120px; height: auto; text-align: center; font-size: 13px}
     
     .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
     .page-link { padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #4a5568; background: #fff; font-weight: 600; transition: 0.2s; }
@@ -168,12 +188,13 @@
                     <input type="text" name="keyword" class="form-control" placeholder="Tìm tên hoặc mã SKU..." value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>">
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 10px; margin-left: 10px;">
-                    <span style="font-size: 13px; font-weight: 600; color: #4a5568;">Sản phẩm tồn dưới :</span>
-                    <input type="number" name="custom_threshold" class="form-control" style="width: 200px;" placeholder="Nhập số lượng sản phẩm" value="<?= htmlspecialchars($_GET['custom_threshold'] ?? '') ?>" min="0">
+                <div class="filter-highlight-box">
+                    <span style="font-size: 13px; font-weight: 700; color: #ffffff;">Tồn dưới :</span>
+                    <input type="number" name="custom_threshold" placeholder="Nhập số lượng..." value="<?= htmlspecialchars($_GET['custom_threshold'] ?? '') ?>" min="0">
+                    <button type="submit" class="btn-filter-action" style="background: #2b6cb0; height: 32px; padding: 0 15px; border-radius: 6px;">
+                        Lọc <i class="fa-solid fa-filter"></i>
+                    </button>
                 </div>
-                
-                <button type="submit" class="btn-filter-action" style="background: #2b6cb0;">Lọc <i class="fa-solid fa-magnifying-glass"></i></button>
                 
                 <div style="flex: 1;"></div>
                 
@@ -214,14 +235,14 @@
                         </td>
                         <td style="text-align: center;"><span style="color: #718096; font-weight: 600;">≤ <?= $p['min_stock_level'] ?></span></td>
                         <td style="text-align: center;">
-    <?php if ($p['stock_quantity'] <= 0): ?>
-        <span class="stock-badge stock-empty">Hết hàng</span>
-    <?php elseif ($p['stock_quantity'] <= $p['min_stock_level']): ?>
-        <span class="stock-badge stock-low">Sắp hết</span>
-    <?php else: ?>
-        <span class="stock-badge" style="background: #e6fffa; color: #2f855a; border: 1px solid #2f855a;">Còn hàng</span>
-    <?php endif; ?>
-</td>
+                            <?php if ($p['stock_quantity'] <= 0): ?>
+                                <span class="stock-badge stock-empty"><i class="fa-solid fa-circle-exclamation"></i> HẾT HÀNG</span>
+                            <?php elseif ($p['stock_quantity'] <= $p['min_stock_level']): ?>
+                                <span class="stock-badge stock-low"><i class="fa-solid fa-triangle-exclamation"></i> SẮP HẾT</span>
+                            <?php else: ?>
+                                <span class="stock-badge" style="background: #2f855a; color: #ffffff; border: 1px solid #2f855a; width: 120px; height: auto; text-align: center; font-size: 13px"><i class="fa-solid fa-check"></i> CÒN HÀNG</span>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -271,8 +292,20 @@
 
 <div id="historyModal" class="modal">
     <div class="modal-content" style="width: 800px;">
-        <h3><i class="fa-solid fa-clock-rotate-left" style="color:#3182ce;"></i> Thẻ kho (Lịch sử Nhập / Xuất / Điều chỉnh)</h3>
-        <p style="margin-bottom: 15px;">Sản phẩm: <b id="histProductName"></b></p>
+        <h3>
+            <i class="fa-solid fa-clock-rotate-left" style="color:#3182ce;"></i> 
+            Thẻ kho ngày: <span id="histDateDisplay" style="color:#e53e3e; font-weight: bold;"></span>
+        </h3>
+        <p style="margin-bottom: 15px;">Sản phẩm: <b id="histProductName" style="color: #1e293b;"></b></p>
+        
+        <div style="display: flex; justify-content: space-between; background: #f8fafc; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+            <div style="font-size: 14px; font-weight: 600; color: #4a5568;">
+                Tồn đầu ngày: <span id="histOpeningStock" style="color:#3182ce; font-size:18px; margin-left: 5px;">...</span>
+            </div>
+            <div style="font-size: 14px; font-weight: 600; color: #4a5568;">
+                Tồn cuối ngày: <span id="histClosingStock" style="color:#38a169; font-size:18px; margin-left: 5px;">...</span>
+            </div>
+        </div>
         
         <table class="lego-table" style="font-size: 13px;">
             <thead>
@@ -411,48 +444,71 @@
 
     // --- 5. API LẤY THẺ KHO (GẮN LINK TỰ ĐỘNG BẰNG REGEX) ---
     async function openHistory(id, name) {
+        // Lấy ngày đang được chọn ở Tab Tổng quan
+        const selectedDate = document.getElementById('snapshotDate').value;
+        
+        // Chuyển format YYYY-MM-DD sang DD/MM/YYYY cho đẹp
+        const dateObj = new Date(selectedDate);
+        const displayDate = ("0" + dateObj.getDate()).slice(-2) + '/' + ("0" + (dateObj.getMonth() + 1)).slice(-2) + '/' + dateObj.getFullYear();
+
         document.getElementById('histProductName').innerText = name;
-        document.getElementById('historyModal').style.display = 'block';
+        document.getElementById('histDateDisplay').innerText = displayDate;
+        
+        // Reset dữ liệu cũ
+        document.getElementById('histOpeningStock').innerText = '...';
+        document.getElementById('histClosingStock').innerText = '...';
         document.getElementById('histBody').innerHTML = '<tr><td colspan="4" style="text-align:center;">Đang tải dữ liệu...</td></tr>';
+        
+        document.getElementById('historyModal').style.display = 'block';
 
         try {
-            const res = await fetch(`/lego_shop_php/admininventory/getStockCardAjax?product_id=${id}`);
+            // Truyền cả product_id và date lên Server
+            const res = await fetch(`/lego_shop_php/admininventory/getStockCardAjax?product_id=${id}&date=${selectedDate}`);
             const result = await res.json();
             
-            let html = '';
-            if (result.data.length === 0) { 
-                html = '<tr><td colspan="4" style="text-align:center;">Chưa có lịch sử giao dịch.</td></tr>'; 
+            if (result.success) {
+                // Điền số Tồn đầu / Tồn cuối
+                document.getElementById('histOpeningStock').innerText = result.data.opening_stock;
+                document.getElementById('histClosingStock').innerText = result.data.closing_stock;
+
+                let html = '';
+                const transactions = result.data.transactions;
+
+                if (transactions.length === 0) { 
+                    html = '<tr><td colspan="4" style="text-align:center; color: #718096;">Không có biến động nào trong ngày này.</td></tr>'; 
+                } else {
+                    transactions.forEach(item => {
+                        let isPlus = item.qty_change > 0;
+                        let color = isPlus ? '#38a169' : '#e53e3e';
+                        let sign = isPlus ? '+' : '';
+                        
+                        let typeBadge = '';
+                        if (item.type === 'import') {
+                            typeBadge = '<span style="background:#e6fffa; color:#2f855a; padding:3px 8px; border-radius:12px;">Nhập kho</span>';
+                        } else if (item.type === 'export') {
+                            typeBadge = '<span style="background:#fff5f5; color:#c53030; padding:3px 8px; border-radius:12px;">Xuất bán</span>';
+                        } else {
+                            typeBadge = '<span style="background:#fffaf0; color:#c05621; padding:3px 8px; border-radius:12px;">Điều chỉnh</span>';
+                        }
+
+                        let safeNote = item.note;
+                        safeNote = safeNote.replace(/PN-(\d+)/g, '<a href="/lego_shop_php/adminimport/detail/$1" target="_blank" style="color: #3182ce; font-weight: 700; text-decoration: underline;">PN-$1</a>');
+                        safeNote = safeNote.replace(/DH-(\d+)/g, '<a href="/lego_shop_php/adminorder/detail/$1" target="_blank" style="color: #e53e3e; font-weight: 700; text-decoration: underline;">DH-$1</a>');
+
+                        html += `<tr>
+                            <td style="color:#718096; font-size:12px;">${item.created_at}</td>
+                            <td style="text-align: center;">${typeBadge}</td>
+                            <td style="color:${color}; font-weight:bold; font-size:15px; text-align:center;">${sign}${item.qty_change}</td>
+                            <td>${safeNote}</td>
+                        </tr>`;
+                    });
+                }
+                document.getElementById('histBody').innerHTML = html;
             } else {
-                result.data.forEach(item => {
-                    let isPlus = item.qty_change > 0;
-                    let color = isPlus ? '#38a169' : '#e53e3e';
-                    let sign = isPlus ? '+' : '';
-                    
-                    let typeBadge = '';
-                    if (item.type === 'import') {
-                        typeBadge = '<span style="background:#e6fffa; color:#2f855a; padding:3px 8px; border-radius:12px;">Nhập kho</span>';
-                    } else if (item.type === 'export') {
-                        typeBadge = '<span style="background:#fff5f5; color:#c53030; padding:3px 8px; border-radius:12px;">Xuất bán</span>';
-                    } else {
-                        typeBadge = '<span style="background:#fffaf0; color:#c05621; padding:3px 8px; border-radius:12px;">Điều chỉnh</span>';
-                    }
-
-                    // TỰ ĐỘNG GẮN LINK CHO MÃ ĐƠN HÀNG VÀ PHIẾU NHẬP BẰNG REGEX
-                    let safeNote = item.note;
-                    safeNote = safeNote.replace(/PN-(\d+)/g, '<a href="/lego_shop_php/adminimport/detail/$1" target="_blank" style="color: #3182ce; font-weight: 700; text-decoration: underline;">PN-$1</a>');
-                    safeNote = safeNote.replace(/DH-(\d+)/g, '<a href="/lego_shop_php/adminorder/detail/$1" target="_blank" style="color: #e53e3e; font-weight: 700; text-decoration: underline;">DH-$1</a>');
-
-                    html += `<tr>
-                        <td style="color:#718096; font-size:12px;">${item.created_at}</td>
-                        <td style="text-align: center;">${typeBadge}</td>
-                        <td style="color:${color}; font-weight:bold; font-size:15px; text-align:center;">${sign}${item.qty_change}</td>
-                        <td>${safeNote}</td>
-                    </tr>`;
-                });
+                document.getElementById('histBody').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Lỗi tải dữ liệu.</td></tr>';
             }
-            document.getElementById('histBody').innerHTML = html;
         } catch(err) {
-            document.getElementById('histBody').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Lỗi kết nối tải dữ liệu.</td></tr>';
+            document.getElementById('histBody').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Lỗi kết nối mạng.</td></tr>';
         }
     }
 

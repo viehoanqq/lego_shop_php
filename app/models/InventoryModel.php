@@ -50,12 +50,11 @@ class InventoryModel extends Database {
         return $result->fetch_assoc()['total'] ?? 0;
     }
 
-    // 2. Tính toán tồn kho tại 1 ngày trong quá khứ (Snapshot)
+    // 2. Tính toán tồn kho tại 1 ngày trong quá khứ (Snapshot tab Tổng quan)
     public function getInventorySnapshot($date) {
         $db = $this->getConnection();
         $target_date = $db->real_escape_string($date) . ' 23:59:59';
         
-        // Công thức: Tồn lịch sử = (Tổng Nhập) - (Tổng Bán) + (Tổng Điều chỉnh) tính đến cuối ngày đó
         $sql = "SELECT p.id, p.name, p.sku, p.import_price,
                 (
                     COALESCE((SELECT SUM(d.quantity) FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id WHERE d.product_id = p.id AND r.status='completed' AND r.created_at <= '$target_date'), 0)
@@ -85,9 +84,7 @@ class InventoryModel extends Database {
 
         $db->begin_transaction();
         try {
-            // Cập nhật kho
             $db->query("UPDATE products SET stock_quantity = $real_stock WHERE id = $product_id");
-            // Ghi log
             $db->query("INSERT INTO stock_adjustments (product_id, admin_id, old_stock, new_stock, qty_change, reason) 
                         VALUES ($product_id, $admin_id, $old_stock, $real_stock, $qty_change, '$reason')");
             $db->commit();
@@ -97,35 +94,91 @@ class InventoryModel extends Database {
         }
     }
 
-    // 4. Thẻ kho (Lịch sử Nhập / Điều chỉnh)
-    public function getStockCard($product_id) {
-        $db = $this->getConnection();
-        $pid = intval($product_id);
-        
-        // Gộp 3 bảng: Nhập hàng (import), Xuất bán (order), và Điều chỉnh (adjust)
-        $sql = "
-            SELECT 'import' as type, r.created_at, d.quantity as qty_change, CONCAT('PN-', r.id, ' - Nhập hàng từ NCC') as note 
-            FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id 
-            WHERE d.product_id = $pid AND r.status='completed'
-            UNION ALL
-            SELECT 'export' as type, o.created_at, -(od.quantity) as qty_change, CONCAT('DH-', o.id, ' - Xuất bán đơn hàng') as note 
-            FROM order_details od JOIN orders o ON od.order_id = o.id 
-            WHERE od.product_id = $pid AND o.status = 'delivered'
-            UNION ALL
-            SELECT 'adjust' as type, created_at, qty_change, CONCAT('Điều chỉnh - Kiểm kho: ', reason) as note 
-            FROM stock_adjustments WHERE product_id = $pid
-            ORDER BY created_at DESC LIMIT 50
-        ";
-        $result = $db->query($sql);
-        return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
-    }
-
+    // Cập nhật mức cảnh báo
     public function updateAllMinStock($min_stock) {
         return $this->getConnection()->query("UPDATE products SET min_stock_level = " . intval($min_stock));
     }
     public function updateSingleMinStock($id, $min_stock) {
-        $stmt = $this->getConnection()->prepare("UPDATE products SET min_stock_level = ? WHERE id = ?");
-        return $stmt->execute([intval($min_stock), intval($id)]);
+        $db = $this->getConnection();
+        $stmt = $db->prepare("UPDATE products SET min_stock_level = ? WHERE id = ?");
+        $ms = intval($min_stock); $pid = intval($id);
+        $stmt->bind_param("ii", $ms, $pid);
+        return $stmt->execute();
+    }
+
+    // =================================================================
+    // CÁC HÀM XỬ LÝ THẺ KHO (DÙNG LOGIC GỘP 3 BẢNG CỦA BẠN CHUẨN 100%)
+    // =================================================================
+
+    // 4. Tính tồn kho quá khứ (Dành cho Tồn Đầu Ngày / Cuối Ngày)
+    public function calculateStockAtTime($product_id, $datetime) {
+        $db = $this->getConnection();
+        $pid = intval($product_id);
+        $dt = $db->real_escape_string($datetime);
+
+        // Lấy tồn thực tế hiện tại
+        $stmt1 = $db->query("SELECT stock_quantity FROM products WHERE id = $pid");
+        $current_stock = $stmt1->fetch_assoc()['stock_quantity'] ?? 0;
+
+        // Gom tổng các biến động xảy ra SAU thời điểm $datetime
+        $sql = "
+            SELECT SUM(qty_change) as total_change FROM (
+                SELECT d.quantity as qty_change 
+                FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id 
+                WHERE d.product_id = $pid AND r.status='completed' AND r.created_at > '$dt'
+                
+                UNION ALL
+                
+                SELECT -(od.quantity) as qty_change 
+                FROM order_details od JOIN orders o ON od.order_id = o.id 
+                WHERE od.product_id = $pid AND o.status = 'delivered' AND o.created_at > '$dt'
+                
+                UNION ALL
+                
+                SELECT qty_change 
+                FROM stock_adjustments 
+                WHERE product_id = $pid AND created_at > '$dt'
+            ) as changes
+        ";
+        
+        $res = $db->query($sql);
+        $total_change = $res->fetch_assoc()['total_change'] ?? 0;
+
+        // Tồn quá khứ = Hiện tại - Các biến động đã xảy ra sau đó
+        return $current_stock - $total_change;
+    }
+
+    // 5. Lấy danh sách giao dịch trong 1 ngày cụ thể (Cho Tab Thẻ Kho)
+    public function getTransactionsByDate($product_id, $date) {
+        $db = $this->getConnection();
+        $pid = intval($product_id);
+        
+        $start_time = $db->real_escape_string($date) . ' 00:00:00';
+        $end_time = $db->real_escape_string($date) . ' 23:59:59';
+
+        $sql = "
+            SELECT * FROM (
+                SELECT 'import' as type, r.created_at, d.quantity as qty_change, CONCAT('PN-', r.id, ' - Nhập hàng từ NCC') as note 
+                FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id 
+                WHERE d.product_id = $pid AND r.status='completed' AND r.created_at >= '$start_time' AND r.created_at <= '$end_time'
+                
+                UNION ALL
+                
+                SELECT 'export' as type, o.created_at, -(od.quantity) as qty_change, CONCAT('DH-', o.id, ' - Xuất bán đơn hàng') as note 
+                FROM order_details od JOIN orders o ON od.order_id = o.id 
+                WHERE od.product_id = $pid AND o.status = 'delivered' AND o.created_at >= '$start_time' AND o.created_at <= '$end_time'
+                
+                UNION ALL
+                
+                SELECT 'adjust' as type, created_at, qty_change, CONCAT('Điều chỉnh - Kiểm kho: ', reason) as note 
+                FROM stock_adjustments 
+                WHERE product_id = $pid AND created_at >= '$start_time' AND created_at <= '$end_time'
+            ) as daily_transactions
+            ORDER BY created_at ASC
+        ";
+                
+        $result = $db->query($sql);
+        return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 }
 ?>

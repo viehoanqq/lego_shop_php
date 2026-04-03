@@ -124,7 +124,7 @@
             
             <div class="btn-wrap">
                                 <a href="/lego_shop_php/home" class="btn-continue"><i class="fa-solid fa-shopping-bag"></i>   Tiếp tục mua sắm</a>
-                <a href="/lego_shop_php/profile/orders" class="btn-continue"><i class="fa-solid fa-shopping-cart"></i>   Giỏ hàng của bạn</a>
+                <a href="/lego_shop_php/profile/orders" class="btn-continue"><i class="fa-solid fa-shopping-cart"></i>   Danh sách đơn hàng</a>
             </div>
         </div>
     </div>

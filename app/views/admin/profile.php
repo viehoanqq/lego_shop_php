@@ -13,14 +13,14 @@
             <p class="profile-role-tag"><?= strtoupper($_SESSION['admin_role'] ?? 'QUẢN TRỊ VIÊN') ?></p>
             
             <div class="profile-stats">
-                <div class="stat-item">
+                <!-- <div class="stat-item">
                     <h4>124</h4>
                     <p>Đơn đã duyệt</p>
                 </div>
                 <div class="stat-item">
                     <h4>45</h4>
                     <p>Báo cáo</p>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
