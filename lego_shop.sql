@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th4 05, 2026 lúc 10:34 AM
+-- Thời gian đã tạo: Th4 03, 2026 lúc 06:50 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -97,7 +97,7 @@ INSERT INTO `categories` (`id`, `name`, `description`, `image_url`, `status`, `o
 (3, 'LEGO Star Wars', 'Cuộc chiến giữa các vì sao và những con tàu vũ trụ.', 'category8.webp', 'active', 0),
 (4, 'LEGO City', 'Xây dựng thành phố trong mơ của bạn.', 'category5.webp', 'active', 0),
 (5, 'LEGO Architecture', 'Tái hiện các công trình kiến trúc nổi tiếng thế giới.', 'category2.webp', 'active', 0),
-(6, 'zzz', 'Thử thách độ khó cao dành cho người lớn.', 'category6.webp', 'hidden', 0),
+(6, 'zzz', 'Thử thách độ khó cao dành cho người lớn.', 'category6.webp', 'locked', 0),
 (7, 'LEGO Ninjago', 'Sát cánh cùng các Ninja bảo vệ thế giới.', 'category4.webp', 'active', 0),
 (8, 'LEGO Super Heroes', 'Sưu tập các siêu anh hùng Marvel & DC.', 'category7.webp', 'active', 0),
 (13, 'DANH MỤC TEST', 'TEST THÊM DANH MỤC', '1775230316.webp', 'locked', 0),
@@ -123,16 +123,11 @@ CREATE TABLE `import_receipts` (
 --
 
 INSERT INTO `import_receipts` (`id`, `admin_id`, `supplier_id`, `total_amount`, `status`, `created_at`) VALUES
-(1, 1, 11, 7260000, 'completed', '2026-04-01 13:07:00'),
-(2, 1, 12, 2150000, 'completed', '2026-04-01 20:08:00'),
-(3, 1, 11, 1200000, 'completed', '2026-04-03 13:25:00'),
-(4, 1, 10, 1000000, 'draft', '2026-04-04 13:37:00'),
-(5, 1, 10, 7170000, 'completed', '2026-04-03 22:38:00'),
-(6, 1, 10, 1000000, 'completed', '2026-04-03 22:40:00'),
-(7, 1, 10, 800000, 'completed', '2026-04-03 22:41:00'),
-(8, 1, 10, 1000000, 'completed', '2026-03-01 23:02:00'),
-(9, 1, 11, 5000000, 'completed', '2026-04-04 09:00:00'),
-(10, 1, 10, 450000, 'completed', '2026-04-05 12:12:00');
+(1, 1, 10, 2200000, 'completed', '2026-04-01 22:52:00'),
+(2, 1, 10, 1800000, 'completed', '2026-04-01 22:52:00'),
+(3, 1, 10, 2200000, 'completed', '2026-04-01 22:54:00'),
+(4, 1, 10, 3150000, 'completed', '2026-04-01 22:55:00'),
+(5, 1, 10, 4140000, 'completed', '2026-04-02 22:58:00');
 
 -- --------------------------------------------------------
 
@@ -155,26 +150,16 @@ CREATE TABLE `import_receipt_details` (
 --
 
 INSERT INTO `import_receipt_details` (`id`, `receipt_id`, `product_id`, `quantity`, `price`, `calculated_average_price`, `calculated_selling_price`) VALUES
-(1, 1, 1, 10, 100000, 100000, 130000),
-(2, 1, 2, 15, 120000, 120000, 156000),
-(3, 1, 3, 20, 80000, 80000, 104000),
-(4, 1, 4, 22, 130000, 130000, 169000),
-(5, 2, 1, 10, 120000, 110000, 143000),
-(6, 2, 2, 5, 100000, 115000, 149500),
-(7, 2, 3, 5, 90000, 82000, 106600),
-(8, 3, 2, 10, 120000, 120000, 240000),
-(9, 4, 1, 10, 100000, 0, 0),
-(10, 5, 13, 8, 120000, 120000, 156000),
-(11, 5, 11, 10, 100000, 100000, 130000),
-(12, 5, 10, 9, 90000, 90000, 117000),
-(13, 5, 9, 15, 120000, 120000, 156000),
-(14, 5, 8, 20, 130000, 130000, 169000),
-(15, 6, 7, 10, 100000, 100000, 130000),
-(16, 7, 6, 8, 100000, 100000, 130000),
-(17, 8, 2, 10, 100000, 108235, 216470),
-(18, 9, 1, 10, 100000, 100000, 200000),
-(19, 9, 1, 20, 200000, 166667, 333334),
-(21, 10, 13, 3, 150000, 135000, 175500);
+(1, 1, 36, 10, 100000, 100000, 130000),
+(2, 1, 37, 10, 120000, 120000, 156000),
+(3, 2, 36, 15, 120000, 112000, 145600),
+(4, 3, 37, 10, 100000, 107500, 139750),
+(5, 3, 1, 10, 120000, 120000, 156000),
+(6, 4, 4, 10, 120000, 120000, 156000),
+(7, 4, 8, 15, 130000, 130000, 169000),
+(8, 5, 13, 10, 120000, 120000, 240000),
+(9, 5, 10, 12, 120000, 120000, 156000),
+(10, 5, 6, 15, 100000, 100000, 130000);
 
 -- --------------------------------------------------------
 
@@ -203,26 +188,11 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `user_id`, `status`, `payment_method`, `payment_status`, `total_amount`, `shipping_fullname`, `shipping_phone`, `shipping_street`, `shipping_ward`, `shipping_district`, `shipping_city`, `created_at`) VALUES
-(1, 2, 'delivered', 'cash', 'unpaid', 715000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-01 13:10:58'),
-(2, 2, 'delivered', 'cash', 'unpaid', 1323400, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-01 13:11:31'),
-(3, 2, 'delivered', 'cash', 'unpaid', 2145000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-02 13:15:34'),
-(4, 2, 'cancelled', 'cash', 'unpaid', 598000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-02 13:17:38'),
-(5, 2, 'delivered', 'transfer', 'paid', 598000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-02 13:18:15'),
-(6, 2, 'delivered', 'cash', 'unpaid', 2300000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-02 13:21:16'),
-(7, 4, 'delivered', 'cash', 'unpaid', 1200000, 'TEST ORDER', '11111111111', 'TEST', 'Phường Bến Thành', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 13:30:37'),
-(8, 2, 'delivered', 'transfer', 'paid', 756600, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-03 22:42:45'),
-(9, 2, 'delivered', 'transfer', 'paid', 480000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-03 22:43:15'),
-(10, 2, 'delivered', 'cash', 'unpaid', 720000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-03-03 22:47:07'),
-(11, 5, 'cancelled', 'transfer', 'unpaid', 1040000, 'Kiều Hoài Nam', '0900000000', '273 An dương vương', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 07:46:42'),
-(12, 5, 'shipping', 'cash', 'unpaid', 468000, 'Kiều Hoài Nam', '0900000000', '273 An dương vương', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 07:47:15'),
-(13, 5, 'pending', 'cash', 'unpaid', 390000, 'Kiều Hoài Nam', '0900000000', '273 An dương vương', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 07:48:16'),
-(14, 5, 'delivered', 'cash', 'unpaid', 2164700, 'Kiều Hoài Nam', '0900000000', '273 An dương vương', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 08:15:35'),
-(15, 2, 'pending', 'cash', 'unpaid', 1183000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 08:54:50'),
-(16, 2, 'delivered', 'cash', 'unpaid', 10000020, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 11:55:19'),
-(17, 2, 'delivered', 'cash', 'unpaid', 780000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 12:11:07'),
-(18, 2, 'delivered', 'cash', 'unpaid', 351000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-05 12:12:51'),
-(19, 2, 'delivered', 'cash', 'unpaid', 810000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-05 12:17:40'),
-(20, 2, 'delivered', 'cash', 'unpaid', 910000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-05 12:35:18');
+(1, 2, 'delivered', 'cash', 'unpaid', 1497600, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-01 22:53:49'),
+(2, 2, 'delivered', 'transfer', 'paid', 2242500, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-02 22:56:39'),
+(3, 2, 'delivered', 'cash', 'unpaid', 1850000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-02 22:59:06'),
+(4, 2, 'delivered', 'transfer', 'paid', 1428700, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-03 23:01:57'),
+(5, 2, 'delivered', 'cash', 'unpaid', 1568000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-03 23:03:14');
 
 -- --------------------------------------------------------
 
@@ -244,30 +214,18 @@ CREATE TABLE `order_details` (
 --
 
 INSERT INTO `order_details` (`id`, `order_id`, `product_id`, `quantity`, `price`, `cost_price`) VALUES
-(1, 1, 1, 5, 143000, 110000.00),
-(2, 2, 3, 4, 106600, 0.00),
-(3, 2, 2, 6, 149500, 0.00),
-(4, 3, 1, 15, 143000, 110000.00),
-(5, 4, 2, 4, 149500, 0.00),
-(6, 5, 2, 4, 149500, 0.00),
-(7, 6, 2, 10, 230000, 0.00),
-(8, 7, 2, 5, 240000, 0.00),
-(9, 8, 7, 3, 130000, 0.00),
-(10, 8, 6, 2, 130000, 0.00),
-(11, 8, 3, 1, 106600, 0.00),
-(12, 9, 2, 2, 240000, 0.00),
-(13, 10, 2, 3, 240000, 0.00),
-(14, 11, 11, 5, 130000, 0.00),
-(15, 11, 7, 3, 130000, 0.00),
-(16, 12, 9, 3, 156000, 0.00),
-(17, 13, 6, 3, 130000, 0.00),
-(18, 14, 2, 10, 216470, 0.00),
-(19, 15, 8, 7, 169000, 0.00),
-(20, 16, 1, 30, 333334, 166667.00),
-(21, 17, 13, 5, 156000, 120000.00),
-(22, 18, 13, 2, 175500, 135000.00),
-(23, 19, 13, 3, 270000, 135000.00),
-(24, 20, 7, 7, 130000, 100000.00);
+(1, 1, 37, 4, 156000, 120000.00),
+(2, 1, 36, 6, 145600, 112000.00),
+(3, 2, 4, 5, 156000, 120000.00),
+(4, 2, 1, 4, 156000, 120000.00),
+(5, 2, 37, 6, 139750, 107500.00),
+(6, 3, 13, 5, 240000, 120000.00),
+(7, 3, 6, 5, 130000, 100000.00),
+(8, 4, 6, 3, 130000, 100000.00),
+(9, 4, 4, 3, 156000, 120000.00),
+(10, 4, 37, 2, 139750, 107500.00),
+(11, 4, 36, 2, 145600, 112000.00),
+(12, 5, 36, 7, 224000, 112000.00);
 
 -- --------------------------------------------------------
 
@@ -288,57 +246,21 @@ CREATE TABLE `order_history` (
 --
 
 INSERT INTO `order_history` (`id`, `order_id`, `status`, `changed_at`, `note`) VALUES
-(1, 1, 'confirmed', '2026-04-01 13:11:06', ''),
-(2, 1, 'shipping', '2026-04-01 13:11:08', ''),
-(3, 1, 'delivered', '2026-04-01 13:11:10', ''),
-(4, 2, 'confirmed', '2026-04-01 13:12:29', ''),
-(5, 2, 'shipping', '2026-04-01 13:12:31', ''),
-(6, 2, 'delivered', '2026-04-01 13:12:33', ''),
-(7, 3, 'confirmed', '2026-04-02 13:15:43', ''),
-(8, 3, 'shipping', '2026-04-02 13:15:46', ''),
-(9, 3, 'delivered', '2026-04-02 13:15:48', ''),
-(10, 4, 'confirmed', '2026-04-02 13:17:45', ''),
-(11, 4, 'shipping', '2026-04-02 13:17:47', ''),
-(12, 4, 'cancelled', '2026-04-02 13:17:49', ''),
-(13, 6, 'confirmed', '2026-04-02 13:21:26', ''),
-(14, 6, 'shipping', '2026-04-02 13:21:28', ''),
-(15, 6, 'delivered', '2026-04-02 13:21:31', ''),
-(16, 5, 'confirmed', '2026-04-03 13:24:03', ''),
-(17, 5, 'shipping', '2026-04-03 13:24:05', ''),
-(18, 5, 'delivered', '2026-04-03 13:24:15', ''),
-(19, 8, 'confirmed', '2026-04-03 22:46:01', ''),
-(20, 8, 'shipping', '2026-04-03 22:46:04', ''),
-(21, 8, 'delivered', '2026-04-03 22:46:07', ''),
-(22, 10, 'confirmed', '2026-04-03 22:48:32', ''),
-(23, 10, 'shipping', '2026-04-03 22:48:36', ''),
-(24, 10, 'delivered', '2026-04-03 22:48:39', ''),
-(25, 7, 'confirmed', '2026-04-04 07:47:29', ''),
-(26, 7, 'shipping', '2026-04-04 07:47:31', ''),
-(27, 7, 'delivered', '2026-04-04 07:47:32', ''),
-(28, 11, 'cancelled', '2026-04-04 07:48:00', 'chưa nhận được chuyển khoản'),
-(29, 12, 'confirmed', '2026-04-04 08:07:36', ''),
-(30, 12, 'shipping', '2026-04-04 08:07:38', ''),
-(31, 14, 'confirmed', '2026-04-04 08:15:43', ''),
-(32, 14, 'shipping', '2026-04-04 08:15:45', ''),
-(33, 14, 'delivered', '2026-04-04 08:15:47', ''),
-(34, 9, 'confirmed', '2026-04-04 08:16:02', ''),
-(35, 9, 'shipping', '2026-04-04 08:16:06', ''),
-(36, 9, 'delivered', '2026-04-04 08:16:19', ''),
-(37, 16, 'confirmed', '2026-04-04 11:55:25', ''),
-(38, 16, 'shipping', '2026-04-04 11:55:28', ''),
-(39, 16, 'delivered', '2026-04-04 11:55:30', ''),
-(40, 17, 'confirmed', '2026-04-04 12:11:18', ''),
-(41, 17, 'shipping', '2026-04-04 12:11:20', ''),
-(42, 17, 'delivered', '2026-04-04 12:11:22', ''),
-(43, 18, 'confirmed', '2026-04-05 12:12:58', ''),
-(44, 18, 'shipping', '2026-04-05 12:13:00', ''),
-(45, 18, 'delivered', '2026-04-05 12:13:01', ''),
-(46, 19, 'confirmed', '2026-04-05 12:17:47', ''),
-(47, 19, 'shipping', '2026-04-05 12:17:49', ''),
-(48, 19, 'delivered', '2026-04-05 12:17:50', ''),
-(49, 20, 'confirmed', '2026-04-05 12:35:24', ''),
-(50, 20, 'shipping', '2026-04-05 12:35:27', ''),
-(51, 20, 'delivered', '2026-04-05 12:35:28', '');
+(1, 1, 'confirmed', '2026-04-01 22:53:58', ''),
+(2, 1, 'shipping', '2026-04-01 22:54:00', ''),
+(3, 1, 'delivered', '2026-04-01 22:54:02', ''),
+(4, 2, 'confirmed', '2026-04-02 22:56:49', ''),
+(5, 2, 'shipping', '2026-04-02 22:56:51', ''),
+(6, 2, 'delivered', '2026-04-02 22:56:53', ''),
+(7, 3, 'confirmed', '2026-04-02 22:59:13', ''),
+(8, 3, 'shipping', '2026-04-02 22:59:16', ''),
+(9, 3, 'delivered', '2026-04-02 22:59:18', ''),
+(10, 4, 'confirmed', '2026-04-03 23:02:09', ''),
+(11, 4, 'shipping', '2026-04-03 23:02:11', ''),
+(12, 4, 'delivered', '2026-04-03 23:02:13', ''),
+(13, 5, 'confirmed', '2026-04-03 23:03:26', ''),
+(14, 5, 'shipping', '2026-04-03 23:03:28', ''),
+(15, 5, 'delivered', '2026-04-03 23:03:30', '');
 
 -- --------------------------------------------------------
 
@@ -366,20 +288,20 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `category_id`, `sku`, `name`, `description`, `import_price`, `profit_margin`, `selling_price`, `stock_quantity`, `min_stock_level`, `status`, `created_at`) VALUES
-(1, 3, 'SW-75192', 'Siêu tàu vũ trụ Millennium Falcon', 'Phi thuyền biểu tượng của Han Solo với hơn 7500 mảnh ghép, to nhất lịch sử Star Wars.', 166667, 1, 333334, 0, 10, 1, '2026-03-27 14:09:27'),
-(2, 1, 'TEC-42115', 'Siêu xe Lamborghini Sián FKP 37', 'Mô hình siêu xe thể thao màu xanh lá tỉ lệ 1:8 chân thực đến từng chi tiết động cơ.', 108235, 1, 216470, 0, 10, 3, '2026-03-27 14:09:27'),
-(3, 2, 'HP-71043', 'Lâu đài Hogwarts Castle', 'Trường học phép thuật Hogwarts siêu to khổng lồ dành cho các fan Harry Potter.', 82000, 0.3, 106600, 20, 10, 3, '2026-03-27 14:09:27'),
-(4, 7, 'NJ-71753', 'Rồng Lửa Của Kai', 'Chiến đấu cùng Ninja lửa Kai cưỡi trên lưng con rồng đỏ rực phun lửa hung tợn.', 130000, 0.3, 169000, 22, 10, 1, '2026-03-27 14:09:27'),
-(5, 4, 'CT-60337', 'Tàu Chở Khách Tốc Hành', 'Hệ thống tàu điện thông minh điều khiển qua Bluetooth.', 0, 0.3, 0, 0, 10, 2, '2026-03-27 14:09:27'),
-(6, 6, 'CRE-10247', 'Vòng Đu Quay Ferris Wheel', 'Khu vui chơi giải trí tuyệt đẹp cho bộ sưu tập Creator.', 100000, 0.3, 130000, 6, 10, 1, '2026-03-27 14:09:27'),
-(7, 5, 'ARC-21044', 'Mô hình Paris Skyline', 'Bản đồ kiến trúc thu nhỏ của thủ đô ánh sáng Paris.', 100000, 0.3, 130000, 0, 10, 1, '2026-03-27 14:09:27'),
-(8, 4, 'CT-60321', 'Trạm Cứu Hỏa Trung Tâm', 'Xe cứu hỏa, trực thăng và đội cứu hộ thành phố City.', 130000, 0.3, 169000, 20, 10, 1, '2026-03-27 14:09:27'),
-(9, 8, 'SH-76191', 'Găng Tay Vô Cực Infinity Gauntlet', 'Mô hình Găng tay vô cực của Thanos mạ vàng sáng bóng.', 120000, 0.3, 156000, 15, 10, 1, '2026-03-27 14:09:27'),
-(10, 1, 'TEC-42056', 'Porsche 911 GT3 RS', 'Huyền thoại siêu xe Porsche màu cam rực rỡ.', 90000, 0.3, 117000, 9, 10, 1, '2026-03-27 14:09:27'),
-(11, 6, 'CRE-10281', 'Cây Bonsai Nhật Bản', 'Nghệ thuật trồng cây Bonsai thu nhỏ giúp thư giãn tĩnh tâm.', 100000, 0.3, 130000, 10, 10, 3, '2026-03-27 14:09:27'),
-(13, 1, 'TEC-42141', 'Siêu xe McLaren Formula 1', 'Xe đua F1 của đội McLaren với độ chi tiết khí động học cao.', 135000, 1, 270000, 1, 10, 1, '2026-03-27 14:09:27'),
-(36, 14, 'SP-TEST', 'SP TEST', 'TEST', 0, 0.3, 0, 0, 10, 1, '2026-04-04 13:34:45'),
-(37, 14, 'TEST2', 'TEST SP2', 'TEST2', 0, 0.3, 0, 0, 10, 1, '2026-04-03 22:33:01');
+(1, 3, 'SW-75192', 'Siêu tàu vũ trụ Millennium Falcon', 'Phi thuyền biểu tượng của Han Solo với hơn 7500 mảnh ghép, to nhất lịch sử Star Wars.', 120000, 0.3, 156000, 6, 20, 3, '2026-03-27 14:09:27'),
+(2, 1, 'TEC-42115', 'Siêu xe Lamborghini Sián FKP 37', 'Mô hình siêu xe thể thao màu xanh lá tỉ lệ 1:8 chân thực đến từng chi tiết động cơ.', 0, 1, 0, 0, 20, 3, '2026-03-27 14:09:27'),
+(3, 2, 'HP-71043', 'Lâu đài Hogwarts Castle', 'Trường học phép thuật Hogwarts siêu to khổng lồ dành cho các fan Harry Potter.', 0, 0.3, 0, 0, 20, 3, '2026-03-27 14:09:27'),
+(4, 7, 'NJ-71753', 'Rồng Lửa Của Kai', 'Chiến đấu cùng Ninja lửa Kai cưỡi trên lưng con rồng đỏ rực phun lửa hung tợn.', 120000, 0.3, 156000, 2, 20, 1, '2026-03-27 14:09:27'),
+(5, 4, 'CT-60337', 'Tàu Chở Khách Tốc Hành', 'Hệ thống tàu điện thông minh điều khiển qua Bluetooth.', 0, 0.3, 0, 0, 20, 2, '2026-03-27 14:09:27'),
+(6, 6, 'CRE-10247', 'Vòng Đu Quay Ferris Wheel', 'Khu vui chơi giải trí tuyệt đẹp cho bộ sưu tập Creator.', 100000, 0.3, 130000, 7, 20, 2, '2026-03-27 14:09:27'),
+(7, 5, 'ARC-21044', 'Mô hình Paris Skyline', 'Bản đồ kiến trúc thu nhỏ của thủ đô ánh sáng Paris.', 0, 0.3, 0, 0, 20, 2, '2026-03-27 14:09:27'),
+(8, 4, 'CT-60321', 'Trạm Cứu Hỏa Trung Tâm', 'Xe cứu hỏa, trực thăng và đội cứu hộ thành phố City.', 130000, 0.3, 169000, 15, 20, 1, '2026-03-27 14:09:27'),
+(9, 8, 'SH-76191', 'Găng Tay Vô Cực Infinity Gauntlet', 'Mô hình Găng tay vô cực của Thanos mạ vàng sáng bóng.', 0, 0.3, 0, 0, 20, 2, '2026-03-27 14:09:27'),
+(10, 1, 'TEC-42056', 'Porsche 911 GT3 RS', 'Huyền thoại siêu xe Porsche màu cam rực rỡ.', 120000, 0.3, 156000, 12, 20, 1, '2026-03-27 14:09:27'),
+(11, 6, 'CRE-10281', 'Cây Bonsai Nhật Bản', 'Nghệ thuật trồng cây Bonsai thu nhỏ giúp thư giãn tĩnh tâm.', 0, 0.3, 0, 0, 20, 3, '2026-03-27 14:09:27'),
+(13, 1, 'TEC-42141', 'Siêu xe McLaren Formula 1', 'Xe đua F1 của đội McLaren với độ chi tiết khí động học cao.', 120000, 1, 240000, 5, 20, 1, '2026-03-27 14:09:27'),
+(36, 14, 'SP-TEST', 'SP TEST', 'TEST', 112000, 1, 224000, 10, 20, 1, '2026-04-04 13:34:45'),
+(37, 14, 'TEST2', 'TEST SP2', 'TEST2', 107500, 0.3, 139750, 8, 20, 2, '2026-04-03 22:33:01');
 
 -- --------------------------------------------------------
 
@@ -483,9 +405,9 @@ CREATE TABLE `product_reviews` (
 --
 
 INSERT INTO `product_reviews` (`id`, `product_id`, `user_id`, `rating`, `comment`, `status`, `created_at`) VALUES
-(1, 2, 2, 5, 'ok', 'approved', '2026-04-02 13:18:44'),
-(2, 3, 2, 4, 'ok', 'approved', '2026-04-02 13:18:51'),
-(3, 1, 2, 1, 'bad', 'hidden', '2026-04-02 13:19:29');
+(1, 6, 2, 5, 'ok', 'approved', '2026-04-03 23:22:22'),
+(2, 37, 2, 5, 'okkk', 'approved', '2026-04-03 23:22:31'),
+(3, 36, 2, 4, 'good', 'approved', '2026-04-03 23:22:41');
 
 -- --------------------------------------------------------
 
@@ -612,6 +534,14 @@ CREATE TABLE `wishlists` (
   `product_id` int(11) NOT NULL COMMENT 'ID sản phẩm yêu thích',
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `wishlists`
+--
+
+INSERT INTO `wishlists` (`id`, `account_id`, `product_id`, `created_at`) VALUES
+(1, 2, 4, '2026-04-03 23:37:45'),
+(2, 2, 6, '2026-04-03 23:37:47');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -761,13 +691,13 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT cho bảng `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT cho bảng `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -779,31 +709,31 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT cho bảng `import_receipts`
 --
 ALTER TABLE `import_receipts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT cho bảng `import_receipt_details`
 --
 ALTER TABLE `import_receipt_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT cho bảng `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT cho bảng `order_history`
 --
 ALTER TABLE `order_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT cho bảng `products`
@@ -845,7 +775,7 @@ ALTER TABLE `user_addresses`
 -- AUTO_INCREMENT cho bảng `wishlists`
 --
 ALTER TABLE `wishlists`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Các ràng buộc cho các bảng đã đổ

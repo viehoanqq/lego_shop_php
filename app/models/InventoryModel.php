@@ -62,11 +62,14 @@ class InventoryModel extends Database {
         $db = $this->getConnection();
         $target_date = $db->real_escape_string($date) . ' 23:59:59';
         
+        // CÔNG THỨC: Tồn quá khứ = Tồn thực tế hiện tại - (Lượng nhập ở tương lai) + (Lượng bán ở tương lai)
         $sql = "SELECT p.id, p.name, p.sku, p.import_price,
         (
-            COALESCE((SELECT SUM(d.quantity) FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id WHERE d.product_id = p.id AND r.status='completed' AND r.created_at <= '$target_date'), 0)
-            -
-            COALESCE((SELECT SUM(od.quantity) FROM order_details od JOIN orders o ON od.order_id = o.id WHERE od.product_id = p.id AND o.status = 'delivered' AND o.created_at <= '$target_date'), 0)
+            p.stock_quantity 
+            - 
+            COALESCE((SELECT SUM(d.quantity) FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id WHERE d.product_id = p.id AND r.status='completed' AND r.created_at > '$target_date'), 0)
+            + 
+            COALESCE((SELECT SUM(od.quantity) FROM order_details od JOIN orders o ON od.order_id = o.id WHERE od.product_id = p.id AND o.status = 'delivered' AND o.created_at > '$target_date'), 0)
         ) as historical_stock
         FROM products p WHERE p.status IN (1,2)";
                 

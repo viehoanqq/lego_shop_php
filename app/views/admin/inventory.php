@@ -142,7 +142,7 @@
                             $wac = $ap['import_price'] ?? 0; 
                             $val = $ap['stock_quantity'] * $wac;
                         ?>
-                        <tr class="overview-row" data-search="<?= strtolower($ap['name'] . ' ' . $ap['sku']) ?>">
+                        <tr class="overview-row" data-id="<?= $ap['id'] ?>" data-min="<?= $ap['min_stock_level'] ?>" data-search="<?= strtolower($ap['name'] . ' ' . $ap['sku']) ?>">
                             <td>
                                 <div class="product-cell">
                                     <img src="/lego_shop_php/public/assets/images/<?= $ap['image_url'] ?? 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/52x52?text=LEGO'">
@@ -371,25 +371,50 @@ if (activeTab === 'alerts' || urlParams.has('threshold') || urlParams.has('keywo
     async function fetchSnapshot() {
         const date = document.getElementById('snapshotDate').value;
         if(!date) return;
+        
+        // Hiệu ứng UX: Đổi chữ nút thành Đang tải...
+        const btn = document.querySelector('button[onclick="fetchSnapshot()"]');
+        const oldText = btn.innerHTML;
+        btn.innerHTML = 'Đang tải <i class="fa-solid fa-spinner fa-spin"></i>';
+
         try {
             const res = await fetch(`/lego_shop_php/admininventory/getSnapshotAjax?date=${date}`);
             const result = await res.json();
+            
             if (result.success) {
-                const rows = document.querySelectorAll('#overviewTable tbody tr');
-                rows.forEach((row, index) => {
-                    const snapItem = result.data[index];
+                // TẠO TỪ ĐIỂN MAP: Biến mảng lộn xộn thành một danh sách có thể tra cứu bằng ID
+                const snapshotMap = {};
+                result.data.forEach(item => {
+                    snapshotMap[item.id] = item;
+                });
+
+                // CHẠY LẶP VÀ CẬP NHẬT CHÍNH XÁC
+                const rows = document.querySelectorAll('#overviewTable tbody tr.overview-row');
+                rows.forEach(row => {
+                    const pId = row.getAttribute('data-id'); // Lấy ID của dòng HTML hiện tại
+                    const snapItem = snapshotMap[pId];       // Tra cứu số liệu chuẩn xác bằng ID
+                    
                     if (snapItem) {
+                        // Tính toán số lượng và tiền
                         let qty = parseInt(snapItem.historical_stock);
-                        row.querySelector('.snap-qty').innerText = qty;
                         let wac = parseFloat(snapItem.import_price || 0);
                         let val = qty * wac;
+                        
+                        // Đẩy dữ liệu ra HTML
+                        row.querySelector('.snap-qty').innerText = qty;
                         row.querySelector('.snap-val').innerText = new Intl.NumberFormat('vi-VN').format(val);
-                        row.querySelector('.snap-qty').style.color = qty <= 0 ? '#ef4444' : '#10b981';
+                        
+                        // Đổi màu sắc (Đỏ nếu <= min_stock_level, Xanh nếu an toàn)
+                        let minStock = parseInt(row.getAttribute('data-min')) || 0;
+                        row.querySelector('.snap-qty').style.color = (qty <= minStock) ? '#ef4444' : '#10b981';
                     }
                 });
-                alert('Tra cứu thành công!');
             }
-        } catch (err) { console.error("Lỗi!"); }
+        } catch (err) { 
+            console.error("Lỗi:", err); 
+        } finally {
+            btn.innerHTML = oldText; // Trả lại chữ cho nút
+        }
     }
 
     async function openHistory(id, name) {

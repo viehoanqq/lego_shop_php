@@ -162,7 +162,7 @@
         // --- Lấy danh sách sản phẩm để quản lý giá (CÓ TÌM KIẾM & LỌC) ---
         public function getAllProductsWithPrices($filters = [], $offset = null, $limit = null) {
         $db = $this->getConnection();
-        $where = ["p.status IN ('1', '2')"];
+        $where = ["p.status IN ('1')"];
 
         if (!empty($filters['keyword'])) {
             $keyword = $db->real_escape_string($filters['keyword']);
@@ -534,7 +534,7 @@
             $sql = "SELECT p.*, 
                            (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as image_url 
                     FROM products p 
-                    WHERE p.status IN (1, 2)";
+                    WHERE p.status IN (1)";
             
             if (!empty($keyword)) {
                 $kw = $db->real_escape_string($keyword);

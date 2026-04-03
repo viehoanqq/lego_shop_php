@@ -2,7 +2,6 @@
 class ReportModel extends Database {
     
     // 1. LẤY DANH SÁCH BÁO CÁO TỔNG (Trang chủ Báo cáo)
-    // 1. LẤY DANH SÁCH BÁO CÁO TỔNG (Trang chủ Báo cáo)
     public function getInventoryReport($filters = []) {
         $db = $this->getConnection();
         
