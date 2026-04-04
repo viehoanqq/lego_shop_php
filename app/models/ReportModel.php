@@ -13,7 +13,15 @@ class ReportModel extends Database {
         $start_time = $db->real_escape_string($start_date . ' 00:00:00');
         $end_time = $db->real_escape_string($end_date . ' 23:59:59');
 
-        $where = "p.status IN (1, 2)";
+        // LOGIC MỚI: Lấy hàng đang bán (1,2) HOẶC hàng đã xóa (3) nhưng có phát sinh Nhập/Xuất trong kỳ
+        $where = "(p.status IN (1, 2) OR (p.status = 3 AND (
+                    EXISTS (SELECT 1 FROM order_details od JOIN orders o ON od.order_id = o.id 
+                            WHERE od.product_id = p.id AND o.status = 'delivered' AND o.created_at BETWEEN '$start_time' AND '$end_time')
+                    OR 
+                    EXISTS (SELECT 1 FROM import_receipt_details id JOIN import_receipts ir ON id.receipt_id = ir.id 
+                            WHERE id.product_id = p.id AND ir.status = 'completed' AND ir.created_at BETWEEN '$start_time' AND '$end_time')
+                  )))";
+
         if ($category_id !== 'all') {
             $where .= " AND p.category_id = " . intval($category_id);
         }
@@ -21,7 +29,7 @@ class ReportModel extends Database {
             $where .= " AND (p.name LIKE '%$keyword%' OR p.sku LIKE '%$keyword%')";
         }
 
-        $sql = "SELECT p.id, p.name, p.sku, 
+        $sql = "SELECT p.id, p.name, p.sku, p.status, 
                 -- Số lượng Nhập và Tổng tiền nhập (Vốn)
                 (SELECT COALESCE(SUM(d.quantity), 0) FROM import_receipt_details d 
                  JOIN import_receipts r ON d.receipt_id = r.id 
@@ -88,6 +96,7 @@ class ReportModel extends Database {
         $start_dt = $db->real_escape_string($start . ' 00:00:00');
         $end_dt = $db->real_escape_string($end . ' 23:59:59');
 
+        // 1. Tính tồn đầu kỳ
         $sqlOpening = "SELECT (
             COALESCE((SELECT SUM(d.quantity) FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id WHERE d.product_id = $id AND r.status = 'completed' AND r.created_at < '$start_dt'), 0)
             -
@@ -95,25 +104,32 @@ class ReportModel extends Database {
         ) as opening";
         $opening = $db->query($sqlOpening)->fetch_assoc()['opening'];
 
+        // 2. Tính Nhập, Xuất, Doanh Thu và LỢI NHUẬN GỘP
         $sqlMain = "SELECT 
-                    SUM(CASE WHEN type = 'import' THEN qty ELSE 0 END) as total_in,
-                    SUM(CASE WHEN type = 'export' THEN ABS(qty) ELSE 0 END) as total_out,
-                    (SELECT SUM((od.price - p.import_price) * od.quantity) 
-                     FROM order_details od JOIN orders o ON od.order_id = o.id JOIN products p ON od.product_id = p.id
-                     WHERE od.product_id = $id AND o.status = 'delivered' AND o.created_at BETWEEN '$start_dt' AND '$end_dt') as profit
-                FROM (
-                    SELECT 'import' as type, d.quantity as qty FROM import_receipt_details d 
-                    JOIN import_receipts r ON d.receipt_id = r.id 
-                    WHERE d.product_id = $id AND r.status = 'completed' AND r.created_at BETWEEN '$start_dt' AND '$end_dt'
-                    UNION ALL
-                    SELECT 'export' as type, -od.quantity as qty FROM order_details od 
-                    JOIN orders o ON od.order_id = o.id 
-                    WHERE od.product_id = $id AND o.status = 'delivered' AND o.created_at BETWEEN '$start_dt' AND '$end_dt'
-                ) as combined";
+            -- Tổng SL Nhập
+            (SELECT COALESCE(SUM(d.quantity), 0) FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id WHERE d.product_id = $id AND r.status = 'completed' AND r.created_at BETWEEN '$start_dt' AND '$end_dt') as total_in,
+            
+            -- Tổng SL Bán (Chỉ tính Delivered)
+            (SELECT COALESCE(SUM(od.quantity), 0) FROM order_details od JOIN orders o ON od.order_id = o.id WHERE od.product_id = $id AND o.status = 'delivered' AND o.created_at BETWEEN '$start_dt' AND '$end_dt') as total_out,
+            
+            -- Tổng Doanh Thu (Giá bán * Số lượng)
+            (SELECT COALESCE(SUM(od.quantity * od.price), 0) FROM order_details od JOIN orders o ON od.order_id = o.id WHERE od.product_id = $id AND o.status = 'delivered' AND o.created_at BETWEEN '$start_dt' AND '$end_dt') as revenue,
+            
+            -- LỢI NHUẬN GỘP: SUM(Số lượng bán * (Giá bán thực tế - Giá nhập gốc))
+            (SELECT COALESCE(SUM(od.quantity * (od.price - p.import_price)), 0) 
+             FROM order_details od 
+             JOIN orders o ON od.order_id = o.id 
+             JOIN products p ON od.product_id = p.id
+             WHERE od.product_id = $id AND o.status = 'delivered' AND o.created_at BETWEEN '$start_dt' AND '$end_dt') as gross_profit";
         
         $stats = $db->query($sqlMain)->fetch_assoc();
+        
+        // Gán các thông số trả về
         $stats['opening_stock'] = $opening;
         $stats['closing_stock'] = $opening + $stats['total_in'] - $stats['total_out'];
+        
+        // Gán Lợi nhuận gộp vào key 'profit' để View hiển thị
+        $stats['profit'] = $stats['gross_profit']; 
         
         return $stats;
     }

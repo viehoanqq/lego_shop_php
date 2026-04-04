@@ -36,7 +36,8 @@ class AdminSupplierController extends Controller {
         
         $this->view('admin/suppliers', array_merge($pageData, [
             'is_form' => false,
-            'filters' => $filters
+            'filters' => $filters,
+            'title'   => 'Quản lý nhà cung cấp',
         ]));
     }
 

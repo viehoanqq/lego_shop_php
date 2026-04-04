@@ -49,7 +49,8 @@ class AdminProductController extends Controller {
         $this->view('admin/products', array_merge($pageData, [
             'categories' => $categories,
             'is_form'    => false,
-            'filters'    => $filters
+            'filters'    => $filters,
+            'title'   => 'Quản lý sản phẩm',
         ]));
     }
 

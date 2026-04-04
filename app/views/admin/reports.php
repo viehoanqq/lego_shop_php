@@ -123,13 +123,32 @@
                     $sum_qty_in += $r['qty_in']; $sum_qty_out += $r['qty_out'];
                     $sum_import_cost += $r['total_import_cost']; $sum_revenue += $r['total_revenue'];
                     $sum_difference += $difference;
+                    
+                    // Kiểm tra xem sản phẩm có bị xóa mềm không
+                    $isDeleted = (isset($r['status']) && $r['status'] == 3);
                 ?>
-                <tr style="transition: 0.2s;">
+                <tr style="transition: 0.2s; <?= $isDeleted ? 'background-color: #f8fafc;' : '' ?>">
                     <td>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <img src="/lego_shop_php/public/assets/images/<?= !empty($r['main_image']) ? $r['main_image'] : 'default.jpg' ?>" class="img-report" onerror="this.src='https://placehold.co/50x50?text=LEGO'">
+                        <div style="display: flex; align-items: center; gap: 15px; <?= $isDeleted ? 'opacity: 0.6;' : '' ?>">
+                            
+                            <img src="/lego_shop_php/public/assets/images/<?= !empty($r['main_image']) ? $r['main_image'] : 'default.jpg' ?>" 
+                                 class="img-report" 
+                                 onerror="this.src='https://placehold.co/50x50?text=LEGO'"
+                                 style="<?= $isDeleted ? 'filter: grayscale(100%);' : '' ?>">
+                                 
                             <div>
-                                <div style="font-weight: 700; color: #1e293b; font-size: 14px; margin-bottom: 4px;"><?= htmlspecialchars($r['name']) ?></div>
+                                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 4px;">
+                                    <span style="font-weight: 700; color: <?= $isDeleted ? '#475569' : '#1e293b' ?>; font-size: 14px;">
+                                        <?= htmlspecialchars($r['name']) ?>
+                                    </span>
+                                    
+                                    <?php if($isDeleted): ?>
+                                        <span style="color: #475569; font-size: 10px; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-weight: 700; border: 1px solid #cbd5e1;">
+                                            <i class="fa-solid fa-ban"></i> Ngừng kinh doanh
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                
                                 <span style="background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; color: #64748b; border: 1px solid #e2e8f0;">SKU: <?= strtoupper($r['sku']) ?></span>
                             </div>
                         </div>

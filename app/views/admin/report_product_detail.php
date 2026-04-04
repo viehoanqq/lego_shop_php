@@ -71,8 +71,8 @@
             <div class="card-value" style="color: #1e40af;"><?= number_format($stats['closing_stock']) ?> <small style="font-size: 12px; opacity: 0.7;">cái</small></div>
         </div>
         <div class="report-card card-profit-focus">
-            <span class="card-label">Lợi nhuận gộp</span>
-            <span class="card-date">Ước tính doanh thu</span>
+            <span class="card-label">Lợi nhuận bán hàng</span>
+            <span class="card-date">Dựa trên doanh thu thực tế từ đơn hàng đã giao</span>
             <div class="card-value"><?= number_format($stats['profit'], 0, ',', '.') ?>đ</div>
         </div>
     </div>

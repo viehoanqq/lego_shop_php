@@ -24,7 +24,8 @@ class AdminReviewController extends Controller {
             'reviews' => $reviews,
             'keyword' => $keyword,
             'rating'  => $rating,
-            'product_id' => $product_id
+            'product_id' => $product_id,
+            'title'   => 'Quản lý đánh giá',
         ]);
     }
 

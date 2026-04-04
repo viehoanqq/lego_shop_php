@@ -33,7 +33,8 @@ class AdminInventoryController extends Controller {
             'currentPage'  => $page,
             'currentType'  => $type,
             'keyword'      => $keyword,
-            'custom_threshold' => $custom_threshold
+            'custom_threshold' => $custom_threshold,
+            'title'   => 'Quản lý tồn kho',
         ]);
     }
 
@@ -77,61 +78,6 @@ class AdminInventoryController extends Controller {
         exit;
     }
 
-    // API Điều chỉnh kho
-    public function adjustStockAjax() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            header('Content-Type: application/json');
-            $data = json_decode(file_get_contents('php://input'), true);
-            $pid = $data['product_id'];
-            $real = $data['real_stock'];
-            $reason = $data['reason'];
-            
-            if($this->InventoryModel->adjustStock($pid, $_SESSION['admin_id'], $real, $reason)){
-                echo json_encode(['success' => true]);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Lỗi CSDL']);
-            }
-            exit;
-        }
-    }
-
-    public function updateBulkMinStock() {
-        // Chỉ xử lý nếu là yêu cầu POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            header('Content-Type: application/json');
-            
-            // Đọc dữ liệu JSON gửi từ Fetch API hoặc Ajax
-            $json = file_get_contents('php://input');
-            $data = json_decode($json, true);
-            
-            // Kiểm tra dữ liệu đầu vào
-            if (!$data || empty($data['items'])) {
-                echo json_encode(['success' => false, 'message' => 'Dữ liệu gửi lên không hợp lệ hoặc trống.']);
-                return;
-            }
-            
-            $db = $this->InventoryModel->getConnection();
-            $db->begin_transaction(); // Sử dụng Transaction để đảm bảo tính toàn vẹn dữ liệu
-
-            try {
-                foreach ($data['items'] as $item) {
-                    $product_id = intval($item['product_id']);
-                    $min_stock = intval($item['min_stock']);
-                    
-                    // Chỉ cập nhật nếu ID hợp lệ và số lượng không âm
-                    if ($product_id > 0 && $min_stock >= 0) {
-                        $this->InventoryModel->updateSingleMinStock($product_id, $min_stock);
-                    }
-                }
-                
-                $db->commit();
-                echo json_encode(['success' => true, 'message' => 'Cập nhật ngưỡng tồn kho thành công!']);
-            } catch (Exception $e) {
-                $db->rollback();
-                echo json_encode(['success' => false, 'message' => 'Lỗi hệ thống: ' . $e->getMessage()]);
-            }
-            exit;
-        }
-    }
+       
 }
 ?>

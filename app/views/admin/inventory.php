@@ -24,7 +24,6 @@
     .form-control { height: 40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 12px; background: #fff; transition: 0.2s; font-size: 13px; outline: none; }
     .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
     
-    /* Đã đồng bộ màu nút bấm sang Xanh dương */
     .btn-filter-action { height: 40px; padding: 0 16px; border-radius: 8px; border: none; background: #3b82f6; color: #fff; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; font-size: 13px; }
     .btn-filter-action:hover { background: #2563eb; }
     .btn-outline { background: #fff; color: #3b82f6; border: 1px solid #3b82f6; }
@@ -40,7 +39,6 @@
     .product-cell { display: flex; align-items: center; gap: 12px; }
     .img-product { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0; background: #fff; }
     
-    /* CẢNH BÁO TỒN KHO & LỌC */
     .stock-badge { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; width: 120px; justify-content: center; }
     .stock-low { background: #fef08a; color: #a16207; border: 1px solid #fde047; }
     .stock-empty { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; animation: pulseRed 1.5s infinite; }
@@ -52,7 +50,6 @@
         100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
 
-    /* BỘ LỌC "TỒN DƯỚI" THIẾT KẾ MỚI ĐỒNG BỘ */
     .filter-threshold-group {
         display: flex; align-items: center; gap: 0;
         background: #f8fafc; border: 1px solid #cbd5e1;
@@ -61,15 +58,14 @@
     .filter-threshold-label { font-size: 12px; font-weight: 700; color: #475569; padding: 0 10px; white-space: nowrap; }
     .filter-threshold-input { border: 1px solid #e2e8f0; background: #fff; height: 34px; border-radius: 6px; width: 90px; padding: 0 10px; outline: none; font-size: 13px; }
     .filter-threshold-input:focus { border-color: #3b82f6; }
-    .filter-threshold-btn { background: #ff0000; color: #fff; height: 34px; padding: 0 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; margin-left: 4px; font-size: 12px; }
-    .filter-threshold-btn:hover { background: #c70000; }
+    .filter-threshold-btn { background: #3b82f6; color: #fff; height: 34px; padding: 0 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; margin-left: 4px; font-size: 12px; }
+    .filter-threshold-btn:hover { background: #2563eb; }
     
     .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
     .page-link { padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #475569; background: #fff; font-weight: 600; transition: 0.2s; }
     .page-link:hover { background: #f8fafc; }
     .page-link.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
 
-    /* MODAL CSS */
     .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px); }
     .modal-content { background: #fff; padding: 25px; width: 800px; max-width: 90%; border-radius: 14px; margin: 50px auto; box-shadow: 0 10px 40px rgba(0,0,0,0.15); animation: fadeIn 0.25s ease; max-height: 85vh; overflow-y: auto;}
     .modal-content h3 { margin-top: 0; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px;}
@@ -133,7 +129,7 @@
                     <th style="text-align: right;">Giá nhập (WAC)</th>
                     <th style="text-align: center;">Tồn kho tại ngày</th>
                     <th style="text-align: right;">Tổng giá trị vốn</th>
-                    <th style="text-align: center;">Thao tác</th>
+                    <th style="text-align: center;">Thẻ Kho</th>
                 </tr>
             </thead>
             <tbody>
@@ -165,10 +161,9 @@
                         </td>
                         
                         <td style="text-align: center;">
-                            <div style="display: flex; gap: 8px; justify-content: center;">
-                                <button class="btn-action-small" onclick="openHistory(<?= $ap['id'] ?>, '<?= addslashes($ap['name']) ?>')" title="Thẻ kho (Lịch sử)"><i class="fa-solid fa-clock-rotate-left"></i></button>
-                                <button class="btn-action-small" onclick="openAdjust(<?= $ap['id'] ?>, '<?= addslashes($ap['name']) ?>', <?= $ap['stock_quantity'] ?>)" title="Điều chỉnh số lượng"><i class="fa-solid fa-pen"></i></button>
-                            </div>
+                            <button class="btn-action-small" onclick="openHistory(<?= $ap['id'] ?>, '<?= addslashes($ap['name']) ?>')">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử
+                            </button>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -268,27 +263,6 @@
     <?php endif; ?>
 </div>
 
-<div id="adjustModal" class="modal">
-    <div class="modal-content" style="width: 500px;">
-        <h3><i class="fa-solid fa-pen-to-square" style="color:#3b82f6;"></i> Điều chỉnh tồn kho</h3>
-        <p style="margin-bottom: 10px; color: #475569;">Sản phẩm: <b id="adjProductName" style="color: #1e293b;"></b></p>
-        <p style="margin-bottom: 20px; color: #475569;">Tồn trên hệ thống: <b id="adjOldStock" style="color:#ef4444; font-size: 18px;"></b></p>
-        
-        <input type="hidden" id="adjProductId">
-        
-        <label style="font-weight: 700; font-size: 12px; color: #475569; display: block; margin-bottom: 6px;">Tồn kho đếm thực tế:</label>
-        <input type="number" id="adjRealStock" class="form-control" min="0" style="font-size: 16px; font-weight: bold; color: #3b82f6; width: 100%; margin-bottom: 15px;">
-        
-        <label style="font-weight: 700; font-size: 12px; color: #475569; display: block; margin-bottom: 6px;">Lý do chênh lệch:</label>
-        <input type="text" id="adjReason" class="form-control" placeholder="VD: Hàng móp méo, đếm sai..." style="width: 100%;">
-        
-        <div style="text-align: right; margin-top: 25px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
-            <button onclick="document.getElementById('adjustModal').style.display='none'" class="btn-filter-action" style="background:#f1f5f9; color:#475569; display:inline-flex;">Hủy bỏ</button>
-            <button onclick="submitAdjust()" class="btn-filter-action" style="display: inline-flex; margin-left: 10px;"><i class="fa-solid fa-floppy-disk"></i> Lưu điều chỉnh</button>
-        </div>
-    </div>
-</div>
-
 <div id="historyModal" class="modal">
     <div class="modal-content" style="width: 800px;">
         <h3>
@@ -349,10 +323,8 @@
 </div>
 
 <script>
-    // FIX LỖI JAVASCRIPT GLOBAL BẰNG WINDOW OBJECT
     window.productsData = <?= json_encode($all_products ?? []) ?>;
 
-    // --- 1. JS XỬ LÝ TABS ---
     function switchTab(tabId) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -365,7 +337,6 @@
         switchTab('alerts');
     }
 
-    // --- 2. TÌM KIẾM NHANH TAB TỔNG QUAN ---
     function filterOverviewTable() {
         let input = document.getElementById("quickSearchOverview").value.toLowerCase();
         let rows = document.querySelectorAll(".overview-row");
@@ -375,7 +346,6 @@
         });
     }
 
-    // --- CÁC HÀM API FETCH & AJAX BÊN DƯỚI GIỮ NGUYÊN (KHÔNG LỖI) ---
     async function fetchSnapshot() {
         const date = document.getElementById('snapshotDate').value;
         if(!date) return;
@@ -398,33 +368,6 @@
                 alert('Tra cứu thành công!');
             }
         } catch (err) { console.error("Lỗi!"); }
-    }
-
-    function openAdjust(id, name, oldStock) {
-        document.getElementById('adjProductId').value = id;
-        document.getElementById('adjProductName').innerText = name;
-        document.getElementById('adjOldStock').innerText = oldStock;
-        document.getElementById('adjRealStock').value = oldStock;
-        document.getElementById('adjReason').value = '';
-        document.getElementById('adjustModal').style.display = 'block';
-    }
-
-    async function submitAdjust() {
-        const pid = document.getElementById('adjProductId').value;
-        const real = document.getElementById('adjRealStock').value;
-        const reason = document.getElementById('adjReason').value;
-        
-        if (real === "") return alert('Vui lòng nhập số lượng!');
-        if (!reason) return alert('Vui lòng ghi chú lý do!');
-
-        try {
-            const res = await fetch('/lego_shop_php/admininventory/adjustStockAjax', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({product_id: pid, real_stock: real, reason: reason})
-            });
-            const result = await res.json();
-            if(result.success) { location.reload(); } else { alert('Lỗi: ' + result.message); }
-        } catch(err) { alert('Lỗi mạng!'); }
     }
 
     async function openHistory(id, name) {
@@ -456,9 +399,12 @@
                         let color = isPlus ? '#10b981' : '#ef4444';
                         let sign = isPlus ? '+' : '';
                         let typeBadge = '';
-                        if (item.type === 'import') typeBadge = '<span style="background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:4px; font-size: 11px;">Nhập kho</span>';
-                        else if (item.type === 'export') typeBadge = '<span style="background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:4px; font-size: 11px;">Xuất bán</span>';
-                        else typeBadge = '<span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:4px; font-size: 11px;">Điều chỉnh</span>';
+                        
+                        if (item.type === 'import') {
+                            typeBadge = '<span style="background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:4px; font-size: 11px;">Nhập kho</span>';
+                        } else if (item.type === 'export') {
+                            typeBadge = '<span style="background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:4px; font-size: 11px;">Xuất bán</span>';
+                        }
 
                         let safeNote = item.note.replace(/PN-(\d+)/g, '<a href="/lego_shop_php/adminimport/detail/$1" target="_blank" style="color:#3b82f6;">PN-$1</a>')
                                                 .replace(/DH-(\d+)/g, '<a href="/lego_shop_php/adminorder/detail/$1" target="_blank" style="color:#3b82f6;">DH-$1</a>');

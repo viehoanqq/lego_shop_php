@@ -56,43 +56,18 @@ class InventoryModel extends Database {
         $target_date = $db->real_escape_string($date) . ' 23:59:59';
         
         $sql = "SELECT p.id, p.name, p.sku, p.import_price,
-                (
-                    COALESCE((SELECT SUM(d.quantity) FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id WHERE d.product_id = p.id AND r.status='completed' AND r.created_at <= '$target_date'), 0)
-                    -
-                    COALESCE((SELECT SUM(od.quantity) FROM order_details od JOIN orders o ON od.order_id = o.id WHERE od.product_id = p.id AND o.status != 'cancelled' AND o.created_at <= '$target_date'), 0)
-                    +
-                    COALESCE((SELECT SUM(a.qty_change) FROM stock_adjustments a WHERE a.product_id = p.id AND a.created_at <= '$target_date'), 0)
-                ) as historical_stock
-                FROM products p WHERE p.status IN (1,2)";
+        (
+            COALESCE((SELECT SUM(d.quantity) FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id WHERE d.product_id = p.id AND r.status='completed' AND r.created_at <= '$target_date'), 0)
+            -
+            COALESCE((SELECT SUM(od.quantity) FROM order_details od JOIN orders o ON od.order_id = o.id WHERE od.product_id = p.id AND o.status = 'delivered' AND o.created_at <= '$target_date'), 0)
+        ) as historical_stock
+        FROM products p WHERE p.status IN (1,2)";
                 
         $result = $db->query($sql);
         return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    // 3. Kiểm kho & Điều chỉnh
-    public function adjustStock($product_id, $admin_id, $real_stock, $reason) {
-        $db = $this->getConnection();
-        $product_id = intval($product_id);
-        $real_stock = intval($real_stock);
-        $reason = $db->real_escape_string($reason);
-
-        $res = $db->query("SELECT stock_quantity FROM products WHERE id = $product_id");
-        $old_stock = $res->fetch_assoc()['stock_quantity'];
-        $qty_change = $real_stock - $old_stock;
-
-        if ($qty_change == 0) return true; // Không thay đổi gì
-
-        $db->begin_transaction();
-        try {
-            $db->query("UPDATE products SET stock_quantity = $real_stock WHERE id = $product_id");
-            $db->query("INSERT INTO stock_adjustments (product_id, admin_id, old_stock, new_stock, qty_change, reason) 
-                        VALUES ($product_id, $admin_id, $old_stock, $real_stock, $qty_change, '$reason')");
-            $db->commit();
-            return true;
-        } catch (Exception $e) {
-            $db->rollback(); return false;
-        }
-    }
+    
 
     // Cập nhật mức cảnh báo
     public function updateAllMinStock($min_stock) {
@@ -122,24 +97,18 @@ class InventoryModel extends Database {
 
         // Gom tổng các biến động xảy ra SAU thời điểm $datetime
         $sql = "
-            SELECT SUM(qty_change) as total_change FROM (
-                SELECT d.quantity as qty_change 
-                FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id 
-                WHERE d.product_id = $pid AND r.status='completed' AND r.created_at > '$dt'
-                
-                UNION ALL
-                
-                SELECT -(od.quantity) as qty_change 
-                FROM order_details od JOIN orders o ON od.order_id = o.id 
-                WHERE od.product_id = $pid AND o.status = 'delivered' AND o.created_at > '$dt'
-                
-                UNION ALL
-                
-                SELECT qty_change 
-                FROM stock_adjustments 
-                WHERE product_id = $pid AND created_at > '$dt'
-            ) as changes
-        ";
+    SELECT SUM(qty_change) as total_change FROM (
+        SELECT d.quantity as qty_change 
+        FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id 
+        WHERE d.product_id = $pid AND r.status='completed' AND r.created_at > '$dt'
+        
+        UNION ALL
+        
+        SELECT -(od.quantity) as qty_change 
+        FROM order_details od JOIN orders o ON od.order_id = o.id 
+        WHERE od.product_id = $pid AND o.status = 'delivered' AND o.created_at > '$dt'
+    ) as changes
+";
         
         $res = $db->query($sql);
         $total_change = $res->fetch_assoc()['total_change'] ?? 0;
@@ -157,25 +126,19 @@ class InventoryModel extends Database {
         $end_time = $db->real_escape_string($date) . ' 23:59:59';
 
         $sql = "
-            SELECT * FROM (
-                SELECT 'import' as type, r.created_at, d.quantity as qty_change, CONCAT('PN-', r.id, ' - Nhập hàng từ NCC') as note 
-                FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id 
-                WHERE d.product_id = $pid AND r.status='completed' AND r.created_at >= '$start_time' AND r.created_at <= '$end_time'
-                
-                UNION ALL
-                
-                SELECT 'export' as type, o.created_at, -(od.quantity) as qty_change, CONCAT('DH-', o.id, ' - Xuất bán đơn hàng') as note 
-                FROM order_details od JOIN orders o ON od.order_id = o.id 
-                WHERE od.product_id = $pid AND o.status = 'delivered' AND o.created_at >= '$start_time' AND o.created_at <= '$end_time'
-                
-                UNION ALL
-                
-                SELECT 'adjust' as type, created_at, qty_change, CONCAT('Điều chỉnh - Kiểm kho: ', reason) as note 
-                FROM stock_adjustments 
-                WHERE product_id = $pid AND created_at >= '$start_time' AND created_at <= '$end_time'
-            ) as daily_transactions
-            ORDER BY created_at ASC
-        ";
+    SELECT * FROM (
+        SELECT 'import' as type, r.created_at, d.quantity as qty_change, CONCAT('PN-', r.id, ' - Nhập hàng từ NCC') as note 
+        FROM import_receipt_details d JOIN import_receipts r ON d.receipt_id = r.id 
+        WHERE d.product_id = $pid AND r.status='completed' AND r.created_at >= '$start_time' AND r.created_at <= '$end_time'
+        
+        UNION ALL
+        
+        SELECT 'export' as type, o.created_at, -(od.quantity) as qty_change, CONCAT('DH-', o.id, ' - Xuất bán đơn hàng') as note 
+        FROM order_details od JOIN orders o ON od.order_id = o.id 
+        WHERE od.product_id = $pid AND o.status = 'delivered' AND o.created_at >= '$start_time' AND o.created_at <= '$end_time'
+    ) as daily_transactions
+    ORDER BY created_at ASC
+";
                 
         $result = $db->query($sql);
         return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];

@@ -43,7 +43,8 @@ class AdminCategoryController extends Controller {
 
         $this->view('admin/categories', array_merge($pageData, [
             'is_form' => false,
-            'filters' => $filters
+            'filters' => $filters,
+            'title'   => 'Quản lý danh mục',
         ]));
     }
 

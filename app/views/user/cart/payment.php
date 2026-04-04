@@ -11,7 +11,7 @@ $current_order_id = $order_id ?? 0;
 $current_total_price = $total_price ?? 0;
 
 // Link tạo mã VietQR tự động (Thay MB bằng ngân hàng của bạn, 0961589023 là STK)
-$qr_code_url = "https://img.vietqr.io/image/MB-0961589023-compact.png?amount={$current_total_price}&addInfo=LEGO{$current_order_id}";
+$qr_code_url = "/lego_shop_php/public/assets/images/qrcode.png"; // Thay bằng link tạo mã QR động nếu có
 ?>
 
 <!DOCTYPE html>
