@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th4 03, 2026 lúc 06:50 PM
+-- Thời gian đã tạo: Th4 04, 2026 lúc 07:01 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -192,7 +192,11 @@ INSERT INTO `orders` (`id`, `user_id`, `status`, `payment_method`, `payment_stat
 (2, 2, 'delivered', 'transfer', 'paid', 2242500, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-02 22:56:39'),
 (3, 2, 'delivered', 'cash', 'unpaid', 1850000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-02 22:59:06'),
 (4, 2, 'delivered', 'transfer', 'paid', 1428700, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-03 23:01:57'),
-(5, 2, 'delivered', 'cash', 'unpaid', 1568000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-03 23:03:14');
+(5, 2, 'delivered', 'cash', 'unpaid', 1568000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-03 23:03:14'),
+(6, 2, 'delivered', 'transfer', 'paid', 1200000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 11:18:38'),
+(7, 2, 'pending', 'cash', 'unpaid', 139750, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 11:38:59'),
+(8, 2, 'pending', 'cash', 'unpaid', 1326000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 11:39:20'),
+(9, 2, 'delivered', 'transfer', 'paid', 780000, 'Hoàng Nguyễn', '0961589023', '451 Phạm Thế Hiển', 'Phường Bến Nghé', 'Quận 1', 'Hồ Chí Minh', '2026-04-04 11:39:31');
 
 -- --------------------------------------------------------
 
@@ -225,7 +229,12 @@ INSERT INTO `order_details` (`id`, `order_id`, `product_id`, `quantity`, `price`
 (9, 4, 4, 3, 156000, 120000.00),
 (10, 4, 37, 2, 139750, 107500.00),
 (11, 4, 36, 2, 145600, 112000.00),
-(12, 5, 36, 7, 224000, 112000.00);
+(12, 5, 36, 7, 224000, 112000.00),
+(13, 6, 13, 5, 240000, 120000.00),
+(14, 7, 37, 1, 139750, 107500.00),
+(15, 8, 8, 6, 169000, 130000.00),
+(16, 8, 4, 2, 156000, 120000.00),
+(17, 9, 10, 5, 156000, 120000.00);
 
 -- --------------------------------------------------------
 
@@ -260,7 +269,13 @@ INSERT INTO `order_history` (`id`, `order_id`, `status`, `changed_at`, `note`) V
 (12, 4, 'delivered', '2026-04-03 23:02:13', ''),
 (13, 5, 'confirmed', '2026-04-03 23:03:26', ''),
 (14, 5, 'shipping', '2026-04-03 23:03:28', ''),
-(15, 5, 'delivered', '2026-04-03 23:03:30', '');
+(15, 5, 'delivered', '2026-04-03 23:03:30', ''),
+(16, 6, 'confirmed', '2026-04-04 11:18:52', ''),
+(17, 6, 'shipping', '2026-04-04 11:18:54', ''),
+(18, 6, 'delivered', '2026-04-04 11:18:56', ''),
+(19, 9, 'confirmed', '2026-04-04 11:40:30', ''),
+(20, 9, 'shipping', '2026-04-04 11:40:32', ''),
+(21, 9, 'delivered', '2026-04-04 11:40:34', '');
 
 -- --------------------------------------------------------
 
@@ -297,11 +312,11 @@ INSERT INTO `products` (`id`, `category_id`, `sku`, `name`, `description`, `impo
 (7, 5, 'ARC-21044', 'Mô hình Paris Skyline', 'Bản đồ kiến trúc thu nhỏ của thủ đô ánh sáng Paris.', 0, 0.3, 0, 0, 20, 2, '2026-03-27 14:09:27'),
 (8, 4, 'CT-60321', 'Trạm Cứu Hỏa Trung Tâm', 'Xe cứu hỏa, trực thăng và đội cứu hộ thành phố City.', 130000, 0.3, 169000, 15, 20, 1, '2026-03-27 14:09:27'),
 (9, 8, 'SH-76191', 'Găng Tay Vô Cực Infinity Gauntlet', 'Mô hình Găng tay vô cực của Thanos mạ vàng sáng bóng.', 0, 0.3, 0, 0, 20, 2, '2026-03-27 14:09:27'),
-(10, 1, 'TEC-42056', 'Porsche 911 GT3 RS', 'Huyền thoại siêu xe Porsche màu cam rực rỡ.', 120000, 0.3, 156000, 12, 20, 1, '2026-03-27 14:09:27'),
+(10, 1, 'TEC-42056', 'Porsche 911 GT3 RS', 'Huyền thoại siêu xe Porsche màu cam rực rỡ.', 120000, 0.3, 156000, 7, 20, 1, '2026-03-27 14:09:27'),
 (11, 6, 'CRE-10281', 'Cây Bonsai Nhật Bản', 'Nghệ thuật trồng cây Bonsai thu nhỏ giúp thư giãn tĩnh tâm.', 0, 0.3, 0, 0, 20, 3, '2026-03-27 14:09:27'),
-(13, 1, 'TEC-42141', 'Siêu xe McLaren Formula 1', 'Xe đua F1 của đội McLaren với độ chi tiết khí động học cao.', 120000, 1, 240000, 5, 20, 1, '2026-03-27 14:09:27'),
-(36, 14, 'SP-TEST', 'SP TEST', 'TEST', 112000, 1, 224000, 10, 20, 1, '2026-04-04 13:34:45'),
-(37, 14, 'TEST2', 'TEST SP2', 'TEST2', 107500, 0.3, 139750, 8, 20, 2, '2026-04-03 22:33:01');
+(13, 1, 'TEC-42141', 'Siêu xe McLaren Formula 1', 'Xe đua F1 của đội McLaren với độ chi tiết khí động học cao.', 120000, 1, 240000, 0, 20, 1, '2026-03-27 14:09:27'),
+(36, 14, 'SP-TEST', 'SP TEST NEW', 'TEST', 112000, 1, 224000, 10, 20, 2, '2026-04-04 13:34:45'),
+(37, 14, 'TEST2', 'TEST SP2', 'TEST2', 107500, 0.3, 139750, 8, 20, 1, '2026-04-03 22:33:01');
 
 -- --------------------------------------------------------
 
@@ -407,7 +422,8 @@ CREATE TABLE `product_reviews` (
 INSERT INTO `product_reviews` (`id`, `product_id`, `user_id`, `rating`, `comment`, `status`, `created_at`) VALUES
 (1, 6, 2, 5, 'ok', 'approved', '2026-04-03 23:22:22'),
 (2, 37, 2, 5, 'okkk', 'approved', '2026-04-03 23:22:31'),
-(3, 36, 2, 4, 'good', 'approved', '2026-04-03 23:22:41');
+(3, 36, 2, 4, 'good', 'hidden', '2026-04-03 23:22:41'),
+(4, 10, 2, 5, 'ok', 'approved', '2026-04-04 11:41:46');
 
 -- --------------------------------------------------------
 
@@ -444,7 +460,7 @@ CREATE TABLE `shop_settings` (
 --
 
 INSERT INTO `shop_settings` (`id`, `shop_name`, `company_name`, `business_license`, `logo_url`, `phone`, `email`, `address`, `working_hours_1`, `working_hours_2`, `policy_1`, `policy_2`, `policy_3`, `policy_4`, `policy_5`, `facebook_url`, `instagram_url`, `youtube_url`, `tiktok_url`, `zalo_url`, `updated_at`) VALUES
-(1, 'LEGO WORLD STORE', 'Công ty cổ phần LEGO', '0309132354', 'logo.png', '1900 1208 0000000000000000000000000', 'hotro@legoworldstore.com.vn', '273 An Dương Vương, Phường 1, Quận 5, TP. Hồ Chí Minh', 'Thứ 2 - Thứ 7: 8:00 - 17:00', 'Chủ nhật: 8:00 - 12:00', 'Miễn phí giao hàng đơn từ 500k', 'Giao hàng hỏa tốc 4 tiếng', 'Chương trình thành viên VIP', 'Hỗ trợ mua hàng trả góp 0%', 'Hệ thống 200 cửa hàng toàn quốc', '#', '#', '#', '#', '#', '2026-04-01 22:15:06');
+(1, 'LEGO WORLD STORE', 'Công ty cổ phần LEGO', '0309132354', 'logo.png', '1900 1208 000', 'hotro@legoworldstore.com.vn', '273 An Dương Vương, Phường 1, Quận 5, TP. Hồ Chí Minh', 'Thứ 2 - Thứ 7: 8:00 - 17:00', 'Chủ nhật: 8:00 - 12:00', 'Miễn phí giao hàng đơn từ 500k', 'Giao hàng hỏa tốc 4 tiếng', 'Chương trình thành viên VIP', 'Hỗ trợ mua hàng trả góp 0%', 'Hệ thống 200 cửa hàng toàn quốc', '#', '#', '#', '#', '#', '2026-04-04 11:08:48');
 
 -- --------------------------------------------------------
 
@@ -691,13 +707,13 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT cho bảng `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT cho bảng `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -721,19 +737,19 @@ ALTER TABLE `import_receipt_details`
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT cho bảng `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT cho bảng `order_history`
 --
 ALTER TABLE `order_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT cho bảng `products`
@@ -751,7 +767,7 @@ ALTER TABLE `product_images`
 -- AUTO_INCREMENT cho bảng `product_reviews`
 --
 ALTER TABLE `product_reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT cho bảng `suppliers`

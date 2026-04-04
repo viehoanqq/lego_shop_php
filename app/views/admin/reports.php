@@ -135,30 +135,47 @@
                     $sum_import_cost += $r['total_import_cost']; $sum_revenue += $r['total_revenue'];
                     $sum_difference += $difference;
                     
-                    // Kiểm tra xem sản phẩm có bị xóa mềm không
+                    // Kiểm tra trạng thái
                     $isDeleted = (isset($r['status']) && $r['status'] == 3);
+                    $isLocked = (isset($r['status']) && $r['status'] == 2);
+                    
+                    // Thiết lập CSS theo trạng thái để code HTML bên dưới gọn hơn
+                    $rowStyle = $isDeleted ? 'background-color: #f8fafc;' : '';
+                    $opacityStyle = $isDeleted ? 'opacity: 0.6;' : '';
+                    $nameColor = ($isDeleted || $isLocked) ? '#94a3b8' : '#1e293b';
+                    $imgFilter = $isDeleted ? 'filter: grayscale(100%);' : '';
                 ?>
-                <tr style="transition: 0.2s; <?= $isDeleted ? 'background-color: #f8fafc;' : '' ?>">
+                <tr style="transition: 0.2s; <?= $rowStyle ?>">
                     <td>
-                        <div style="display: flex; align-items: center; gap: 15px; <?= $isDeleted ? 'opacity: 0.6;' : '' ?>">
+                        <div style="display: flex; align-items: center; gap: 15px; <?= $opacityStyle ?>">
+                            
                             <img src="/lego_shop_php/public/assets/images/<?= !empty($r['main_image']) ? $r['main_image'] : 'default.jpg' ?>" 
                                  class="img-report" 
                                  onerror="this.src='https://placehold.co/50x50?text=LEGO'"
-                                 style="<?= $isDeleted ? 'filter: grayscale(100%);' : '' ?>">
+                                 style="<?= $imgFilter ?>">
                                  
                             <div>
-                                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 4px;">
-                                    <span style="font-weight: 700; color: <?= $isDeleted ? '#475569' : '#1e293b' ?>; font-size: 14px;">
-                                        <?= htmlspecialchars($r['name']) ?>
+                                <div style="font-weight: 700; color: <?= $nameColor ?>; font-size: 14px; margin-bottom: 6px; line-height: 1.4;">
+                                    <?= htmlspecialchars($r['name']) ?>
+                                </div>
+                                
+                                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                                    
+                                    <span style="background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; color: #64748b; border: 1px solid #e2e8f0;">
+                                        SKU: <?= strtoupper($r['sku']) ?>
                                     </span>
                                     
                                     <?php if($isDeleted): ?>
-                                        <span style="color: #475569; font-size: 10px; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-weight: 700; border: 1px solid #cbd5e1;">
+                                        <span style="color: #475569; font-size: 10px; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-weight: 700; border: 1px solid #cbd5e1; white-space: nowrap;">
                                             <i class="fa-solid fa-ban"></i> Ngừng kinh doanh
                                         </span>
+                                    <?php elseif($isLocked): ?>
+                                        <span style="color: #cf48006c; font-size: 10px; background: #ffffff; padding: 2px 6px; border-radius: 4px; font-weight: 700; border: 1px solid #fde68a; white-space: nowrap;">
+                                            <i class="fa-solid fa-lock"></i> Đang khóa
+                                        </span>
                                     <?php endif; ?>
+                                    
                                 </div>
-                                <span style="background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; color: #64748b; border: 1px solid #e2e8f0;">SKU: <?= strtoupper($r['sku']) ?></span>
                             </div>
                         </div>
                     </td>
@@ -168,7 +185,7 @@
                     <td style="text-align: right; color: #10b981; font-weight: 600;"><?= number_format($r['total_revenue'], 0, ',', '.') ?>đ</td>
                     <td style="text-align: right; font-weight: 800; color: <?= $difference >= 0 ? '#10b981' : '#ef4444' ?>;"><?= number_format($difference, 0, ',', '.') ?>đ</td>
                     <td style="text-align: center;">
-                        <a href="/lego_shop_php/adminreport/productDetail/<?= $r['id'] ?>?start=<?= $filters['start_date'] ?>&end=<?= $filters['end_date'] ?>" class="btn-detail">
+                        <a href="/lego_shop_php/adminreport/productDetail/<?= $r['id'] ?>?start=<?= $filters['start_date'] ?? '' ?>&end=<?= $filters['end_date'] ?? '' ?>" class="btn-detail">
                             <i class="fa-solid fa-chart-line"></i> Phân tích
                         </a>
                     </td>

@@ -145,17 +145,23 @@
                 <h3 class="card-title"><i class="fa-solid fa-money-bill-transfer"></i> Xác nhận Thanh toán</h3>
                 
                 <?php if ($order['payment_method'] === 'transfer'): ?>
-                    <form action="/lego_shop_php/adminorder/update_payment/<?= $order['id'] ?>" method="POST">
-                        <select name="payment_status" class="form-control">
-                            <option value="unpaid" <?= ($order['payment_status'] ?? '') == 'unpaid' ? 'selected' : '' ?>>Chưa thanh toán</option>
-                            <option value="paid" <?= ($order['payment_status'] ?? '') == 'paid' ? 'selected' : '' ?>>Đã thanh toán</option>
-                        </select>
-                        <button type="submit" class="btn-submit"><i class="fa-solid fa-check"></i> Lưu Thanh Toán</button>
-                    </form>
+                    <?php if (($order['payment_status'] ?? 'unpaid') === 'paid'): ?>
+                        <div style="padding: 15px; background: #f0fdf4; color: #15803d; border-radius: 6px; text-align: center; font-weight: 600; border: 1px solid #bbf7d0;">
+                            <i class="fa-solid fa-check-double"></i> Đã xác nhận Thanh toán
+                        </div>
+                    <?php else: ?>
+                        <form action="/lego_shop_php/adminorder/update_payment/<?= $order['id'] ?>" method="POST" onsubmit="return confirm('XÁC NHẬN:\nBạn đã nhận được tiền từ khách hàng này chưa?')">
+                            <select name="payment_status" class="form-control">
+                                <option value="unpaid" selected>Chưa thanh toán</option>
+                                <option value="paid">Đã thanh toán (Nhận được tiền)</option>
+                            </select>
+                            <button type="submit" class="btn-submit"><i class="fa-solid fa-check"></i> Lưu Thanh Toán</button>
+                        </form>
+                    <?php endif; ?>
                 <?php else: ?>
                     <div style="font-size: 12px; color: #64748b; text-align: center; padding: 10px 0;">
                         <?php if ($order['payment_method'] === 'online'): ?>
-                            <i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> Đã thanh toán Online
+                            <i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> Đã thanh toán Online qua VNPay
                         <?php else: ?>
                             <i class="fa-solid fa-truck" style="color: #64748b;"></i> Thanh toán khi nhận hàng (COD)
                         <?php endif; ?>
@@ -251,7 +257,7 @@
 </div>
 
 <script>
-document.getElementById('statusUpdateForm').addEventListener('submit', function(e) {
+document.getElementById('statusUpdateForm')?.addEventListener('submit', function(e) {
     const newStatus = document.getElementById('order_status_select').value;
     const paymentMethod = '<?= $order['payment_method'] ?>';
     const currentPaymentStatus = '<?= $order['payment_status'] ?? 'unpaid' ?>';
@@ -259,7 +265,7 @@ document.getElementById('statusUpdateForm').addEventListener('submit', function(
     // RÀNG BUỘC: Nếu là Chuyển khoản, PHẢI xác nhận "Đã thanh toán" mới được chọn "Thành công"
     if (newStatus === 'delivered' && paymentMethod === 'transfer' && currentPaymentStatus !== 'paid') {
         e.preventDefault(); 
-        alert('CẢNH BÁO LỖI LOGIC:\nĐơn hàng này thanh toán qua Chuyển khoản. Bạn phải cập nhật "Đã thanh toán" ở phía trên trước khi có thể đổi trạng thái đơn thành "Giao thành công".');
+        alert('CẢNH BÁO LỖI LOGIC:\nĐơn hàng này thanh toán qua Chuyển khoản. Bạn phải xác nhận Đã nhận được tiền ở phía trên trước khi có thể đổi trạng thái đơn thành "Giao thành công".');
     }
 });
 </script>
