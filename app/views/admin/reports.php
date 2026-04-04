@@ -1,5 +1,4 @@
 <style>
-    /* Ép kích thước ảnh chuẩn để không bị vỡ layout */
     .img-report { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; }
     .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); max-height: 65vh; overflow-y: auto; }
     .lego-table { width: 100%; border-collapse: separate; border-spacing: 0; }
@@ -9,7 +8,7 @@
     .table-container::-webkit-scrollbar { width: 6px; }
     .table-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
 
-    /* BỐ CỤC FORM LỌC CHIA 2 BÊN */
+    /* LAYOUT FORM */
     .filter-split-layout { display: flex; gap: 40px; flex-wrap: wrap; }
     .filter-col { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 15px; }
     .filter-col-right { border-left: 1px dashed #cbd5e1; padding-left: 40px; justify-content: space-between; }
@@ -25,7 +24,7 @@
     .form-control-ui:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
     .filter-label { font-weight: 700; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
 
-    /* CÁC NÚT TÁC VỤ */
+    /* NÚT */
     .btn-submit-filter { background: #3b82f6; color: #fff; height: 42px; border: none; padding: 0 25px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
     .btn-submit-filter:hover { background: #2563eb; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
     
@@ -35,19 +34,19 @@
     .btn-detail { background: #eff6ff; color: #3b82f6; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; }
     .btn-detail:hover { background: #3b82f6; color: #fff; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2); transform: translateY(-2px); }
 
-    /* THANH LỌC NHANH BÊN DƯỚI */
     .btn-quick { background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #475569; cursor: pointer; transition: 0.2s; }
     .btn-quick:hover { background: #3b82f6; color: #fff; border-color: #3b82f6; }
-    
-    @media(max-width: 900px) {
-        .filter-col-right { border-left: none; padding-left: 0; border-top: 1px dashed #cbd5e1; padding-top: 20px; }
-    }
+
+    /* HÀNG TỔNG CỘNG CHUẨN */
+    .row-total-footer { background: #fef08a !important; font-weight: 800; font-size: 14px; color: #1e293b; }
+    .row-total-footer td { border-top: 2px solid #eab308; }
+    .badge-qty-in { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-weight: 700; font-size: 12px; display: inline-block; min-width: 40px; text-align: center; }
+    .badge-qty-out { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-weight: 700; font-size: 12px; display: inline-block; min-width: 40px; text-align: center; }
 </style>
 
 
 
 <form method="GET" action="/lego_shop_php/adminreport" id="reportForm" style="background: #fff; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9;">
-    
     <div class="filter-split-layout">
         <div class="filter-col">
             <div class="filter-row">
@@ -87,18 +86,13 @@
             <div class="filter-row" style="align-items: center; justify-content: space-between; margin-top: 10px;">
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;"> Chọn nhanh:</span>
-                    <button type="button" class="btn-quick" onclick="quickDate('7')">7 ngày trước</button>
-                    <button type="button" class="btn-quick" onclick="quickDate('30')">30 ngày trước</button>
-                    <button type="button" class="btn-quick" onclick="quickDate('month')">Tháng này</button>
+                    <button type="button" class="btn-quick" onclick="quickDate('7')"> <i class="fa-solid fa-arrow-left"></i> 7 ngày </button>
+                    <button type="button" class="btn-quick" onclick="quickDate('30')"> <i class="fa-solid fa-arrow-left"></i> 30 ngày </button>
+                    <button type="button" class="btn-quick" onclick="quickDate('month')"> <i class="fa-solid fa-calendar-days"></i> Tháng này </button>
                 </div>
-                
                 <div style="display: flex; gap: 10px;">
-                    <button type="submit" class="btn-submit-filter">
-                        <i class="fa-solid fa-filter"></i> LỌC
-                    </button>
-                    <a href="/lego_shop_php/adminreport" class="btn-outline-danger" title="Xóa bộ lọc">
-                        <i class="fa-solid fa-rotate-right"></i>
-                    </a>
+                    <button type="submit" class="btn-submit-filter"><i class="fa-solid fa-filter"></i> LỌC</button>
+                    <a href="/lego_shop_php/adminreport" class="btn-outline-danger" title="Xóa bộ lọc"><i class="fa-solid fa-rotate-right"></i></a>
                 </div>
             </div>
         </div>
@@ -109,18 +103,26 @@
     <table class="lego-table">
         <thead>
             <tr>
-                <th style="width: 35%;">Sản phẩm & Thông tin</th>
-                <th style="text-align: center;">Tồn đầu kỳ</th>
-                <th style="text-align: center;">Nhập kho (+)</th>
-                <th style="text-align: center;">Xuất bán (-)</th>
-                <th style="text-align: center; background: #eff6ff; color: #1e40af;">Tồn Cuối Kỳ</th>
-                <th style="text-align: center;">Hành động</th>
+                <th style="width: 30%;">Sản phẩm & Thông tin</th>
+                <th style="text-align: center;">SL Nhập</th>
+                <th style="text-align: center;">SL Bán</th>
+                <th style="text-align: right;">Tổng vốn nhập</th>
+                <th style="text-align: right;">Tổng doanh thu</th>
+                <th style="text-align: right;">Lợi nhuận</th>
+                <th style="text-align: center;">Thao tác</th>
             </tr>
         </thead>
         <tbody>
+            <?php 
+                $sum_qty_in = 0; $sum_qty_out = 0;
+                $sum_import_cost = 0; $sum_revenue = 0; $sum_difference = 0;
+            ?>
             <?php if(!empty($reports)): ?>
                 <?php foreach($reports as $r): 
-                    $opening = $r['stock_at_time'] - $r['period_in'] + $r['period_out'];
+                    $difference = $r['total_revenue'] - $r['total_import_cost'];
+                    $sum_qty_in += $r['qty_in']; $sum_qty_out += $r['qty_out'];
+                    $sum_import_cost += $r['total_import_cost']; $sum_revenue += $r['total_revenue'];
+                    $sum_difference += $difference;
                 ?>
                 <tr style="transition: 0.2s;">
                     <td>
@@ -132,10 +134,11 @@
                             </div>
                         </div>
                     </td>
-                    <td style="text-align: center; color: #64748b; font-weight: 600; font-size: 15px;"><?= number_format($opening) ?></td>
-                    <td style="text-align: center;"><span style="color:#10b981; font-weight:800; font-size: 15px;">+<?= number_format($r['period_in']) ?></span></td>
-                    <td style="text-align: center;"><span style="color:#f43f5e; font-weight:800; font-size: 15px;">-<?= number_format($r['period_out']) ?></span></td>
-                    <td style="text-align: center; background: #fafafa;"><b style="font-size: 18px; color: #1e40af;"><?= number_format($r['stock_at_time']) ?></b></td>
+                    <td style="text-align: center;"><?= $r['qty_in'] > 0 ? '<span class="badge-qty-in">+'.number_format($r['qty_in']).'</span>' : '<span style="color:#cbd5e1">-</span>' ?></td>
+                    <td style="text-align: center;"><?= $r['qty_out'] > 0 ? '<span class="badge-qty-out">-'.number_format($r['qty_out']).'</span>' : '<span style="color:#cbd5e1">-</span>' ?></td>
+                    <td style="text-align: right; color: #64748b; font-weight: 600;"><?= number_format($r['total_import_cost'], 0, ',', '.') ?>đ</td>
+                    <td style="text-align: right; color: #10b981; font-weight: 600;"><?= number_format($r['total_revenue'], 0, ',', '.') ?>đ</td>
+                    <td style="text-align: right; font-weight: 800; color: <?= $difference >= 0 ? '#10b981' : '#ef4444' ?>;"><?= number_format($difference, 0, ',', '.') ?>đ</td>
                     <td style="text-align: center;">
                         <a href="/lego_shop_php/adminreport/productDetail/<?= $r['id'] ?>?start=<?= $filters['start_date'] ?>&end=<?= $filters['end_date'] ?>" class="btn-detail">
                             <i class="fa-solid fa-chart-line"></i> Phân tích
@@ -145,13 +148,27 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 60px; color: #94a3b8; font-size: 14px;">
+                    <td colspan="7" style="text-align: center; padding: 60px; color: #94a3b8; font-size: 14px;">
                         <i class="fa-solid fa-folder-open" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
-                        Không có dữ liệu trong khoảng thời gian hoặc điều kiện lọc này.
+                        Không có dữ liệu giao dịch trong khoảng thời gian này.
                     </td>
                 </tr>
             <?php endif; ?>
         </tbody>
+        
+        <?php if(!empty($reports)): ?>
+        <tfoot>
+            <tr class="row-total-footer">
+                <td style="text-transform: uppercase;">TỔNG CỘNG</td>
+                <td style="text-align: center;"><?= number_format($sum_qty_in) ?></td>
+                <td style="text-align: center;"><?= number_format($sum_qty_out) ?></td>
+                <td style="text-align: right;"><?= number_format($sum_import_cost, 0, ',', '.') ?>đ</td>
+                <td style="text-align: right;"><?= number_format($sum_revenue, 0, ',', '.') ?>đ</td>
+                <td style="text-align: right; color: <?= $sum_difference >= 0 ? '#166534' : '#991b1b' ?>;"><?= number_format($sum_difference, 0, ',', '.') ?>đ</td>
+                <td></td>
+            </tr>
+        </tfoot>
+        <?php endif; ?>
     </table>
 </div>
 
@@ -162,23 +179,14 @@ function quickDate(type) {
     const today = new Date();
     let sDate = new Date();
     
-    if (type === '7') {
-        sDate.setDate(today.getDate() - 7);
-    } else if (type === '30') {
-        sDate.setDate(today.getDate() - 30);
-    } else if (type === 'month') {
-        sDate = new Date(today.getFullYear(), today.getMonth(), 1);
-    }
+    if (type === '7') sDate.setDate(today.getDate() - 7);
+    else if (type === '30') sDate.setDate(today.getDate() - 30);
+    else if (type === 'month') sDate = new Date(today.getFullYear(), today.getMonth(), 1);
     
-    // Format YYYY-MM-DD
-    const formatYYYYMMDD = (d) => {
-        return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
-    }
+    const fmt = (d) => d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
 
-    start.value = formatYYYYMMDD(sDate);
-    end.value = formatYYYYMMDD(today);
-    
-    // Tự động submit form khi bấm nút lọc nhanh
+    start.value = fmt(sDate);
+    end.value = fmt(today);
     document.getElementById('reportForm').submit();
 }
 </script>

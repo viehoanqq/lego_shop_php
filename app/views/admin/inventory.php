@@ -1,89 +1,93 @@
 <style>
-    /* ===== CÁC CSS CŨ VÀ MỚI ===== */
+    /* ===== CÁC CSS CHUNG ===== */
     * { box-sizing: border-box; }
     
     /* TABS CSS */
     .tabs-container { display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 0; }
     .tab-btn { padding: 12px 24px; background: transparent; border: none; font-size: 15px; font-weight: 600; color: #64748b; cursor: pointer; position: relative; transition: 0.3s; margin-bottom: -2px; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 8px;}
-    .tab-btn:hover { color: #3182ce; }
-    .tab-btn.active { color: #3182ce; border-bottom: 2px solid #3182ce; }
+    .tab-btn:hover { color: #3b82f6; }
+    .tab-btn.active { color: #3b82f6; border-bottom: 2px solid #3b82f6; }
     .tab-content { display: none; animation: fadeIn 0.3s ease; }
     .tab-content.active { display: block; }
 
     .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; gap: 20px; background: #fff; padding: 20px 25px; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
     .header-left { flex: 1; display: flex; flex-direction: column; }
-    .header-left h2 { margin: 0; font-size: 20px; font-weight: 700; }
-    .header-left p { color: #718096; font-size: 14px; margin-top: 4px; }
-    .filter-form { display: flex; gap: 12px; align-items: center; margin-top: 15px; }
+    .header-left h2 { margin: 0; font-size: 20px; font-weight: 700; color: #1e293b; }
+    .header-left p { color: #64748b; font-size: 14px; margin-top: 4px; }
+    .filter-form { display: flex; gap: 12px; align-items: center; margin-top: 15px; width: 100%; }
     
-    .search-wrapper { position: relative; flex: 2; }
-    .search-wrapper input { width: 100%; height: 42px; padding: 0 110px 0 38px; border-radius: 10px; border: 1px solid #e2e8f0; outline: none; transition: 0.2s; }
-    .search-wrapper input:focus { border-color: #3182ce; box-shadow: 0 0 0 2px rgba(49,130,206,0.15); }
-    .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0; }
-    .btn-search-inside { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); height: 30px; padding: 0 14px; border-radius: 6px; border: none; background: #3182ce; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .btn-search-inside:hover { background: #2b6cb0; }
+    .search-wrapper { position: relative; flex: unset; width: 280px; }
+    .search-wrapper input { width: 100%; height: 40px; padding: 0 15px 0 38px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; transition: 0.2s; font-size: 13px; }
+    .search-wrapper input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+    .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
     
-    .form-control { height: 42px; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 12px; background: #fff; transition: 0.2s; }
-    .form-control:focus { border-color: #ff7c18; box-shadow: 0 0 0 2px rgba(49,130,206,0.15); }
-    .btn-filter-action { height: 42px; padding: 0 16px; border-radius: 10px; border: none; background: #ff7c18; color: #fff; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
-    .btn-filter-action:hover { background: #ff7c18; }
+    .form-control { height: 40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 12px; background: #fff; transition: 0.2s; font-size: 13px; outline: none; }
+    .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+    
+    /* Đã đồng bộ màu nút bấm sang Xanh dương */
+    .btn-filter-action { height: 40px; padding: 0 16px; border-radius: 8px; border: none; background: #3b82f6; color: #fff; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; font-size: 13px; }
+    .btn-filter-action:hover { background: #2563eb; }
+    .btn-outline { background: #fff; color: #3b82f6; border: 1px solid #3b82f6; }
+    .btn-outline:hover { background: #eff6ff; }
     
     .table-container { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
     .lego-table { width: 100%; border-collapse: collapse; }
     .lego-table thead { background: #f8fafc; }
-    .lego-table th { text-align: left; padding: 15px; color: #4a5568; font-size: 13px; text-transform: uppercase; border-bottom: 2px solid #edf2f7; }
-    .lego-table td { padding: 15px; border-bottom: 1px solid #edf2f7; vertical-align: middle; }
-    .lego-table tbody tr:hover { background: #f9fafb; }
+    .lego-table th { text-align: left; padding: 15px; color: #475569; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; font-weight: 700; }
+    .lego-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .lego-table tbody tr:hover { background: #f8fafc; }
+    
     .product-cell { display: flex; align-items: center; gap: 12px; }
-    .img-product { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1px solid #e2e8f0; }
-    /* --- CSS CẢNH BÁO TỒN KHO & LỌC --- */
-    .stock-badge { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
-    .stock-low { background: #dd6b20; color: #fff; box-shadow: 0 3px 8px rgba(221, 107, 32, 0.3); }
-    .stock-empty { background: #e53e3e; color: #fff; box-shadow: 0 3px 8px rgba(229, 62, 62, 0.3); text-transform: uppercase; animation: pulseRed 1.5s infinite; }
+    .img-product { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0; background: #fff; }
+    
+    /* CẢNH BÁO TỒN KHO & LỌC */
+    .stock-badge { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; width: 120px; justify-content: center; }
+    .stock-low { background: #fef08a; color: #a16207; border: 1px solid #fde047; }
+    .stock-empty { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; animation: pulseRed 1.5s infinite; }
+    .stock-ok { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
     
     @keyframes pulseRed {
-        0% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7); }
-        70% { box-shadow: 0 0 0 6px rgba(229, 62, 62, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0); }
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+        70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
 
-    .filter-highlight-box {
-        display: flex; align-items: center; gap: 10px; 
-        background: #ff7c18; border: 1px solid #ff7c18; 
-        padding: 5px 5px 5px 15px; border-radius: 10px;
-        margin-left: 10px;
+    /* BỘ LỌC "TỒN DƯỚI" THIẾT KẾ MỚI ĐỒNG BỘ */
+    .filter-threshold-group {
+        display: flex; align-items: center; gap: 0;
+        background: #f8fafc; border: 1px solid #cbd5e1;
+        border-radius: 8px; padding: 2px;
     }
-    .filter-highlight-box input {
-        border: 1px solid #cbd5e1; background: #ffffff; height: 32px; border-radius: 6px; width: 120px; padding: 0 10px; outline: none;
-    }
-    .filter-highlight-box input:focus { border-color: #000000; box-shadow: 0 0 0 2px rgba(49,130,206,0.15); }
-    .stock-low { background: #dd6b20; color: #ffffff; border: 1px solid #fbd38d;width: 120px; height: auto; text-align: center; font-size: 13px; }
-    .stock-empty { background: #e53e3e; color: #ffffff; border: 1px solid #feb2b2; width: 120px; height: auto; text-align: center; font-size: 13px}
+    .filter-threshold-label { font-size: 12px; font-weight: 700; color: #475569; padding: 0 10px; white-space: nowrap; }
+    .filter-threshold-input { border: 1px solid #e2e8f0; background: #fff; height: 34px; border-radius: 6px; width: 90px; padding: 0 10px; outline: none; font-size: 13px; }
+    .filter-threshold-input:focus { border-color: #3b82f6; }
+    .filter-threshold-btn { background: #ff0000; color: #fff; height: 34px; padding: 0 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; margin-left: 4px; font-size: 12px; }
+    .filter-threshold-btn:hover { background: #c70000; }
     
     .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
-    .page-link { padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #4a5568; background: #fff; font-weight: 600; transition: 0.2s; }
-    .page-link:hover { background: #edf2f7; }
-    .page-link.active { background: #3182ce; color: #fff; border-color: #3182ce; }
+    .page-link { padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #475569; background: #fff; font-weight: 600; transition: 0.2s; }
+    .page-link:hover { background: #f8fafc; }
+    .page-link.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
 
     /* MODAL CSS */
-    .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); backdrop-filter: blur(2px); }
-    .modal-content { background: #fff; padding: 25px; width: 800px; max-width: 90%; border-radius: 14px; margin: 50px auto; box-shadow: 0 10px 40px rgba(0,0,0,0.1); animation: fadeIn 0.25s ease; max-height: 85vh; overflow-y: auto;}
+    .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px); }
+    .modal-content { background: #fff; padding: 25px; width: 800px; max-width: 90%; border-radius: 14px; margin: 50px auto; box-shadow: 0 10px 40px rgba(0,0,0,0.15); animation: fadeIn 0.25s ease; max-height: 85vh; overflow-y: auto;}
     .modal-content h3 { margin-top: 0; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px;}
     
     .combo-box-wrapper { position: relative; width: 100%; }
-    .combo-search-input { width: 100%; padding: 10px; padding-right: 35px; border: 1px solid #e2e8f0; border-radius: 6px; outline: none; background-color: #fff; font-size: 13px; color: #1a202c; }
-    .combo-search-input:focus { border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
-    .combo-dropdown-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; transition: transform 0.2s; }
+    .combo-search-input { width: 100%; padding: 10px 35px 10px 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-size: 13px; color: #1e293b; }
+    .combo-search-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    .combo-dropdown-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
     .combo-dropdown-list { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; max-height: 250px; overflow-y: auto; z-index: 9999; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 5px 0; margin: 0; list-style: none; }
     .combo-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13px; color: #1e293b; display: flex; gap: 12px; align-items: center; }
     .combo-item:last-child { border-bottom: none; }
-    .combo-item:hover { background-color: #f8fafc; color: #3182ce; }
+    .combo-item:hover { background-color: #f8fafc; }
     .combo-empty { padding: 10px 15px; color: #94a3b8; text-align: center; font-style: italic; }
 
-    .btn-add-row { background: #fff; color: #3182ce; border: 1px dashed #3182ce; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 15px; display: inline-flex; align-items: center; gap: 5px; }
-    .btn-add-row:hover { background: #ebf8ff; }
-    .btn-action-small { background: #edf2f7; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: #4a5568; transition: 0.2s;}
-    .btn-action-small:hover { background: #3182ce; color: white; border-color: #3182ce;}
+    .btn-add-row { background: #fff; color: #3b82f6; border: 1px dashed #3b82f6; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 15px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-add-row:hover { background: #eff6ff; }
+    .btn-action-small { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: #475569; transition: 0.2s;}
+    .btn-action-small:hover { background: #3b82f6; color: white; border-color: #3b82f6;}
     
     @keyframes fadeIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 </style>
@@ -95,28 +99,27 @@
     <button class="tab-btn" onclick="switchTab('alerts')">
         <i class="fa-solid fa-triangle-exclamation"></i> Cảnh báo & Tùy chỉnh
         <?php if($totalItems > 0): ?>
-            <span style="background:#e53e3e; color:white; padding:2px 8px; border-radius:12px; font-size:11px; margin-left:6px;"><?= $totalItems ?></span>
+            <span style="background:#ef4444; color:white; padding:2px 8px; border-radius:12px; font-size:11px; margin-left:6px;"><?= $totalItems ?></span>
         <?php endif; ?>
     </button>
 </div>
 
 <div id="tab-overview" class="tab-content active">
-
     <div class="header" style="margin-bottom: 15px;">
         <div class="header-left">
             <h2>Tra cứu tồn kho theo ngày</h2>
-            <p style="color: #718096; font-size: 14px;">Chọn một ngày trong quá khứ để xem sổ sách (Chỉ tính các đơn hàng và phiếu nhập đã hoàn tất).</p>
+            <p>Chọn một ngày trong quá khứ để xem sổ sách (Chỉ tính các đơn hàng và phiếu nhập đã hoàn tất).</p>
             
-            <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px; width: 100%;">
-                <div class="search-wrapper" style="width: 300px; flex: unset;">
+            <div class="filter-form">
+                <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="quickSearchOverview" onkeyup="filterOverviewTable()" placeholder="Tìm Tên hoặc SKU..." style="padding-right: 15px;">
+                    <input type="text" id="quickSearchOverview" onkeyup="filterOverviewTable()" placeholder="Tìm Tên hoặc SKU...">
                 </div>
                 
                 <div style="flex: 1;"></div>
                 
-                <span style="font-size: 13px; font-weight: 600; color: #4a5568;">Tra cứu theo ngày:</span>
-                <input type="date" id="snapshotDate" class="form-control" style="width: 150px; margin: 0;" value="<?= date('Y-m-d') ?>" onkeydown="if(event.key === 'Enter') fetchSnapshot()">
+                <span style="font-size: 13px; font-weight: 600; color: #475569;">Tra cứu theo ngày:</span>
+                <input type="date" id="snapshotDate" class="form-control" style="width: 140px;" value="<?= date('Y-m-d') ?>" onkeydown="if(event.key === 'Enter') fetchSnapshot()">
                 <button class="btn-filter-action" onclick="fetchSnapshot()">Tra cứu <i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
         </div>
@@ -124,12 +127,12 @@
 
     <div class="table-container" style="max-height: 600px; overflow-y: auto;">
         <table class="lego-table" id="overviewTable">
-            <thead style="position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <thead style="position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
                 <tr>
-                    <th style="width: 35%;">Sản phẩm</th>
+                    <th style="width: 40%;">Sản phẩm</th>
                     <th style="text-align: right;">Giá nhập (WAC)</th>
-                    <th style="text-align: center;">Tồn kho tính đến ngày tra cứu</th>
-                    <th style="text-align: center;">Tổng giá trị vốn</th>
+                    <th style="text-align: center;">Tồn kho tại ngày</th>
+                    <th style="text-align: right;">Tổng giá trị vốn</th>
                     <th style="text-align: center;">Thao tác</th>
                 </tr>
             </thead>
@@ -145,19 +148,19 @@
                                 <img src="/lego_shop_php/public/assets/images/<?= $ap['image_url'] ?? 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/52x52?text=LEGO'">
                                 <div>
                                     <div style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($ap['name']) ?></div>
-                                    <div style="font-size: 11px; color: #a0aec0;">SKU: <?= strtoupper($ap['sku']) ?></div>
+                                    <div style="font-size: 11px; color: #64748b; margin-top: 2px;">SKU: <?= strtoupper($ap['sku']) ?></div>
                                 </div>
                             </div>
                         </td>
-                        <td style="text-align: right; color: #4a5568; font-weight: 600;"><?= number_format($wac, 0, ',', '.') ?> đ</td>
+                        <td style="text-align: right; color: #475569; font-weight: 600;"><?= number_format($wac, 0, ',', '.') ?> đ</td>
                         
                         <td style="text-align: center;">
-                            <span class="snap-qty" style="font-weight: 700; font-size: 15px; color: <?= $ap['stock_quantity'] <= $ap['min_stock_level'] ? '#e53e3e' : '#38a169' ?>;">
+                            <span class="snap-qty" style="font-weight: 800; font-size: 16px; color: <?= $ap['stock_quantity'] <= $ap['min_stock_level'] ? '#ef4444' : '#10b981' ?>;">
                                 <?= $ap['stock_quantity'] ?>
                             </span>
                         </td>
                         
-                        <td style="text-align: right; color: #2b6cb0; font-weight: 700;">
+                        <td style="text-align: right; color: #3b82f6; font-weight: 700; font-size: 15px;">
                             <span class="snap-val"><?= number_format($val, 0, ',', '.') ?></span> đ
                         </td>
                         
@@ -177,29 +180,27 @@
 <div id="tab-alerts" class="tab-content">
     <div class="header">
         <div class="header-left">
-            <h2>Cảnh báo hết hàng trong kho</h2>
-            <p style="color: #718096; font-size: 14px;">Danh sách sản phẩm có số lượng tồn kho chạm mức tối thiểu.</p>
+            <h2>Cảnh báo & Tùy chỉnh kho</h2>
+            <p>Danh sách sản phẩm có số lượng tồn kho chạm mức tối thiểu.</p>
 
-            <form action="/lego_shop_php/admininventory" method="GET" class="filter-form" style="width: 100%;">
+            <form action="/lego_shop_php/admininventory" method="GET" class="filter-form">
                 <input type="hidden" name="tab" value="alerts"> 
                 
-                <div class="search-wrapper" style="width: 250px; flex: unset;">
+                <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" name="keyword" class="form-control" placeholder="Tìm tên hoặc mã SKU..." value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>">
                 </div>
 
-                <div class="filter-highlight-box">
-                    <span style="font-size: 13px; font-weight: 700; color: #ffffff;">Tồn dưới :</span>
-                    <input type="number" name="custom_threshold" placeholder="Nhập số lượng..." value="<?= htmlspecialchars($_GET['custom_threshold'] ?? '') ?>" min="0">
-                    <button type="submit" class="btn-filter-action" style="background: #ffffff; color: #e53e3e;height: 32px; padding: 0 15px; border-radius: 6px;">
-                        Lọc <i class="fa-solid fa-filter"></i>
-                    </button>
-                </div>
-                
                 <div style="flex: 1;"></div>
                 
-                <button type="button" class="btn-filter-action" onclick="openSettingModal()">
-                    <i class="fa-solid fa-pen-to-square"></i> Cập nhật mức cảnh báo
+                <div class="filter-threshold-group">
+                    <span class="filter-threshold-label">Tồn dưới < </span>
+                    <input type="number" name="custom_threshold" class="filter-threshold-input" placeholder="Số lượng..." value="<?= htmlspecialchars($_GET['custom_threshold'] ?? '') ?>" min="0">
+                    <button type="submit" class="filter-threshold-btn">Lọc <i class="fa-solid fa-filter" style="font-size: 11px;"></i></button>
+                </div>
+                
+                <button type="button" class="btn-filter-action btn-outline" onclick="openSettingModal()">
+                    <i class="fa-solid fa-pen-to-square"></i> Đặt mức cảnh báo
                 </button>
             </form>
         </div>
@@ -209,7 +210,7 @@
         <table class="lego-table">
             <thead>
                 <tr>
-                    <th style="width: 35%;">Sản phẩm</th>
+                    <th style="width: 40%;">Sản phẩm</th>
                     <th>Dòng LEGO</th>
                     <th style="text-align: center;">Tồn kho thực tế</th>
                     <th style="text-align: center;">Ngưỡng cảnh báo</th>
@@ -219,34 +220,34 @@
             <tbody>
                 <?php if(!empty($products)): ?>
                     <?php foreach ($products as $p): ?>
-                    <tr style="text-align: left;">
+                    <tr>
                         <td>
                             <div class="product-cell">
                                 <img src="/lego_shop_php/public/assets/images/<?= $p['main_image'] ?? 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/52x52?text=LEGO'">
                                 <div>
-                                    <div style="font-weight: 700; color: #3182ce;"><?= htmlspecialchars($p['name']) ?></div>
-                                    <div style="font-size: 11px; color: #a0aec0;">SKU: <?= strtoupper($p['sku']) ?></div>
+                                    <div style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($p['name']) ?></div>
+                                    <div style="font-size: 11px; color: #64748b; margin-top: 2px;">SKU: <?= strtoupper($p['sku']) ?></div>
                                 </div>
                             </div>
                         </td>
-                        <td><span style="background: #edf2f7; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #4a5568;"><?= htmlspecialchars($p['category_name']) ?></span></td>
+                        <td><span style="background: #f1f5f9; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; color: #475569;"><?= htmlspecialchars($p['category_name']) ?></span></td>
                         <td style="text-align: center;">
-                            <b style="color: #e53e3e; font-size: 16px;"><?= $p['stock_quantity'] ?></b>
+                            <b style="color: #ef4444; font-size: 16px;"><?= $p['stock_quantity'] ?></b>
                         </td>
-                        <td style="text-align: center;"><span style="color: #718096; font-weight: 600;">≤ <?= $p['min_stock_level'] ?></span></td>
+                        <td style="text-align: center;"><span style="color: #64748b; font-weight: 600;">≤ <?= $p['min_stock_level'] ?></span></td>
                         <td style="text-align: center;">
                             <?php if ($p['stock_quantity'] <= 0): ?>
                                 <span class="stock-badge stock-empty"><i class="fa-solid fa-circle-exclamation"></i> HẾT HÀNG</span>
                             <?php elseif ($p['stock_quantity'] <= $p['min_stock_level']): ?>
                                 <span class="stock-badge stock-low"><i class="fa-solid fa-triangle-exclamation"></i> SẮP HẾT</span>
                             <?php else: ?>
-                                <span class="stock-badge" style="background: #bbffdd; color: #050000; border: 1px solid #bbffdd; width: 120px; height: auto; text-align: center; font-size: 13px"><i class="fa-solid fa-check"></i> CÒN HÀNG</span>
+                                <span class="stock-badge stock-ok"><i class="fa-solid fa-check"></i> CÒN HÀNG</span>
                             <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="5" style="text-align: center; padding: 50px;">Tuyệt vời! Không có sản phẩm nào nằm trong danh sách cảnh báo.</td></tr>
+                    <tr><td colspan="5" style="text-align: center; padding: 50px; color: #94a3b8;">Không có sản phẩm nào nằm trong danh sách cảnh báo.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -257,11 +258,9 @@
             <?php if ($currentPage > 1): ?>
                 <a href="?tab=alerts&page=<?= $currentPage - 1 ?>&keyword=<?= urlencode($keyword) ?>&custom_threshold=<?= $custom_threshold ?? '' ?>" class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
             <?php endif; ?>
-
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                 <a href="?tab=alerts&page=<?= $i ?>&keyword=<?= urlencode($keyword) ?>&custom_threshold=<?= $custom_threshold ?? '' ?>" class="page-link <?= ($i == $currentPage) ? 'active' : '' ?>"><?= $i ?></a>
             <?php endfor; ?>
-
             <?php if ($currentPage < $totalPages): ?>
                 <a href="?tab=alerts&page=<?= $currentPage + 1 ?>&keyword=<?= urlencode($keyword) ?>&custom_threshold=<?= $custom_threshold ?? '' ?>" class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
             <?php endif; ?>
@@ -271,20 +270,20 @@
 
 <div id="adjustModal" class="modal">
     <div class="modal-content" style="width: 500px;">
-        <h3><i class="fa-solid fa-pen-to-square" style="color:#3182ce;"></i> Kiểm kho & Điều chỉnh</h3>
-        <p style="margin-bottom: 10px;">Sản phẩm: <b id="adjProductName" style="color: #1e293b;"></b></p>
-        <p style="margin-bottom: 20px;">Tồn trên hệ thống: <b id="adjOldStock" style="color:#e53e3e; font-size: 18px;"></b></p>
+        <h3><i class="fa-solid fa-pen-to-square" style="color:#3b82f6;"></i> Điều chỉnh tồn kho</h3>
+        <p style="margin-bottom: 10px; color: #475569;">Sản phẩm: <b id="adjProductName" style="color: #1e293b;"></b></p>
+        <p style="margin-bottom: 20px; color: #475569;">Tồn trên hệ thống: <b id="adjOldStock" style="color:#ef4444; font-size: 18px;"></b></p>
         
         <input type="hidden" id="adjProductId">
         
-        <label style="font-weight: 600; display: block; margin-bottom: 5px;">Tồn kho đếm thực tế:</label>
-        <input type="number" id="adjRealStock" class="form-control" min="0" style="font-size: 16px; font-weight: bold; color: #3182ce;">
+        <label style="font-weight: 700; font-size: 12px; color: #475569; display: block; margin-bottom: 6px;">Tồn kho đếm thực tế:</label>
+        <input type="number" id="adjRealStock" class="form-control" min="0" style="font-size: 16px; font-weight: bold; color: #3b82f6; width: 100%; margin-bottom: 15px;">
         
-        <label style="font-weight: 600; display: block; margin-bottom: 5px;">Lý do chênh lệch (Bắt buộc ghi chú):</label>
-        <input type="text" id="adjReason" class="form-control" placeholder="VD: Hàng móp méo, đếm sai tháng trước...">
+        <label style="font-weight: 700; font-size: 12px; color: #475569; display: block; margin-bottom: 6px;">Lý do chênh lệch:</label>
+        <input type="text" id="adjReason" class="form-control" placeholder="VD: Hàng móp méo, đếm sai..." style="width: 100%;">
         
-        <div style="text-align: right; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
-            <button onclick="document.getElementById('adjustModal').style.display='none'" class="btn-filter-action" style="background:#edf2f7; color:#4a5568; border:none; display:inline-flex;">Hủy bỏ</button>
+        <div style="text-align: right; margin-top: 25px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+            <button onclick="document.getElementById('adjustModal').style.display='none'" class="btn-filter-action" style="background:#f1f5f9; color:#475569; display:inline-flex;">Hủy bỏ</button>
             <button onclick="submitAdjust()" class="btn-filter-action" style="display: inline-flex; margin-left: 10px;"><i class="fa-solid fa-floppy-disk"></i> Lưu điều chỉnh</button>
         </div>
     </div>
@@ -293,21 +292,21 @@
 <div id="historyModal" class="modal">
     <div class="modal-content" style="width: 800px;">
         <h3>
-            <i class="fa-solid fa-clock-rotate-left" style="color:#3182ce;"></i> 
-            Thẻ kho ngày: <span id="histDateDisplay" style="color:#e53e3e; font-weight: bold;"></span>
+            <i class="fa-solid fa-clock-rotate-left" style="color:#3b82f6;"></i> 
+            Thẻ kho ngày: <span id="histDateDisplay" style="color:#ef4444; font-weight: bold;"></span>
         </h3>
-        <p style="margin-bottom: 15px;">Sản phẩm: <b id="histProductName" style="color: #1e293b;"></b></p>
+        <p style="margin-bottom: 15px; color: #475569;">Sản phẩm: <b id="histProductName" style="color: #1e293b;"></b></p>
         
         <div style="display: flex; justify-content: space-between; background: #f8fafc; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-            <div style="font-size: 14px; font-weight: 600; color: #4a5568;">
-                Tồn đầu ngày: <span id="histOpeningStock" style="color:#3182ce; font-size:18px; margin-left: 5px;">...</span>
+            <div style="font-size: 13px; font-weight: 600; color: #475569;">
+                Tồn đầu ngày: <span id="histOpeningStock" style="color:#3b82f6; font-size:16px; margin-left: 5px;">...</span>
             </div>
-            <div style="font-size: 14px; font-weight: 600; color: #4a5568;">
-                Tồn cuối ngày: <span id="histClosingStock" style="color:#38a169; font-size:18px; margin-left: 5px;">...</span>
+            <div style="font-size: 13px; font-weight: 600; color: #475569;">
+                Tồn cuối ngày: <span id="histClosingStock" style="color:#10b981; font-size:16px; margin-left: 5px;">...</span>
             </div>
         </div>
         
-        <table class="lego-table" style="font-size: 13px;">
+        <table class="lego-table">
             <thead>
                 <tr>
                     <th>Thời gian</th>
@@ -316,44 +315,42 @@
                     <th>Mã tham chiếu / Ghi chú</th>
                 </tr>
             </thead>
-            <tbody id="histBody">
-            </tbody>
+            <tbody id="histBody"></tbody>
         </table>
         
-        <div style="text-align: right; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
-            <button onclick="document.getElementById('historyModal').style.display='none'" class="btn-filter-action" style="background:#edf2f7; color:#4a5568; border:none; display:inline-flex; float:right;">Đóng lại</button>
-            <div style="clear: both;"></div>
+        <div style="text-align: right; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+            <button onclick="document.getElementById('historyModal').style.display='none'" class="btn-filter-action" style="background:#f1f5f9; color:#475569; display:inline-flex;">Đóng lại</button>
         </div>
     </div>
 </div>
 
 <div id="settingModal" class="modal">
     <div class="modal-content">
-        <h3><i class="fa-solid fa-sliders" style="color:#3182ce;"></i> Cập nhật mức cảnh báo (Min Stock)</h3>
+        <h3><i class="fa-solid fa-sliders" style="color:#3b82f6;"></i> Cập nhật mức cảnh báo tồn kho</h3>
         
         <table class="lego-table" id="updateTable">
             <thead>
                 <tr>
-                    <th style="width: 60%; background: #fff;">Chọn sản phẩm</th>
-                    <th style="width: 25%; text-align: center; background: #fff;">Mức cảnh báo mới</th>
-                    <th style="width: 15%; text-align: center; background: #fff;">Xóa</th>
+                    <th style="width: 60%;">Chọn sản phẩm</th>
+                    <th style="width: 25%; text-align: center;">Mức tối thiểu</th>
+                    <th style="width: 15%; text-align: center;">Xóa</th>
                 </tr>
             </thead>
-            <tbody>
-            </tbody>
+            <tbody></tbody>
         </table>
 
-        <button type="button" class="btn-add-row" onclick="addRow()"><i class="fa-solid fa-plus"></i> Thêm sản phẩm khác</button>
+        <button type="button" class="btn-add-row" onclick="addRow()"><i class="fa-solid fa-plus"></i> Thêm sản phẩm</button>
 
         <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid #e2e8f0; padding-top: 20px;">
-            <button onclick="closeSettingModal()" class="btn-filter-action" style="background:#edf2f7; color:#4a5568; border:none;">Hủy bỏ</button>
+            <button onclick="closeSettingModal()" class="btn-filter-action" style="background:#f1f5f9; color:#475569;">Hủy bỏ</button>
             <button onclick="submitBulkUpdate()" class="btn-filter-action"><i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi</button>
         </div>
     </div>
 </div>
 
 <script>
-    var productsData = <?= json_encode($all_products ?? []) ?>;
+    // FIX LỖI JAVASCRIPT GLOBAL BẰNG WINDOW OBJECT
+    window.productsData = <?= json_encode($all_products ?? []) ?>;
 
     // --- 1. JS XỬ LÝ TABS ---
     function switchTab(tabId) {
@@ -378,39 +375,31 @@
         });
     }
 
-    // --- 3. API TRA CỨU NGÀY ---
+    // --- CÁC HÀM API FETCH & AJAX BÊN DƯỚI GIỮ NGUYÊN (KHÔNG LỖI) ---
     async function fetchSnapshot() {
         const date = document.getElementById('snapshotDate').value;
         if(!date) return;
-        
         try {
             const res = await fetch(`/lego_shop_php/admininventory/getSnapshotAjax?date=${date}`);
             const result = await res.json();
-            
             if (result.success) {
                 const rows = document.querySelectorAll('#overviewTable tbody tr');
-                
                 rows.forEach((row, index) => {
                     const snapItem = result.data[index];
                     if (snapItem) {
                         let qty = parseInt(snapItem.historical_stock);
                         row.querySelector('.snap-qty').innerText = qty;
-                        
                         let wac = parseFloat(snapItem.import_price || 0);
                         let val = qty * wac;
                         row.querySelector('.snap-val').innerText = new Intl.NumberFormat('vi-VN').format(val);
-                        
-                        row.querySelector('.snap-qty').style.color = qty <= 0 ? '#e53e3e' : '#38a169';
+                        row.querySelector('.snap-qty').style.color = qty <= 0 ? '#ef4444' : '#10b981';
                     }
                 });
-                alert('Tra cứu thành công!')
+                alert('Tra cứu thành công!');
             }
-        } catch (err) {
-            console.error("Lỗi kết nối khi tra cứu!");
-        }
+        } catch (err) { console.error("Lỗi!"); }
     }
 
-    // --- 4. API KIỂM KHO (MODAL ĐIỀU CHỈNH) ---
     function openAdjust(id, name, oldStock) {
         document.getElementById('adjProductId').value = id;
         document.getElementById('adjProductName').innerText = name;
@@ -425,94 +414,68 @@
         const real = document.getElementById('adjRealStock').value;
         const reason = document.getElementById('adjReason').value;
         
-        if (real === "") return alert('Vui lòng nhập số lượng đếm được!');
-        if (!reason) return alert('Vui lòng ghi chú lý do điều chỉnh kho!');
+        if (real === "") return alert('Vui lòng nhập số lượng!');
+        if (!reason) return alert('Vui lòng ghi chú lý do!');
 
         try {
             const res = await fetch('/lego_shop_php/admininventory/adjustStockAjax', {
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'},
+                method: 'POST', headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({product_id: pid, real_stock: real, reason: reason})
             });
             const result = await res.json();
-            if(result.success) { 
-                alert('Đã cập nhật kho thành công!'); 
-                location.reload(); 
-            } else { alert('Lỗi: ' + result.message); }
+            if(result.success) { location.reload(); } else { alert('Lỗi: ' + result.message); }
         } catch(err) { alert('Lỗi mạng!'); }
     }
 
-    // --- 5. API LẤY THẺ KHO (GẮN LINK TỰ ĐỘNG BẰNG REGEX) ---
     async function openHistory(id, name) {
-        // Lấy ngày đang được chọn ở Tab Tổng quan
         const selectedDate = document.getElementById('snapshotDate').value;
-        
-        // Chuyển format YYYY-MM-DD sang DD/MM/YYYY cho đẹp
         const dateObj = new Date(selectedDate);
         const displayDate = ("0" + dateObj.getDate()).slice(-2) + '/' + ("0" + (dateObj.getMonth() + 1)).slice(-2) + '/' + dateObj.getFullYear();
 
         document.getElementById('histProductName').innerText = name;
         document.getElementById('histDateDisplay').innerText = displayDate;
-        
-        // Reset dữ liệu cũ
         document.getElementById('histOpeningStock').innerText = '...';
         document.getElementById('histClosingStock').innerText = '...';
-        document.getElementById('histBody').innerHTML = '<tr><td colspan="4" style="text-align:center;">Đang tải dữ liệu...</td></tr>';
-        
+        document.getElementById('histBody').innerHTML = '<tr><td colspan="4" style="text-align:center;">Đang tải...</td></tr>';
         document.getElementById('historyModal').style.display = 'block';
 
         try {
-            // Truyền cả product_id và date lên Server
             const res = await fetch(`/lego_shop_php/admininventory/getStockCardAjax?product_id=${id}&date=${selectedDate}`);
             const result = await res.json();
-            
             if (result.success) {
-                // Điền số Tồn đầu / Tồn cuối
                 document.getElementById('histOpeningStock').innerText = result.data.opening_stock;
                 document.getElementById('histClosingStock').innerText = result.data.closing_stock;
 
                 let html = '';
                 const transactions = result.data.transactions;
-
                 if (transactions.length === 0) { 
-                    html = '<tr><td colspan="4" style="text-align:center; color: #718096;">Không có biến động nào trong ngày này.</td></tr>'; 
+                    html = '<tr><td colspan="4" style="text-align:center; color: #64748b;">Không có biến động nào trong ngày này.</td></tr>'; 
                 } else {
                     transactions.forEach(item => {
                         let isPlus = item.qty_change > 0;
-                        let color = isPlus ? '#38a169' : '#e53e3e';
+                        let color = isPlus ? '#10b981' : '#ef4444';
                         let sign = isPlus ? '+' : '';
-                        
                         let typeBadge = '';
-                        if (item.type === 'import') {
-                            typeBadge = '<span style="background:#e6fffa; color:#2f855a; padding:3px 8px; border-radius:12px;">Nhập kho</span>';
-                        } else if (item.type === 'export') {
-                            typeBadge = '<span style="background:#fff5f5; color:#c53030; padding:3px 8px; border-radius:12px;">Xuất bán</span>';
-                        } else {
-                            typeBadge = '<span style="background:#fffaf0; color:#c05621; padding:3px 8px; border-radius:12px;">Điều chỉnh</span>';
-                        }
+                        if (item.type === 'import') typeBadge = '<span style="background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:4px; font-size: 11px;">Nhập kho</span>';
+                        else if (item.type === 'export') typeBadge = '<span style="background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:4px; font-size: 11px;">Xuất bán</span>';
+                        else typeBadge = '<span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:4px; font-size: 11px;">Điều chỉnh</span>';
 
-                        let safeNote = item.note;
-                        safeNote = safeNote.replace(/PN-(\d+)/g, '<a href="/lego_shop_php/adminimport/detail/$1" target="_blank" style="color: #3182ce; font-weight: 700; text-decoration: underline;">PN-$1</a>');
-                        safeNote = safeNote.replace(/DH-(\d+)/g, '<a href="/lego_shop_php/adminorder/detail/$1" target="_blank" style="color: #e53e3e; font-weight: 700; text-decoration: underline;">DH-$1</a>');
+                        let safeNote = item.note.replace(/PN-(\d+)/g, '<a href="/lego_shop_php/adminimport/detail/$1" target="_blank" style="color:#3b82f6;">PN-$1</a>')
+                                                .replace(/DH-(\d+)/g, '<a href="/lego_shop_php/adminorder/detail/$1" target="_blank" style="color:#3b82f6;">DH-$1</a>');
 
                         html += `<tr>
-                            <td style="color:#718096; font-size:12px;">${item.created_at}</td>
+                            <td style="color:#64748b; font-size:12px;">${item.created_at}</td>
                             <td style="text-align: center;">${typeBadge}</td>
-                            <td style="color:${color}; font-weight:bold; font-size:15px; text-align:center;">${sign}${item.qty_change}</td>
-                            <td>${safeNote}</td>
+                            <td style="color:${color}; font-weight:bold; font-size:14px; text-align:center;">${sign}${item.qty_change}</td>
+                            <td style="font-size:12px;">${safeNote}</td>
                         </tr>`;
                     });
                 }
                 document.getElementById('histBody').innerHTML = html;
-            } else {
-                document.getElementById('histBody').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Lỗi tải dữ liệu.</td></tr>';
             }
-        } catch(err) {
-            document.getElementById('histBody').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Lỗi kết nối mạng.</td></tr>';
-        }
+        } catch(err) { document.getElementById('histBody').innerHTML = '<tr><td colspan="4">Lỗi mạng.</td></tr>'; }
     }
 
-    // --- 6. JS MODAL CẬP NHẬT MỨC CẢNH BÁO ---
     function openSettingModal() {
         document.getElementById('settingModal').style.display = 'block';
         document.querySelector('#updateTable tbody').innerHTML = ''; 
@@ -525,16 +488,16 @@
         const tbody = document.querySelector('#updateTable tbody');
         const rowId = 'row_' + Date.now();
         
-        let listHtml = productsData.map(p => {
+        let listHtml = window.productsData.map(p => {
             let searchStr = (p.name + " " + p.sku).toLowerCase();
             let safeName = p.name.replace(/'/g, "\\'");
             let safeImg = p.image_url ? p.image_url : 'default.jpg';
             return `
             <li class="combo-item" data-search="${searchStr}" onclick="selectProduct('${rowId}', ${p.id}, '${safeName}', ${p.min_stock_level})">
-                <img src="/lego_shop_php/public/assets/images/${safeImg}" style="width:40px; height:40px; border-radius:4px; object-fit:cover; border: 1px solid #cbd5e1;" onerror="this.src='https://placehold.co/40x40?text=LEGO'">
+                <img src="/lego_shop_php/public/assets/images/${safeImg}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border: 1px solid #e2e8f0;" onerror="this.src='https://placehold.co/40x40?text=LEGO'">
                 <div style="flex: 1;">
                     <div style="font-weight: 700;">${p.name}</div>
-                    <span class="combo-item-sku">SKU: ${p.sku} | Mức cảnh báo cũ: <b style="color:#dd6b20">${p.min_stock_level}</b></span>
+                    <span class="combo-item-sku" style="font-size:11px;">SKU: ${p.sku} | Mức hiện tại: <b style="color:#3b82f6">${p.min_stock_level}</b></span>
                 </div>
             </li>`;
         }).join('');
@@ -543,20 +506,20 @@
             <tr id="${rowId}">
                 <td style="padding: 10px 0;">
                     <div class="combo-box-wrapper" id="combo_${rowId}">
-                        <input type="text" class="combo-search-input" placeholder="Gõ tên hoặc mã sản phẩm..." onfocus="openDropdown('${rowId}')" onkeyup="filterDropdown('${rowId}', this.value)" autocomplete="off">
+                        <input type="text" class="combo-search-input" placeholder="Gõ tên hoặc mã SKU..." onfocus="openDropdown('${rowId}')" onkeyup="filterDropdown('${rowId}', this.value)" autocomplete="off">
                         <i class="fa-solid fa-chevron-down combo-dropdown-icon"></i>
                         <input type="hidden" class="real-product-id">
                         <ul class="combo-dropdown-list">
                             ${listHtml}
-                            <li class="combo-empty" style="display:none;">Không tìm thấy sản phẩm...</li>
+                            <li class="combo-empty" style="display:none;">Không tìm thấy...</li>
                         </ul>
                     </div>
                 </td>
                 <td style="padding: 10px; text-align:center;">
-                    <input type="number" class="form-control min-stock-input" value="0" min="0" style="text-align:center; width: 80px; margin: 0 auto;">
+                    <input type="number" class="form-control min-stock-input" value="0" min="0" style="text-align:center; width: 80px; margin: 0 auto; font-weight: bold; color: #3b82f6;">
                 </td>
                 <td style="padding: 10px; text-align: center;">
-                    <button type="button" onclick="document.getElementById('${rowId}').remove();" style="color: #e53e3e; border:none; background:none; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                    <button type="button" onclick="document.getElementById('${rowId}').remove();" style="color: #ef4444; border:none; background:none; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
                 </td>
             </tr>`;
         tbody.insertAdjacentHTML('beforeend', rowHtml);
@@ -574,15 +537,12 @@
         const items = combo.querySelectorAll('.combo-item');
         let hasResult = false;
         keyword = keyword.toLowerCase().trim();
-
         if(keyword !== '') combo.querySelector('.real-product-id').value = '';
 
         items.forEach(item => {
             if (item.getAttribute('data-search').includes(keyword)) {
                 item.style.display = 'flex'; hasResult = true;
-            } else {
-                item.style.display = 'none';
-            }
+            } else { item.style.display = 'none'; }
         });
         combo.querySelector('.combo-empty').style.display = hasResult ? 'none' : 'block';
     }
@@ -603,41 +563,33 @@
 
     async function submitBulkUpdate() {
         const rows = document.querySelectorAll('#updateTable tbody tr');
-        if (rows.length === 0) return alert("Vui lòng thêm ít nhất một sản phẩm!");
-
+        if (rows.length === 0) return alert("Vui lòng thêm sản phẩm!");
         const dataToSend = [];
         let isValid = true;
-
         rows.forEach(row => {
             const pId = row.querySelector('.real-product-id').value;
             const minStock = row.querySelector('.min-stock-input').value;
-            
             if (!pId) {
                 isValid = false;
-                row.querySelector('.combo-search-input').style.borderColor = '#e53e3e';
+                row.querySelector('.combo-search-input').style.borderColor = '#ef4444';
             } else {
-                row.querySelector('.combo-search-input').style.borderColor = '#e2e8f0';
+                row.querySelector('.combo-search-input').style.borderColor = '#cbd5e1';
                 dataToSend.push({ product_id: pId, min_stock: minStock });
             }
         });
 
-        if (!isValid) return alert("Có sản phẩm chưa được chọn đúng từ danh sách. Vui lòng kiểm tra lại viền đỏ!");
+        if (!isValid) return alert("Có sản phẩm chưa được chọn đúng từ danh sách dropdown!");
 
         try {
             const response = await fetch('/lego_shop_php/admininventory/updateBulkMinStock', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                method: 'POST', headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ items: dataToSend })
             });
             const result = await response.json();
             if(result.success) {
                 alert("Cập nhật thành công!");
                 window.location.href = "/lego_shop_php/admininventory?tab=alerts";
-            } else {
-                alert("Lỗi: " + result.message);
-            }
-        } catch (err) {
-            alert("Lỗi kết nối mạng!");
-        }
+            } else { alert("Lỗi: " + result.message); }
+        } catch (err) { alert("Lỗi mạng!"); }
     }
 </script>

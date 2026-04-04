@@ -205,7 +205,7 @@ $session_error = get_flash_message('error');
                             <div class="product-cell">
                                 <img src="/lego_shop_php/public/assets/images/<?= !empty($p['main_image']) ? $p['main_image'] : 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/60x60?text=LEGO'">
                                 <div>
-                                    <a href="/lego_shop_php/adminproduct/detail/<?= $p['id'] ?>" style="text-decoration: none; display: block;">
+                                    <a href="/lego_shop_php/adminproduct/edit/<?= $p['id'] ?>" style="text-decoration: none; display: block;">
                                         <div style="font-weight: 700; color: #3182ce;"><?= htmlspecialchars($p['name']) ?></div>
                                     </a>
                                     <div style="font-size: 11px; color: #a0aec0;">SKU: <?= strtoupper($p['sku']) ?></div>
