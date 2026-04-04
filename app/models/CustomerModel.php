@@ -22,8 +22,19 @@ class CustomerModel extends Database {
             $sql .= " AND a.status = '$status'";
         }
 
-        $sql .= " ORDER BY a.created_at DESC";
-        if ($limit !== null && $offset !== null) { $sql .= " LIMIT " . (int)$offset . ", " . (int)$limit; }
+        // ==========================================
+        // ĐÃ SỬA: Đẩy tài khoản 'locked' và 'deleted' xuống cuối danh sách
+        // ==========================================
+        $sql .= " ORDER BY CASE 
+                    WHEN a.status = 'active' THEN 0 
+                    WHEN a.status = 'locked' THEN 1 
+                    ELSE 2 
+                  END ASC, a.created_at DESC";
+
+        // Xử lý LIMIT & OFFSET
+        if ($limit !== null && $offset !== null) { 
+            $sql .= " LIMIT " . (int)$offset . ", " . (int)$limit; 
+        }
         
         $result = $db->query($sql);
         return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];

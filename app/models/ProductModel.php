@@ -225,47 +225,50 @@
 
         // Hàm lấy danh sách dành riêng cho Admin (Lấy cả status 1 và 2)
         public function getAdminProducts($filters = [], $offset = 0, $limit = 6) {
-            $db = $this->getConnection();
-            
-            // Mặc định lấy cả 1 và 2
-            $where = "WHERE p.status IN (1, 2)"; 
+        $db = $this->getConnection();
+        
+        // Mặc định lấy cả 1 và 2 (1: Đang bán, 2: Tạm ẩn)
+        $where = "WHERE p.status IN (1, 2)"; 
 
-            // Kiểm tra nếu lọc status là số cụ thể (1 hoặc 2)
-            if (isset($filters['status']) && is_numeric($filters['status'])) {
-                $where = "WHERE p.status = " . intval($filters['status']);
-            } 
-            // Nếu lọc là một danh sách (ví dụ '1,2')
-            elseif (!empty($filters['status']) && $filters['status'] !== 'all' && strpos($filters['status'], ',') !== false) {
-                // Làm sạch chuỗi để tránh SQL Injection (ví dụ: "1,2")
-                $safe_status = $db->real_escape_string($filters['status']);
-                $where = "WHERE p.status IN ($safe_status)";
-            }
-
-            $sql = "SELECT p.*, c.name as category_name, pd.pieces,
-                    (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
-                    FROM products p 
-                    LEFT JOIN categories c ON p.category_id = c.id 
-                    LEFT JOIN product_details pd ON p.id = pd.product_id 
-                    $where";
-
-            if (!empty($filters['keyword'])) {
-                $k = $db->real_escape_string(trim($filters['keyword']));
-                $sql .= " AND (p.name LIKE '%$k%' OR p.sku LIKE '%$k%')";
-            }
-            
-            if (!empty($filters['category']) && $filters['category'] !== 'all') {
-                $sql .= " AND p.category_id = " . intval($filters['category']);
-            }
-
-            $sql .= " ORDER BY p.created_at DESC LIMIT " . intval($offset) . ", " . intval($limit);
-
-            $result = $db->query($sql);
-            $products = [];
-            if ($result) {
-                while ($row = $result->fetch_assoc()) { $products[] = $row; }
-            }
-            return $products;
+        // Kiểm tra nếu lọc status là số cụ thể (1 hoặc 2)
+        if (isset($filters['status']) && is_numeric($filters['status'])) {
+            $where = "WHERE p.status = " . intval($filters['status']);
+        } 
+        // Nếu lọc là một danh sách (ví dụ '1,2')
+        elseif (!empty($filters['status']) && $filters['status'] !== 'all' && strpos($filters['status'], ',') !== false) {
+            // Làm sạch chuỗi để tránh SQL Injection (ví dụ: "1,2")
+            $safe_status = $db->real_escape_string($filters['status']);
+            $where = "WHERE p.status IN ($safe_status)";
         }
+
+        $sql = "SELECT p.*, c.name as category_name, pd.pieces,
+                (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM products p 
+                LEFT JOIN categories c ON p.category_id = c.id 
+                LEFT JOIN product_details pd ON p.id = pd.product_id 
+                $where";
+
+        if (!empty($filters['keyword'])) {
+            $k = $db->real_escape_string(trim($filters['keyword']));
+            $sql .= " AND (p.name LIKE '%$k%' OR p.sku LIKE '%$k%')";
+        }
+        
+        if (!empty($filters['category']) && $filters['category'] !== 'all') {
+            $sql .= " AND p.category_id = " . intval($filters['category']);
+        }
+
+        // ==================================================
+        // ĐÃ SỬA: Thêm CASE WHEN để đẩy status = 2 xuống cuối cùng
+        // ==================================================
+        $sql .= " ORDER BY CASE WHEN p.status = 2 THEN 1 ELSE 0 END ASC, p.created_at DESC LIMIT " . intval($offset) . ", " . intval($limit);
+
+        $result = $db->query($sql);
+        $products = [];
+        if ($result) {
+            while ($row = $result->fetch_assoc()) { $products[] = $row; }
+        }
+        return $products;
+    }
 
         // Hàm đếm tổng sản phẩm dành riêng cho Admin
         public function countAdminProducts($filters = []) {

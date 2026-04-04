@@ -93,18 +93,18 @@ class CategoryModel extends Database {
         }
 
         // Đếm số lượng sản phẩm TRONG danh mục (kể cả sản phẩm bị khóa nhưng không tính SP bị xóa mềm)
+        // SỬ DỤNG CASE WHEN TRONG ORDER BY ĐỂ ĐẨY STATUS 'locked' XUỐNG CUỐI
         $sql = "SELECT c.*, COUNT(p.id) as product_count 
                 FROM categories c 
                 LEFT JOIN products p ON c.id = p.category_id AND p.status != 3
                 $whereClause 
                 GROUP BY c.id 
-                ORDER BY c.id DESC 
+                ORDER BY CASE WHEN c.status = 'locked' THEN 1 ELSE 0 END ASC, c.id DESC 
                 LIMIT $offset, $limit";
                 
         $result = $db->query($sql);
         return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
-
     // Đếm tổng số bản ghi (Dùng cho phân trang)
     public function countAdminCategories($keyword = '', $status = 'all') {
         $db = $this->getConnection();

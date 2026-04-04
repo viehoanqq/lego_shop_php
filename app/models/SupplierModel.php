@@ -19,11 +19,20 @@ class SupplierModel extends Database {
             $where .= " AND (name LIKE '%$k%' OR phone LIKE '%$k%' OR email LIKE '%$k%')";
         }
 
-        $sql = "SELECT * FROM suppliers $where ORDER BY id DESC LIMIT $offset, $limit";
+        // ==========================================
+        // ĐÃ SỬA: Ưu tiên Active lên đầu, đẩy Locked/Inactive và Deleted xuống đáy
+        // ==========================================
+        $sql = "SELECT * FROM suppliers $where 
+                ORDER BY CASE 
+                    WHEN status = 'active' THEN 0 
+                    WHEN status = 'locked' THEN 1  -- (Hoặc 'inactive' tùy cách bạn đặt tên trong DB)
+                    ELSE 2 
+                END ASC, id DESC 
+                LIMIT $offset, $limit";
+                
         $result = $db->query($sql);
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
-
     // Đếm tổng số lượng (Cập nhật hỗ trợ lọc deleted)
     public function countSuppliers($keyword = '', $status = 'all') {
         $db = $this->getConnection();
