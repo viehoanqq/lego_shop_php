@@ -201,17 +201,33 @@
 </div>
 
 <script>
-$(function() {
-    var start = moment($('#start_date').val(), 'YYYY-MM-DD');
-    var end = moment($('#end_date').val(), 'YYYY-MM-DD');
-
-    function cb(s, e) {
-        $('#reportrange').val(s.format('DD/MM/YYYY') + '  -  ' + e.format('DD/MM/YYYY'));
-        $('#start_date').val(s.format('YYYY-MM-DD'));
-        $('#end_date').val(e.format('YYYY-MM-DD'));
+// Chạy hàm này ngay lập tức khi file JS được load (không chờ document.ready)
+(function initDateRangePicker() {
+    // Đảm bảo jQuery và daterangepicker đã sẵn sàng
+    if (typeof $ === 'undefined' || !$.fn.daterangepicker) {
+        setTimeout(initDateRangePicker, 100); // Nếu chưa có, thử lại sau 0.1s
+        return;
     }
 
-    $('#reportrange').daterangepicker({
+    var startInput = $('#start_date');
+    var endInput = $('#end_date');
+    var reportRange = $('#reportrange');
+
+    // Tránh khởi tạo 2 lần nếu chuyển trang AJAX
+    if (reportRange.data('daterangepicker')) {
+        reportRange.daterangepicker('destroy'); 
+    }
+
+    var start = moment(startInput.val(), 'YYYY-MM-DD');
+    var end = moment(endInput.val(), 'YYYY-MM-DD');
+
+    function cb(s, e) {
+        reportRange.val(s.format('DD/MM/YYYY') + '  -  ' + e.format('DD/MM/YYYY'));
+        startInput.val(s.format('YYYY-MM-DD'));
+        endInput.val(e.format('YYYY-MM-DD'));
+    }
+
+    reportRange.daterangepicker({
         startDate: start,
         endDate: end,
         showDropdowns: true, 
@@ -231,10 +247,11 @@ $(function() {
             firstDay: 1 
         }
     }, cb);
+
     cb(start, end);
 
-    $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+    reportRange.on('apply.daterangepicker', function(ev, picker) {
         $('#reportForm').submit();
     });
-});
+})();
 </script>

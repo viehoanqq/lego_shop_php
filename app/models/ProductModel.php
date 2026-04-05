@@ -527,7 +527,46 @@
             $result = $db->query($sql);
             return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
         }
-        
+        public function getProductsPaginated($offset, $limit, $keyword = '') {
+            $db = $this->getConnection();
+            
+            // Dùng subquery lấy ảnh chính, và loại bỏ sản phẩm có status = 0 (khóa/xóa)
+            $sql = "SELECT p.*, 
+                           (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as image_url 
+                    FROM products p 
+                    WHERE p.status IN (1, 2)";
+            
+            if (!empty($keyword)) {
+                $kw = $db->real_escape_string($keyword);
+                $sql .= " AND (p.name LIKE '%$kw%' OR p.sku LIKE '%$kw%')";
+            }
+            
+            $sql .= " ORDER BY p.id DESC LIMIT " . intval($offset) . ", " . intval($limit);
+            
+            $result = $db->query($sql);
+            $data = [];
+            if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) { 
+                    $data[] = $row; 
+                }
+            }
+            return $data;
+        }
+
+        // Đếm tổng số lượng sản phẩm (Cập nhật đồng bộ điều kiện bỏ SP bị khóa)
+        public function countProducts($keyword = '') {
+            $db = $this->getConnection();
+            
+            $sql = "SELECT COUNT(*) as total FROM products p WHERE p.status IN (1, 2)";
+            
+            if (!empty($keyword)) {
+                $kw = $db->real_escape_string($keyword);
+                $sql .= " AND (p.name LIKE '%$kw%' OR p.sku LIKE '%$kw%')";
+            }
+            
+            $result = $db->query($sql);
+            return (int)$result->fetch_assoc()['total'];
+        }
         //Cập nhật trạng thái sản phẩm có kiểm tra trạng thái Danh mục
         public function updateStatusWithTaskCheck($id, $status) {
             $db = $this->getConnection();

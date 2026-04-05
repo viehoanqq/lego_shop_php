@@ -100,30 +100,33 @@
     </button>
 </div>
 
-<div id="tab-overview" class="tab-content active">
+<div id="tab-overview" class="tab-content">
     <div class="header" style="margin-bottom: 15px;">
         <div class="header-left">
             <h2>Tra cứu tồn kho theo ngày</h2>
             <p>Chọn một ngày trong quá khứ để xem sổ sách (Chỉ tính các đơn hàng và phiếu nhập đã hoàn tất).</p>
             
-            <div class="filter-form">
+            <form action="/lego_shop_php/admininventory" method="GET" class="filter-form" style="margin-bottom: 0;">
+                <input type="hidden" name="tab" value="overview">
+                
                 <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="quickSearchOverview" onkeyup="filterOverviewTable()" placeholder="Tìm Tên hoặc SKU...">
+                    <input type="text" name="overview_keyword" value="<?= htmlspecialchars($overview_keyword ?? '') ?>" placeholder="Tìm Tên hoặc SKU...">
                 </div>
+                <button type="submit" class="btn-filter-action" style="padding: 0 12px; margin-right: 20px;">Tìm</button>
                 
                 <div style="flex: 1;"></div>
                 
                 <span style="font-size: 13px; font-weight: 600; color: #475569;">Tra cứu theo ngày:</span>
                 <input type="date" id="snapshotDate" class="form-control" style="width: 140px;" value="<?= date('Y-m-d') ?>" onkeydown="if(event.key === 'Enter') fetchSnapshot()">
-                <button class="btn-filter-action" onclick="fetchSnapshot()">Tra cứu <i class="fa-solid fa-magnifying-glass"></i></button>
-            </div>
+                <button type="button" class="btn-filter-action" onclick="fetchSnapshot()">Tra cứu <i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>
         </div>
     </div>
 
-    <div class="table-container" style="max-height: 600px; overflow-y: auto;">
+    <div class="table-container">
         <table class="lego-table" id="overviewTable">
-            <thead style="position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+            <thead>
                 <tr>
                     <th style="width: 40%;">Sản phẩm</th>
                     <th style="text-align: right;">Giá nhập (WAC)</th>
@@ -133,43 +136,63 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach($all_products as $ap): ?>
-                    <?php 
-                        $wac = $ap['import_price'] ?? 0; 
-                        $val = $ap['stock_quantity'] * $wac;
-                    ?>
-                    <tr class="overview-row" data-search="<?= strtolower($ap['name'] . ' ' . $ap['sku']) ?>">
-                        <td>
-                            <div class="product-cell">
-                                <img src="/lego_shop_php/public/assets/images/<?= $ap['image_url'] ?? 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/52x52?text=LEGO'">
-                                <div>
-                                    <div style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($ap['name']) ?></div>
-                                    <div style="font-size: 11px; color: #64748b; margin-top: 2px;">SKU: <?= strtoupper($ap['sku']) ?></div>
+                <?php if(!empty($overview_products)): ?>
+                    <?php foreach($overview_products as $ap): ?>
+                        <?php 
+                            $wac = $ap['import_price'] ?? 0; 
+                            $val = $ap['stock_quantity'] * $wac;
+                        ?>
+                        <tr class="overview-row" data-search="<?= strtolower($ap['name'] . ' ' . $ap['sku']) ?>">
+                            <td>
+                                <div class="product-cell">
+                                    <img src="/lego_shop_php/public/assets/images/<?= $ap['image_url'] ?? 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/52x52?text=LEGO'">
+                                    <div>
+                                        <div style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($ap['name']) ?></div>
+                                        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">SKU: <?= strtoupper($ap['sku']) ?></div>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td style="text-align: right; color: #475569; font-weight: 600;"><?= number_format($wac, 0, ',', '.') ?> đ</td>
-                        
-                        <td style="text-align: center;">
-                            <span class="snap-qty" style="font-weight: 800; font-size: 16px; color: <?= $ap['stock_quantity'] <= $ap['min_stock_level'] ? '#ef4444' : '#10b981' ?>;">
-                                <?= $ap['stock_quantity'] ?>
-                            </span>
-                        </td>
-                        
-                        <td style="text-align: right; color: #3b82f6; font-weight: 700; font-size: 15px;">
-                            <span class="snap-val"><?= number_format($val, 0, ',', '.') ?></span> đ
-                        </td>
-                        
-                        <td style="text-align: center;">
-                            <button class="btn-action-small" onclick="openHistory(<?= $ap['id'] ?>, '<?= addslashes($ap['name']) ?>')">
-                                <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử
-                            </button>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
+                            </td>
+                            <td style="text-align: right; color: #475569; font-weight: 600;"><?= number_format($wac, 0, ',', '.') ?> đ</td>
+                            
+                            <td style="text-align: center;">
+                                <span class="snap-qty" style="font-weight: 800; font-size: 16px; color: <?= $ap['stock_quantity'] <= $ap['min_stock_level'] ? '#ef4444' : '#10b981' ?>;">
+                                    <?= $ap['stock_quantity'] ?>
+                                </span>
+                            </td>
+                            
+                            <td style="text-align: right; color: #3b82f6; font-weight: 700; font-size: 15px;">
+                                <span class="snap-val"><?= number_format($val, 0, ',', '.') ?></span> đ
+                            </td>
+                            
+                            <td style="text-align: center;">
+                                <button type="button" class="btn-action-small" onclick="openHistory(<?= $ap['id'] ?>, '<?= addslashes($ap['name']) ?>')">
+                                    <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử
+                                </button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr><td colspan="5" style="text-align: center; padding: 30px;">Không tìm thấy sản phẩm nào.</td></tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
+
+    <?php if ($overview_totalPages > 1): ?>
+        <div class="pagination">
+            <?php if ($overview_currentPage > 1): ?>
+                <a href="?tab=overview&overview_page=<?= $overview_currentPage - 1 ?>&overview_keyword=<?= urlencode($overview_keyword) ?>" class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
+            <?php endif; ?>
+            
+            <?php for ($i = 1; $i <= $overview_totalPages; $i++): ?>
+                <a href="?tab=overview&overview_page=<?= $i ?>&overview_keyword=<?= urlencode($overview_keyword) ?>" class="page-link <?= ($i == $overview_currentPage) ? 'active' : '' ?>"><?= $i ?></a>
+            <?php endfor; ?>
+            
+            <?php if ($overview_currentPage < $overview_totalPages): ?>
+                <a href="?tab=overview&overview_page=<?= $overview_currentPage + 1 ?>&overview_keyword=<?= urlencode($overview_keyword) ?>" class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
 </div>
 
 <div id="tab-alerts" class="tab-content">
@@ -327,9 +350,14 @@
     }
 
     var urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('custom_threshold') || urlParams.has('keyword') || urlParams.get('tab') === 'alerts') {
-        switchTab('alerts');
-    }
+var activeTab = urlParams.get('tab');
+
+if (activeTab === 'alerts' || urlParams.has('threshold') || urlParams.has('keyword')) {
+    switchTab('alerts');
+} else {
+    // Mặc định luôn là overview
+    switchTab('overview');
+}
 
     function filterOverviewTable() {
         let input = document.getElementById("quickSearchOverview").value.toLowerCase();
