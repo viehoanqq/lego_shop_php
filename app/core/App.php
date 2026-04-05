@@ -9,18 +9,23 @@ class App {
 
         // 1. XỬ LÝ CONTROLLER
         if (isset($url[0])) {
-            // Ép tất cả URL về chữ thường, sau đó mới viết hoa chữ cái đầu
-            // Ví dụ: pRoFiLe -> profile -> Profile
-            $controllerName = ucfirst(strtolower($url[0])) . 'Controller';
-            
-            // QUAN TRỌNG: Hãy kiểm tra file vật lý của bạn tên là gì (ví dụ: ProfileController.php)
-            $file = 'app/controllers/' . $controllerName . '.php';
+    // Thử trường hợp viết hoa chữ đầu (chuẩn thường)
+    $name = ucfirst($url[0]) . 'Controller';
+    
+    // MẸO: Nếu URL bắt đầu bằng 'admin', ta thử tìm file có chữ hoa ở từ thứ 2
+    // Ví dụ: adminreport -> AdminReportController
+    if (strpos($url[0], 'admin') === 0 && strlen($url[0]) > 5) {
+        $sub = substr($url[0], 5); // lấy phần sau chữ 'admin'
+        $name = 'Admin' . ucfirst($sub) . 'Controller';
+    }
 
-            if (file_exists($file)) {
-                $this->controller = $controllerName;
-                unset($url[0]);
-            }
-        }
+    $file = 'app/controllers/' . $name . '.php';
+
+    if (file_exists($file)) {
+        $this->controller = $name;
+        unset($url[0]);
+    }
+}
 
         // Kiểm tra lại đường dẫn file trước khi require
         $fullPath = 'app/controllers/' . $this->controller . '.php';
