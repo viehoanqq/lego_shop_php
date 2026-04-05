@@ -76,6 +76,12 @@
         color: #319795;
         border: 1px solid #81e6d9;
     }
+    /* ===== PAGINATION CSS ===== */
+.pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; padding-bottom: 20px;}
+.page-link { padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #475569; background: #fff; font-weight: 600; transition: 0.2s; }
+.page-link:hover { background: #f8fafc; color: #3182ce; border-color: #3182ce; }
+.page-link.active { background: #3182ce; color: #fff; border-color: #3182ce; box-shadow: 0 4px 10px rgba(49, 130, 206, 0.2);}
+.page-link.disabled { opacity: 0.5; pointer-events: none; background: #f7fafc; color: #cbd5e1; }
 </style>
 
 <div class="admin-header1" style="margin-bottom: 20px; padding: 5px;">
@@ -255,5 +261,39 @@ $payment_map = [
                 </td>
             </tr>
         </table>
+    </div>
+<?php endif; ?>
+<?php if (isset($totalPages) && $totalPages > 1): ?>
+    <?php 
+        // Xây dựng chuỗi URL cơ sở để giữ nguyên bộ lọc (Search, Date, Sort...)
+        $query_params = [];
+        if (!empty($filters['search'])) $query_params['search'] = $filters['search'];
+        if (!empty($filters['status'])) $query_params['status'] = $filters['status'];
+        if (!empty($filters['date_from'])) $query_params['date_from'] = $filters['date_from'];
+        if (!empty($filters['date_to'])) $query_params['date_to'] = $filters['date_to'];
+        if (!empty($filters['sort'])) $query_params['sort'] = $filters['sort'];
+        
+        $base_query = http_build_query($query_params);
+        $url_prefix = "/lego_shop_php/adminorder?" . (!empty($base_query) ? $base_query . "&" : "");
+    ?>
+    
+    <div class="pagination">
+        <a href="<?= $url_prefix ?>page=<?= $currentPage - 1 ?>" class="page-link <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+
+        <?php 
+            $startPage = max(1, $currentPage - 2);
+            $endPage = min($totalPages, $currentPage + 2);
+            for ($i = $startPage; $i <= $endPage; $i++): 
+        ?>
+            <a href="<?= $url_prefix ?>page=<?= $i ?>" class="page-link <?= ($i == $currentPage) ? 'active' : '' ?>">
+                <?= $i ?>
+            </a>
+        <?php endfor; ?>
+
+        <a href="<?= $url_prefix ?>page=<?= $currentPage + 1 ?>" class="page-link <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
     </div>
 <?php endif; ?>

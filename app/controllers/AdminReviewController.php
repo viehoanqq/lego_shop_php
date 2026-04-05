@@ -18,17 +18,28 @@ class AdminReviewController extends Controller {
         $keyword = $_GET['keyword'] ?? '';
         $rating = $_GET['rating'] ?? '';
 
-        $reviews = $this->reviewModel->getReviews($product_id, $keyword, $rating);
+        // ===== CẤU HÌNH PHÂN TRANG =====
+        $limit = 10; // Số review trên 1 trang
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $offset = ($page - 1) * $limit;
+
+        // Lấy dữ liệu đã phân trang
+        $reviews = $this->reviewModel->getReviews($product_id, $keyword, $rating, $offset, $limit);
+        
+        // Lấy tổng số review để tính số trang
+        $totalItems = $this->reviewModel->countReviews($product_id, $keyword, $rating);
+        $totalPages = ceil($totalItems / $limit);
 
         $this->view('admin/review', [
             'reviews' => $reviews,
             'keyword' => $keyword,
             'rating'  => $rating,
             'product_id' => $product_id,
+            'currentPage' => $page,
+            'totalPages'  => $totalPages,
             'title'   => 'Quản lý đánh giá',
         ]);
     }
-
     // Thay đổi trạng thái Duyệt/Ẩn
     public function toggleStatus() {
         if (!isset($_GET['id']) || !isset($_GET['status'])) {

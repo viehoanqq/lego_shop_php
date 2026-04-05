@@ -2,7 +2,7 @@
 class AdminInventoryController extends Controller {
     private $InventoryModel;
     private $productModel;
-    private $limit = 10; 
+    private $limit = 6; 
 
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) session_start();
@@ -14,13 +14,26 @@ class AdminInventoryController extends Controller {
     public function index() {
         $type = $_GET['type'] ?? 'all';
         $keyword = $_GET['keyword'] ?? ''; 
-        $custom_threshold = $_GET['custom_threshold'] ?? ''; // Lọc theo số lượng
         
+        // BƯỚC 1: XỬ LÝ LƯU NGƯỠNG CẢNH BÁO MỚI (NẾU CÓ)
+        if (isset($_GET['threshold']) && is_numeric($_GET['threshold'])) {
+            $new_threshold = intval($_GET['threshold']);
+            $this->InventoryModel->updateAllMinStock($new_threshold);
+            
+            // Xóa tham số threshold trên URL để tránh update lại khi F5
+            header("Location: /lego_shop_php/admininventory?tab=alerts&keyword=" . urlencode($keyword));
+            exit;
+        }
+
+        // BƯỚC 2: LẤY NGƯỠNG CẢNH BÁO HIỆN TẠI TỪ DB
+        $current_threshold = $this->InventoryModel->getGlobalMinStock();
+
         $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
         $offset = ($page - 1) * $this->limit;
 
-        $products = $this->InventoryModel->getLowStockProducts($offset, $this->limit, $type, $keyword, $custom_threshold);
-        $totalItems = $this->InventoryModel->countLowStockProducts($type, $keyword, $custom_threshold);
+        // BƯỚC 3: LẤY DỮ LIỆU
+        $products = $this->InventoryModel->getLowStockProducts($offset, $this->limit, $type, $keyword);
+        $totalItems = $this->InventoryModel->countLowStockProducts($type, $keyword);
         $totalPages = ceil($totalItems / $this->limit);
 
         $all_products = $this->productModel->getAllProductsForDropdown();
@@ -33,7 +46,7 @@ class AdminInventoryController extends Controller {
             'currentPage'  => $page,
             'currentType'  => $type,
             'keyword'      => $keyword,
-            'custom_threshold' => $custom_threshold,
+            'current_threshold' => $current_threshold, // Truyền biến này ra View
             'title'   => 'Quản lý tồn kho',
         ]);
     }

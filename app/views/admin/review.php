@@ -4,7 +4,11 @@
     background-color: #f7fafc;
     min-height: 100vh;
 }
-
+/* CSS Phân trang */
+.pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; padding-bottom: 20px;}
+.page-link { padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #475569; background: #fff; font-weight: 600; transition: 0.2s; }
+.page-link:hover { background: #f8fafc; color: #3182ce; border-color: #3182ce; }
+.page-link.active { background: #3182ce; color: #fff; border-color: #3182ce; box-shadow: 0 4px 10px rgba(49, 130, 206, 0.2);}
 .header {
     background: #ffffff;
     padding: 24px;
@@ -372,7 +376,31 @@ $session_error = get_flash_message('error');
             </tbody>
         </table>
     </div>
-</div>
+</div> <?php if (isset($totalPages) && $totalPages > 1): ?>
+        <div class="pagination">
+            <?php 
+                // Tạo URL cơ sở để giữ nguyên các tham số lọc khi bấm chuyển trang
+                $base_url = "?keyword=" . urlencode($keyword) . "&rating=" . urlencode($rating);
+                if (!empty($product_id)) {
+                    $base_url .= "&product_id=" . urlencode($product_id);
+                }
+            ?>
+            
+            <?php if ($currentPage > 1): ?>
+                <a href="<?= $base_url ?>&page=<?= $currentPage - 1 ?>" class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
+            <?php endif; ?>
+            
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <a href="<?= $base_url ?>&page=<?= $i ?>" class="page-link <?= ($i == $currentPage) ? 'active' : '' ?>">
+                    <?= $i ?>
+                </a>
+            <?php endfor; ?>
+            
+            <?php if ($currentPage < $totalPages): ?>
+                <a href="<?= $base_url ?>&page=<?= $currentPage + 1 ?>" class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
 
 <script>
 setTimeout(function() {

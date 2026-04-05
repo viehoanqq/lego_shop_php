@@ -1,18 +1,29 @@
 <?php
 class InventoryModel extends Database {
-    
+    public function getGlobalMinStock() {
+        $db = $this->getConnection();
+        // Lấy min_stock_level của 1 sản phẩm bất kỳ làm chuẩn chung
+        $res = $db->query("SELECT min_stock_level FROM products LIMIT 1");
+        if ($res && $row = $res->fetch_assoc()) {
+            return $row['min_stock_level'];
+        }
+        return 10; // Mặc định nếu db trống
+    }
+
+    // Cập nhật ngưỡng cảnh báo cho TẤT CẢ sản phẩm
+    public function updateAllMinStock($min_stock) {
+        $db = $this->getConnection();
+        $ms = intval($min_stock);
+        return $db->query("UPDATE products SET min_stock_level = $ms");
+    }
     // 1. Lấy danh sách cảnh báo (Đã thêm lọc theo số lượng tùy chỉnh)
-    public function getLowStockProducts($offset = 0, $limit = 6, $type = 'all', $keyword = '', $custom_threshold = null) {
+    public function getLowStockProducts($offset = 0, $limit = 6, $type = 'all', $keyword = '') {
         $db = $this->getConnection();
         $where = "WHERE p.status IN (1, 2) ";
 
-        if ($custom_threshold !== null && $custom_threshold !== '') {
-            $where .= " AND p.stock_quantity <= " . intval($custom_threshold);
-        } else {
-            if ($type === 'out') { $where .= " AND p.stock_quantity <= 0"; } 
-            elseif ($type === 'low') { $where .= " AND p.stock_quantity > 0 AND p.stock_quantity <= p.min_stock_level"; } 
-            elseif ($type === 'all') { $where .= " AND p.stock_quantity <= p.min_stock_level"; }
-        }
+        if ($type === 'out') { $where .= " AND p.stock_quantity <= 0"; } 
+        elseif ($type === 'low') { $where .= " AND p.stock_quantity > 0 AND p.stock_quantity <= p.min_stock_level"; } 
+        elseif ($type === 'all') { $where .= " AND p.stock_quantity <= p.min_stock_level"; }
 
         if (!empty($keyword)) {
             $k = $db->real_escape_string($keyword);
@@ -29,17 +40,13 @@ class InventoryModel extends Database {
         return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    public function countLowStockProducts($type = 'all', $keyword = '', $custom_threshold = null) {
+    public function countLowStockProducts($type = 'all', $keyword = '') {
         $db = $this->getConnection();
         $where = "WHERE status IN (1, 2) ";
         
-        if ($custom_threshold !== null && $custom_threshold !== '') {
-            $where .= " AND stock_quantity <= " . intval($custom_threshold);
-        } else {
-            if ($type === 'out') $where .= " AND stock_quantity <= 0";
-            elseif ($type === 'low') $where .= " AND stock_quantity > 0 AND stock_quantity <= min_stock_level";
-            elseif ($type === 'all') $where .= " AND stock_quantity <= min_stock_level";
-        }
+        if ($type === 'out') $where .= " AND stock_quantity <= 0";
+        elseif ($type === 'low') $where .= " AND stock_quantity > 0 AND stock_quantity <= min_stock_level";
+        elseif ($type === 'all') $where .= " AND stock_quantity <= min_stock_level";
 
         if (!empty($keyword)) {
             $k = $db->real_escape_string($keyword);
@@ -68,11 +75,6 @@ class InventoryModel extends Database {
     }
 
     
-
-    // Cập nhật mức cảnh báo
-    public function updateAllMinStock($min_stock) {
-        return $this->getConnection()->query("UPDATE products SET min_stock_level = " . intval($min_stock));
-    }
     public function updateSingleMinStock($id, $min_stock) {
         $db = $this->getConnection();
         $stmt = $db->prepare("UPDATE products SET min_stock_level = ? WHERE id = ?");

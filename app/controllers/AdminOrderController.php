@@ -1,6 +1,8 @@
 <?php
 class AdminOrderController extends Controller {
     
+    private $limit = 5; // SỐ DÒNG HIỂN THỊ TRÊN MỖI TRANG
+
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         if (!isset($_SESSION['admin_id'])) { 
@@ -9,12 +11,26 @@ class AdminOrderController extends Controller {
         }
     }
 
-    // Hiển thị danh sách tất cả đơn hàng
+    // Hiển thị danh sách tất cả đơn hàng (CÓ PHÂN TRANG)
     public function index() {
         $orderModel = $this->model('OrderModel');
-        $data['orders'] = $orderModel->getAllOrdersAdmin($_GET ?? []);
-        $data['filters'] = $_GET ?? []; 
+        $filters = $_GET ?? [];
+
+        // 1. Cấu hình phân trang
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $offset = ($page - 1) * $this->limit;
+
+        // 2. Đếm tổng số đơn hàng (theo bộ lọc) để tính số trang
+        $totalRecords = $orderModel->countAllOrdersAdmin($filters);
+        $totalPages = ceil($totalRecords / $this->limit);
+
+        // 3. Lấy dữ liệu 1 trang (truyền thêm limit và offset)
+        $data['orders'] = $orderModel->getAllOrdersAdmin($filters, $this->limit, $offset);
+        
+        $data['filters'] = $filters; 
         $data['title'] = "Quản lý Đơn hàng";
+        $data['currentPage'] = $page;
+        $data['totalPages'] = $totalPages;
         
         $this->view('admin/orders', $data);
     }

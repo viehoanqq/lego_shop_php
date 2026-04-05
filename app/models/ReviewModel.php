@@ -2,24 +2,18 @@
 class ReviewModel extends Database {
     
     // Lấy danh sách review kèm tên khách hàng và tên sản phẩm
-    public function getReviews($product_id = null, $keyword = '', $rating = '') {
+    public function getReviews($product_id = null, $keyword = '', $rating = '', $offset = 0, $limit = 6) {
         $db = $this->getConnection();
         
-        // Điều kiện mặc định
         $where = "WHERE 1=1 ";
 
-        // Lọc theo sản phẩm cụ thể (nếu có)
         if ($product_id) {
             $where .= " AND r.product_id = " . (int)$product_id;
         }
-
-        // Lọc theo từ khóa (Tên khách hàng hoặc tên sản phẩm)
         if (!empty($keyword)) {
             $k = $db->real_escape_string($keyword);
             $where .= " AND (u.fullname LIKE '%$k%' OR p.name LIKE '%$k%')";
         }
-
-        // Lọc theo số sao
         if (!empty($rating)) {
             $where .= " AND r.rating = " . (int)$rating;
         }
@@ -29,10 +23,35 @@ class ReviewModel extends Database {
                 JOIN users u ON r.user_id = u.id
                 JOIN products p ON r.product_id = p.id
                 $where
-                ORDER BY r.created_at DESC";
+                ORDER BY r.created_at DESC
+                LIMIT $offset, $limit";
         
         $result = $db->query($sql);
         return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+    public function countReviews($product_id = null, $keyword = '', $rating = '') {
+        $db = $this->getConnection();
+        $where = "WHERE 1=1 ";
+
+        if ($product_id) {
+            $where .= " AND r.product_id = " . (int)$product_id;
+        }
+        if (!empty($keyword)) {
+            $k = $db->real_escape_string($keyword);
+            $where .= " AND (u.fullname LIKE '%$k%' OR p.name LIKE '%$k%')";
+        }
+        if (!empty($rating)) {
+            $where .= " AND r.rating = " . (int)$rating;
+        }
+
+        $sql = "SELECT COUNT(*) as total
+                FROM product_reviews r
+                JOIN users u ON r.user_id = u.id
+                JOIN products p ON r.product_id = p.id
+                $where";
+        
+        $result = $db->query($sql);
+        return $result ? $result->fetch_assoc()['total'] : 0;
     }
 
     // Cập nhật trạng thái 'approved' hoặc 'hidden'

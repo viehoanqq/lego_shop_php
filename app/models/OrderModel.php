@@ -2,8 +2,35 @@
 class OrderModel extends Database {
     
     // Lưu thông tin chung của đơn hàng
-    
-
+    private function buildAdminOrdersWhere($filters) {
+        $db = $this->getConnection();
+        $where = ["1=1"]; 
+        
+        if (!empty($filters['search'])) {
+            $s = $db->real_escape_string(trim($filters['search']));
+            if (stripos($s, 'DH') !== false || strpos($s, '#') === 0) {
+                $clean_id = (int) preg_replace('/[^0-9]/', '', $s);
+                $where[] = "id = $clean_id";
+            } else {
+                $where[] = "(id = '$s' OR shipping_phone LIKE '%$s%' OR shipping_fullname LIKE '%$s%')";
+            }
+        }
+        
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            $st = $db->real_escape_string($filters['status']);
+            $where[] = "status = '$st'";
+        }
+        
+        if (!empty($filters['date_from'])) {
+            $df = $db->real_escape_string($filters['date_from']) . ' 00:00:00';
+            $where[] = "created_at >= '$df'";
+        }
+        if (!empty($filters['date_to'])) {
+            $dt = $db->real_escape_string($filters['date_to']) . ' 23:59:59';
+            $where[] = "created_at <= '$dt'";
+        }
+        return implode(' AND ', $where);
+    }
     // Lưu chi tiết từng món hàng
     public function addOrderItem($order_id, $product_id, $quantity, $price) {
         $db = $this->getConnection();
@@ -94,21 +121,17 @@ class OrderModel extends Database {
     //admin
 
 
-    /// [ADMIN] Lấy tất cả đơn hàng (Hỗ trợ Lọc, Tìm kiếm, Sắp xếp)
-    public function getAllOrdersAdmin($filters = []) {
+    public function getAllOrdersAdmin($filters = [], $limit = null, $offset = null) {
         $db = $this->getConnection();
         $where = ["1=1"]; 
         
-        // 1. Lọc theo mã đơn hàng hoặc tên, SĐT khách hàng (ĐÃ FIX THÔNG MINH)
+        // 1. Lọc theo mã đơn hàng hoặc tên, SĐT khách hàng
         if (!empty($filters['search'])) {
             $s = $db->real_escape_string(trim($filters['search']));
-            
-            // Bắt trường hợp gõ có chữ DH (Chắc chắn là tìm mã đơn)
             if (stripos($s, 'DH') !== false || strpos($s, '#') === 0) {
-                $clean_id = (int) preg_replace('/[^0-9]/', '', $s); // Rút trích chỉ lấy số
+                $clean_id = (int) preg_replace('/[^0-9]/', '', $s);
                 $where[] = "id = $clean_id";
             } else {
-                // Nếu gõ bình thường thì tìm ID chính xác, hoặc tìm tương đối trong Tên/SĐT
                 $where[] = "(id = '$s' OR shipping_phone LIKE '%$s%' OR shipping_fullname LIKE '%$s%')";
             }
         }
@@ -129,27 +152,71 @@ class OrderModel extends Database {
             $where[] = "created_at <= '$dt'";
         }
         
-        // 4. Sắp xếp
+        // 4. Sắp xếp (Đã gom hết lên đây để MySQL kịp xử lý)
         $orderBy = "created_at DESC"; 
         if (!empty($filters['sort'])) {
             if ($filters['sort'] == 'price_asc') $orderBy = "total_amount ASC";
             if ($filters['sort'] == 'price_desc') $orderBy = "total_amount DESC";
             if ($filters['sort'] == 'date_asc') $orderBy = "created_at ASC";
+            if ($filters['sort'] == 'ward_asc') $orderBy = "shipping_city ASC, shipping_district ASC, shipping_ward ASC";
         }
         
         $whereSql = implode(' AND ', $where);
         $sql = "SELECT * FROM orders WHERE $whereSql ORDER BY $orderBy";
         
+        // 5. Xử lý Phân trang
+        if ($limit !== null && $offset !== null) {
+            $sql .= " LIMIT " . (int)$offset . ", " . (int)$limit;
+        }
+        
         $result = $db->query($sql);
         $orders = [];
         if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) { $orders[] = $row; }
+            while ($row = $result->fetch_assoc()) { 
+                $orders[] = $row; 
+            }
         }
-        if (isset($filters['sort']) && $filters['sort'] == 'ward_asc') {
-    // Sắp xếp theo 3 cấp: Thành phố -> Quận -> Phường
-    $orderBy = "shipping_city ASC, shipping_district ASC, shipping_ward ASC";
-}
+        
         return $orders;
+    }
+
+    // ==================================================
+    // [ADMIN] ĐẾM TỔNG SỐ ĐƠN HÀNG (ĐỂ TÍNH SỐ TRANG)
+    // ==================================================
+    public function countAllOrdersAdmin($filters = []) {
+        $db = $this->getConnection();
+        $where = ["1=1"]; 
+        
+        // Phải lặp lại logic lọc y hệt hàm trên để đếm cho chuẩn xác
+        if (!empty($filters['search'])) {
+            $s = $db->real_escape_string(trim($filters['search']));
+            if (stripos($s, 'DH') !== false || strpos($s, '#') === 0) {
+                $clean_id = (int) preg_replace('/[^0-9]/', '', $s);
+                $where[] = "id = $clean_id";
+            } else {
+                $where[] = "(id = '$s' OR shipping_phone LIKE '%$s%' OR shipping_fullname LIKE '%$s%')";
+            }
+        }
+        
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            $st = $db->real_escape_string($filters['status']);
+            $where[] = "status = '$st'";
+        }
+        
+        if (!empty($filters['date_from'])) {
+            $df = $db->real_escape_string($filters['date_from']) . ' 00:00:00';
+            $where[] = "created_at >= '$df'";
+        }
+        if (!empty($filters['date_to'])) {
+            $dt = $db->real_escape_string($filters['date_to']) . ' 23:59:59';
+            $where[] = "created_at <= '$dt'";
+        }
+        
+        $whereSql = implode(' AND ', $where);
+        $sql = "SELECT COUNT(*) as total FROM orders WHERE $whereSql";
+        
+        $result = $db->query($sql);
+        return (int)$result->fetch_assoc()['total'];
     }
 
     // ==================================================

@@ -1,7 +1,7 @@
 <?php
 class AdminCustomerController extends Controller {
     private $customerModel;
-    private $limit = 5;
+    private $limit = 10;
 
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }

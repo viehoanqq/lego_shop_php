@@ -175,28 +175,26 @@
 <div id="tab-alerts" class="tab-content">
     <div class="header">
         <div class="header-left">
-            <h2>Cảnh báo & Tùy chỉnh kho</h2>
-            <p>Danh sách sản phẩm có số lượng tồn kho chạm mức tối thiểu.</p>
+            <h2>Cảnh báo Tồn kho</h2>
+            <p>Hiển thị các sản phẩm chạm ngưỡng báo động. Cài đặt ngưỡng chung cho toàn bộ kho.</p>
 
             <form action="/lego_shop_php/admininventory" method="GET" class="filter-form">
                 <input type="hidden" name="tab" value="alerts"> 
                 
                 <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" name="keyword" class="form-control" placeholder="Tìm tên hoặc mã SKU..." value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>">
+                    <input type="text" name="keyword" class="form-control" placeholder="Tìm tên hoặc mã SKU..." value="<?= htmlspecialchars($keyword) ?>">
                 </div>
 
                 <div style="flex: 1;"></div>
                 
-                <div class="filter-threshold-group">
-                    <span class="filter-threshold-label">Tồn dưới < </span>
-                    <input type="number" name="custom_threshold" class="filter-threshold-input" placeholder="Số lượng..." value="<?= htmlspecialchars($_GET['custom_threshold'] ?? '') ?>" min="0">
-                    <button type="submit" class="filter-threshold-btn">Lọc <i class="fa-solid fa-filter" style="font-size: 11px;"></i></button>
+                <div class="filter-threshold-group" style="padding: 4px 6px; background: #eff6ff; border: 1px solid #bfdbfe;">
+                    <span class="filter-threshold-label" style="color: #1e40af;">Báo động khi tồn kho ≤ </span>
+                    <input type="number" name="threshold" class="filter-threshold-input" value="<?= $current_threshold ?>" min="0" style="border-color: #93c5fd; font-weight: 800; color: #1d4ed8;">
+                    <button type="submit" class="filter-threshold-btn" style="background: #3b82f6;">
+                        <i class="fa-solid fa-floppy-disk"></i> Lưu & Lọc
+                    </button>
                 </div>
-                
-                <button type="button" class="btn-filter-action btn-outline" onclick="openSettingModal()">
-                    <i class="fa-solid fa-pen-to-square"></i> Đặt mức cảnh báo
-                </button>
             </form>
         </div>
     </div>
@@ -205,10 +203,9 @@
         <table class="lego-table">
             <thead>
                 <tr>
-                    <th style="width: 40%;">Sản phẩm</th>
-                    <th>Dòng LEGO</th>
+                    <th style="width: 45%;">Sản phẩm</th>
+                    <th>Danh mục LEGO</th>
                     <th style="text-align: center;">Tồn kho thực tế</th>
-                    <th style="text-align: center;">Ngưỡng cảnh báo</th>
                     <th style="text-align: center;">Trạng thái</th>
                 </tr>
             </thead>
@@ -227,22 +224,19 @@
                         </td>
                         <td><span style="background: #f1f5f9; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; color: #475569;"><?= htmlspecialchars($p['category_name']) ?></span></td>
                         <td style="text-align: center;">
-                            <b style="color: #ef4444; font-size: 16px;"><?= $p['stock_quantity'] ?></b>
+                            <b style="color: #ef4444; font-size: 18px;"><?= $p['stock_quantity'] ?></b>
                         </td>
-                        <td style="text-align: center;"><span style="color: #64748b; font-weight: 600;">≤ <?= $p['min_stock_level'] ?></span></td>
                         <td style="text-align: center;">
                             <?php if ($p['stock_quantity'] <= 0): ?>
                                 <span class="stock-badge stock-empty"><i class="fa-solid fa-circle-exclamation"></i> HẾT HÀNG</span>
-                            <?php elseif ($p['stock_quantity'] <= $p['min_stock_level']): ?>
-                                <span class="stock-badge stock-low"><i class="fa-solid fa-triangle-exclamation"></i> SẮP HẾT</span>
                             <?php else: ?>
-                                <span class="stock-badge stock-ok"><i class="fa-solid fa-check"></i> CÒN HÀNG</span>
+                                <span class="stock-badge stock-low"><i class="fa-solid fa-triangle-exclamation"></i> SẮP HẾT</span>
                             <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="5" style="text-align: center; padding: 50px; color: #94a3b8;">Không có sản phẩm nào nằm trong danh sách cảnh báo.</td></tr>
+                    <tr><td colspan="4" style="text-align: center; padding: 60px; color: #94a3b8;"><i class="fa-solid fa-check-circle" style="font-size: 32px; display: block; margin-bottom: 10px; color: #10b981; opacity: 0.6;"></i> Tuyệt vời! Không có sản phẩm nào sắp hết hàng.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -251,13 +245,13 @@
     <?php if ($totalPages > 1): ?>
         <div class="pagination">
             <?php if ($currentPage > 1): ?>
-                <a href="?tab=alerts&page=<?= $currentPage - 1 ?>&keyword=<?= urlencode($keyword) ?>&custom_threshold=<?= $custom_threshold ?? '' ?>" class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
+                <a href="?tab=alerts&page=<?= $currentPage - 1 ?>&keyword=<?= urlencode($keyword) ?>" class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
             <?php endif; ?>
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <a href="?tab=alerts&page=<?= $i ?>&keyword=<?= urlencode($keyword) ?>&custom_threshold=<?= $custom_threshold ?? '' ?>" class="page-link <?= ($i == $currentPage) ? 'active' : '' ?>"><?= $i ?></a>
+                <a href="?tab=alerts&page=<?= $i ?>&keyword=<?= urlencode($keyword) ?>" class="page-link <?= ($i == $currentPage) ? 'active' : '' ?>"><?= $i ?></a>
             <?php endfor; ?>
             <?php if ($currentPage < $totalPages): ?>
-                <a href="?tab=alerts&page=<?= $currentPage + 1 ?>&keyword=<?= urlencode($keyword) ?>&custom_threshold=<?= $custom_threshold ?? '' ?>" class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
+                <a href="?tab=alerts&page=<?= $currentPage + 1 ?>&keyword=<?= urlencode($keyword) ?>" class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
             <?php endif; ?>
         </div>
     <?php endif; ?>
