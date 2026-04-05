@@ -15,32 +15,24 @@ class ImportModel extends Database {
 
     // 2. Lấy danh sách Lịch sử phiếu nhập
     // --- Lấy danh sách Lịch sử phiếu nhập (CÓ TÌM KIẾM & LỌC) ---
-    public function getAllImports($filters = []) {
+    public function getAllImports($filters = [], $offset = null, $limit = null) {
         $db = $this->getConnection();
-        
-        // Mặc định luôn đúng để dễ nối chuỗi AND
         $where = ["1=1"];
 
-        // Lọc theo Nhà cung cấp
         if (!empty($filters['supplier_id'])) {
             $where[] = "r.supplier_id = " . intval($filters['supplier_id']);
         }
-        // Lọc theo Trạng thái (draft / completed)
         if (!empty($filters['status'])) {
             $where[] = "r.status = '" . $db->real_escape_string($filters['status']) . "'";
         }
-        // Lọc Từ ngày (Bắt đầu từ 00:00:00 của ngày đó)
         if (!empty($filters['start_date'])) {
             $where[] = "r.created_at >= '" . $db->real_escape_string($filters['start_date']) . " 00:00:00'";
         }
-        // Lọc Đến ngày (Kết thúc vào 23:59:59 của ngày đó)
         if (!empty($filters['end_date'])) {
             $where[] = "r.created_at <= '" . $db->real_escape_string($filters['end_date']) . " 23:59:59'";
         }
-        // TÌM KIẾM: Theo Mã phiếu nhập
         if (!empty($filters['keyword'])) {
             $keyword = $db->real_escape_string($filters['keyword']);
-            // Tách lấy phần số (Ví dụ gõ "PN-12" hoặc "#12" thì chỉ lấy số 12)
             $clean_id = preg_replace('/[^0-9]/', '', $keyword);
             if (!empty($clean_id)) {
                 $where[] = "r.id = " . intval($clean_id);
@@ -59,12 +51,47 @@ class ImportModel extends Database {
                 WHERE $whereSql
                 ORDER BY r.created_at DESC";
 
+        // Xử lý LIMIT
+        if ($limit !== null && $offset !== null) {
+            $sql .= " LIMIT " . intval($offset) . ", " . intval($limit);
+        }
+
         $result = $db->query($sql);
         $data = [];
         if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) { $data[] = $row; }
         }
         return $data;
+    }
+    public function countAllImports($filters = []) {
+        $db = $this->getConnection();
+        $where = ["1=1"];
+
+        if (!empty($filters['supplier_id'])) {
+            $where[] = "r.supplier_id = " . intval($filters['supplier_id']);
+        }
+        if (!empty($filters['status'])) {
+            $where[] = "r.status = '" . $db->real_escape_string($filters['status']) . "'";
+        }
+        if (!empty($filters['start_date'])) {
+            $where[] = "r.created_at >= '" . $db->real_escape_string($filters['start_date']) . " 00:00:00'";
+        }
+        if (!empty($filters['end_date'])) {
+            $where[] = "r.created_at <= '" . $db->real_escape_string($filters['end_date']) . " 23:59:59'";
+        }
+        if (!empty($filters['keyword'])) {
+            $keyword = $db->real_escape_string($filters['keyword']);
+            $clean_id = preg_replace('/[^0-9]/', '', $keyword);
+            if (!empty($clean_id)) {
+                $where[] = "r.id = " . intval($clean_id);
+            }
+        }
+
+        $whereSql = implode(' AND ', $where);
+
+        $sql = "SELECT COUNT(*) as total FROM import_receipts r WHERE $whereSql";
+        $result = $db->query($sql);
+        return (int)$result->fetch_assoc()['total'];
     }
 
     // 3. Xử lý lưu Phiếu nhập và Tính Giá Bình Quân Gia Quyền (WAC)

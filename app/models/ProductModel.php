@@ -160,40 +160,60 @@
             return $stmt->execute();
         }
         // --- Lấy danh sách sản phẩm để quản lý giá (CÓ TÌM KIẾM & LỌC) ---
-        public function getAllProductsWithPrices($filters = []) {
-            $db = $this->getConnection();
-            
-            // Điều kiện gốc: Chỉ lấy sản phẩm đang bán hoặc tạm ẩn
-            $where = ["p.status IN ('1', '2')"];
+        public function getAllProductsWithPrices($filters = [], $offset = null, $limit = null) {
+        $db = $this->getConnection();
+        $where = ["p.status IN ('1', '2')"];
 
-            // Xử lý tìm kiếm bằng từ khóa (Tên hoặc SKU)
-            if (!empty($filters['keyword'])) {
-                $keyword = $db->real_escape_string($filters['keyword']);
-                $where[] = "(p.name LIKE '%$keyword%' OR p.sku LIKE '%$keyword%')";
-            }
-
-            // Xử lý lọc theo Danh mục
-            if (!empty($filters['category_id'])) {
-                $where[] = "p.category_id = " . intval($filters['category_id']);
-            }
-
-            $whereSql = implode(' AND ', $where);
-
-            $sql = "SELECT p.*, 
-                        (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
-                    FROM products p 
-                    WHERE $whereSql 
-                    ORDER BY p.created_at DESC";
-            
-            $result = $db->query($sql);
-            $data = [];
-            if ($result && $result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $data[] = $row;
-                }
-            }
-            return $data;
+        if (!empty($filters['keyword'])) {
+            $keyword = $db->real_escape_string($filters['keyword']);
+            $where[] = "(p.name LIKE '%$keyword%' OR p.sku LIKE '%$keyword%')";
         }
+        if (!empty($filters['category_id'])) {
+            $where[] = "p.category_id = " . intval($filters['category_id']);
+        }
+
+        $whereSql = implode(' AND ', $where);
+
+        $sql = "SELECT p.*, 
+                    (SELECT image_url FROM product_images WHERE product_id = p.id AND is_main = 1 LIMIT 1) as main_image
+                FROM products p 
+                WHERE $whereSql 
+                ORDER BY p.created_at DESC";
+        
+        // Nếu có truyền offset và limit thì thêm LIMIT vào câu SQL
+        if ($limit !== null && $offset !== null) {
+            $sql .= " LIMIT " . intval($offset) . ", " . intval($limit);
+        }
+        
+        $result = $db->query($sql);
+        $data = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+        }
+        return $data;
+    }
+
+    // --- Hàm Đếm tổng sản phẩm để chia trang ---
+    public function countAllProductsWithPrices($filters = []) {
+        $db = $this->getConnection();
+        $where = ["p.status IN ('1', '2')"];
+
+        if (!empty($filters['keyword'])) {
+            $keyword = $db->real_escape_string($filters['keyword']);
+            $where[] = "(p.name LIKE '%$keyword%' OR p.sku LIKE '%$keyword%')";
+        }
+        if (!empty($filters['category_id'])) {
+            $where[] = "p.category_id = " . intval($filters['category_id']);
+        }
+
+        $whereSql = implode(' AND ', $where);
+
+        $sql = "SELECT COUNT(*) as total FROM products p WHERE $whereSql";
+        $result = $db->query($sql);
+        return (int)$result->fetch_assoc()['total'];
+    }
 
         // Thay đổi trạng thái (Dùng cho cả Ẩn và Xóa mềm)
         public function updateStatus($id, $status) {

@@ -137,13 +137,13 @@ if($session_msg || $session_error): ?>
                     <th style="text-align: center;">Thao tác</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody style="font-size: 15px;">
                 <?php if(!empty($suppliers)): ?>
                     <?php foreach($suppliers as $s): ?>
                         <?php $is_hidden = ($s['status'] == 'deleted'); ?>
                         <tr style="<?= $s['status'] == 'locked' ? 'opacity: 0.8; background: #f8fafc;' : '' ?> <?= $is_hidden ? 'opacity: 0.6; background: #f1f5f9;' : '' ?>">
                             <td>
-                                <strong style="color: #1e293b; font-size: 15px;"><?= htmlspecialchars($s['name']) ?></strong><br>
+                                <strong style="color: #1e293b; font-size: 13px;"><?= htmlspecialchars($s['name']) ?></strong><br>
                                 <span style="color: #94a3b8; font-size: 12px;">ID: #SUP-<?= $s['id'] ?></span>
                             </td>
                             <td>

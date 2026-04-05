@@ -1,6 +1,8 @@
 <?php
 class AdminImportController extends Controller {
     
+    private $limit = 6; // SỐ DÒNG HIỂN THỊ 1 TRANG
+
     public function __construct() {
         if (!isset($_SESSION['admin_id'])) { 
             header("Location: /lego_shop_php/admin/login"); 
@@ -8,12 +10,10 @@ class AdminImportController extends Controller {
         }
     }
 
-    // Trang mặc định (Chỉ hiện bảng lịch sử)
-    // Trang mặc định (Chỉ hiện bảng lịch sử và Bộ lọc)
+    // Trang mặc định (Chỉ hiện bảng lịch sử và Bộ lọc có Phân Trang)
     public function index() {
         $importModel = $this->model('ImportModel');
         
-        // 1. Nhận dữ liệu lọc từ URL (Thêm keyword)
         $filters = [
             'keyword'     => $_GET['keyword'] ?? '',
             'supplier_id' => $_GET['supplier_id'] ?? '',
@@ -22,12 +22,23 @@ class AdminImportController extends Controller {
             'end_date'    => $_GET['end_date'] ?? ''
         ];
         
-        // 2. Truyền ra view
+        // ===== XỬ LÝ PHÂN TRANG =====
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $offset = ($page - 1) * $this->limit;
+
+        $totalRecords = $importModel->countAllImports($filters);
+        $totalPages = ceil($totalRecords / $this->limit);
+
         $data['filters'] = $filters; 
         $data['suppliers'] = $importModel->getAllSuppliers(); 
-        $data['imports'] = $importModel->getAllImports($filters); 
+        
+        // Truyền thêm offset và limit vào
+        $data['imports'] = $importModel->getAllImports($filters, $offset, $this->limit); 
         $data['title'] = "Quản lý Nhập hàng";
         $data['is_form'] = false; 
+        
+        $data['currentPage'] = $page;
+        $data['totalPages'] = $totalPages;
         
         $this->view('admin/imports', $data);
     }
@@ -35,11 +46,11 @@ class AdminImportController extends Controller {
     // Trang tạo mới (Hiện form phía trên, bảng lịch sử phía dưới)
     public function create() {
         $importModel = $this->model('ImportModel');
-        $productModel = $this->model('ProductModel'); // Thêm lại dòng này
+        $productModel = $this->model('ProductModel'); 
         
-        $data['imports'] = $importModel->getAllImports();
+        // Ở form tạo mới, bảng lịch sử bên dưới chỉ cần hiện 10 phiếu gần nhất
+        $data['imports'] = $importModel->getAllImports([], 0, 6);
         $data['suppliers'] = $importModel->getAllSuppliers();
-        // THÊM LẠI DÒNG NÀY ĐỂ LOAD DANH SÁCH SẢN PHẨM:
         $data['products'] = $productModel->getFilteredProducts(['status' => '1,2'], 0, 1000); 
         
         $data['title'] = "Lập phiếu nhập kho";

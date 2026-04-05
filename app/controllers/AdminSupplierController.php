@@ -1,7 +1,7 @@
 <?php
 class AdminSupplierController extends Controller {
     private $supplierModel;
-    private $limit = 10;
+    private $limit = 6;
 
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) session_start();

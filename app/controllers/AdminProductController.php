@@ -2,7 +2,7 @@
 class AdminProductController extends Controller {
     private $productModel;
     private $categoryModel;
-    private $limit = 6; // Đặt limit chung
+    private $limit = 8; // Đặt limit chung
 
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }

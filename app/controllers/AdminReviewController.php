@@ -19,7 +19,7 @@ class AdminReviewController extends Controller {
         $rating = $_GET['rating'] ?? '';
 
         // ===== CẤU HÌNH PHÂN TRANG =====
-        $limit = 10; // Số review trên 1 trang
+        $limit = 6; // Số review trên 1 trang
         $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
         $offset = ($page - 1) * $limit;
 
