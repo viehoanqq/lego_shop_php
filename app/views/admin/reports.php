@@ -1,3 +1,10 @@
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+</head>
+
 <style>
     .img-report { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; }
     .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); max-height: 65vh; overflow-y: auto; }
@@ -25,7 +32,7 @@
     .filter-label { font-weight: 700; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
 
     /* NÚT */
-    .btn-submit-filter { background: #3b82f6; color: #fff; height: 42px; border: none; padding: 0 25px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
+    .btn-submit-filter { background: #3b82f6; color: #fff; height: 42px; border: none; padding: 0 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; text-decoration: none;}
     .btn-submit-filter:hover { background: #2563eb; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
     
     .btn-outline-danger { background: transparent; color: #ef4444; border: 1px solid #ef4444; height: 42px; width: 42px; border-radius: 8px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; text-decoration: none; }
@@ -34,17 +41,12 @@
     .btn-detail { background: #eff6ff; color: #3b82f6; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; }
     .btn-detail:hover { background: #3b82f6; color: #fff; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2); transform: translateY(-2px); }
 
-    .btn-quick { background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #475569; cursor: pointer; transition: 0.2s; }
-    .btn-quick:hover { background: #3b82f6; color: #fff; border-color: #3b82f6; }
-
     /* HÀNG TỔNG CỘNG CHUẨN */
     .row-total-footer { background: #fef08a !important; font-weight: 800; font-size: 14px; color: #1e293b; }
     .row-total-footer td { border-top: 2px solid #eab308; }
     .badge-qty-in { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-weight: 700; font-size: 12px; display: inline-block; min-width: 40px; text-align: center; }
     .badge-qty-out { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-weight: 700; font-size: 12px; display: inline-block; min-width: 40px; text-align: center; }
 </style>
-
-
 
 <form method="GET" action="/lego_shop_php/adminreport" id="reportForm" style="background: #fff; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9;">
     <div class="filter-split-layout">
@@ -73,26 +75,35 @@
 
         <div class="filter-col filter-col-right">
             <div class="filter-row">
-                <div class="filter-group">
-                    <label class="filter-label">Từ ngày</label>
-                    <input type="date" name="start_date" id="start_date" class="form-control-ui" value="<?= $filters['start_date'] ?? '' ?>">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Đến ngày (Mốc chốt)</label>
-                    <input type="date" name="end_date" id="end_date" class="form-control-ui" value="<?= $filters['end_date'] ?? '' ?>">
+                <div class="filter-group" style="width: 100%;">
+                    <label class="filter-label">Khoảng thời gian báo cáo</label>
+                    <div style="position: relative;">
+                        <i class="fa-regular fa-calendar" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                        <input type="text" id="reportrange" class="form-control-ui" style="padding-left: 40px; cursor: pointer; background: #fff; font-weight: 600; color: #3b82f6;" readonly>
+                        <i class="fa-solid fa-chevron-down" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 12px;"></i>
+                    </div>
+                    <input type="hidden" name="start_date" id="start_date" value="<?= $filters['start_date'] ?? date('Y-m-01') ?>">
+                    <input type="hidden" name="end_date" id="end_date" value="<?= $filters['end_date'] ?? date('Y-m-d') ?>">
                 </div>
             </div>
             
-            <div class="filter-row" style="align-items: center; justify-content: space-between; margin-top: 10px;">
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;"> Chọn nhanh:</span>
-                    <button type="button" class="btn-quick" onclick="quickDate('7')"> <i class="fa-solid fa-arrow-left"></i> 7 ngày </button>
-                    <button type="button" class="btn-quick" onclick="quickDate('30')"> <i class="fa-solid fa-arrow-left"></i> 30 ngày </button>
-                    <button type="button" class="btn-quick" onclick="quickDate('month')"> <i class="fa-solid fa-calendar-days"></i> Tháng này </button>
-                </div>
+            <div class="filter-row" style="align-items: flex-end; justify-content: flex-end; margin-top: 10px;">
                 <div style="display: flex; gap: 10px;">
-                    <button type="submit" class="btn-submit-filter"><i class="fa-solid fa-filter"></i> LỌC</button>
+                    <button type="submit" class="btn-submit-filter"><i class="fa-solid fa-filter"></i> ÁP DỤNG LỌC</button>
                     <a href="/lego_shop_php/adminreport" class="btn-outline-danger" title="Xóa bộ lọc"><i class="fa-solid fa-rotate-right"></i></a>
+                    
+                    <?php
+                        $export_params = http_build_query([
+                            'action' => 'export_excel',
+                            'keyword' => $filters['keyword'] ?? '',
+                            'category_id' => $filters['category_id'] ?? 'all',
+                            'start_date' => $filters['start_date'] ?? date('Y-m-01'),
+                            'end_date' => $filters['end_date'] ?? date('Y-m-d')
+                        ]);
+                    ?>
+                    <a href="/lego_shop_php/adminreport?<?= $export_params ?>" class="btn-submit-filter" style="background: #10b981; color: #fff;">
+                        <i class="fa-solid fa-file-excel"></i> XUẤT EXCEL
+                    </a>
                 </div>
             </div>
         </div>
@@ -108,7 +119,7 @@
                 <th style="text-align: center;">SL Bán</th>
                 <th style="text-align: right;">Tổng vốn nhập</th>
                 <th style="text-align: right;">Tổng doanh thu</th>
-                <th style="text-align: right;">Lợi nhuận</th>
+                <th style="text-align: right;">Dòng tiền (Cash Flow)</th>
                 <th style="text-align: center;">Thao tác</th>
             </tr>
         </thead>
@@ -130,7 +141,6 @@
                 <tr style="transition: 0.2s; <?= $isDeleted ? 'background-color: #f8fafc;' : '' ?>">
                     <td>
                         <div style="display: flex; align-items: center; gap: 15px; <?= $isDeleted ? 'opacity: 0.6;' : '' ?>">
-                            
                             <img src="/lego_shop_php/public/assets/images/<?= !empty($r['main_image']) ? $r['main_image'] : 'default.jpg' ?>" 
                                  class="img-report" 
                                  onerror="this.src='https://placehold.co/50x50?text=LEGO'"
@@ -148,7 +158,6 @@
                                         </span>
                                     <?php endif; ?>
                                 </div>
-                                
                                 <span style="background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; color: #64748b; border: 1px solid #e2e8f0;">SKU: <?= strtoupper($r['sku']) ?></span>
                             </div>
                         </div>
@@ -192,20 +201,40 @@
 </div>
 
 <script>
-function quickDate(type) {
-    const start = document.getElementById('start_date');
-    const end = document.getElementById('end_date');
-    const today = new Date();
-    let sDate = new Date();
-    
-    if (type === '7') sDate.setDate(today.getDate() - 7);
-    else if (type === '30') sDate.setDate(today.getDate() - 30);
-    else if (type === 'month') sDate = new Date(today.getFullYear(), today.getMonth(), 1);
-    
-    const fmt = (d) => d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
+$(function() {
+    var start = moment($('#start_date').val(), 'YYYY-MM-DD');
+    var end = moment($('#end_date').val(), 'YYYY-MM-DD');
 
-    start.value = fmt(sDate);
-    end.value = fmt(today);
-    document.getElementById('reportForm').submit();
-}
+    function cb(s, e) {
+        $('#reportrange').val(s.format('DD/MM/YYYY') + '  -  ' + e.format('DD/MM/YYYY'));
+        $('#start_date').val(s.format('YYYY-MM-DD'));
+        $('#end_date').val(e.format('YYYY-MM-DD'));
+    }
+
+    $('#reportrange').daterangepicker({
+        startDate: start,
+        endDate: end,
+        showDropdowns: true, 
+        ranges: {
+           'Hôm nay': [moment(), moment()],
+           'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           '7 ngày qua': [moment().subtract(6, 'days'), moment()],
+           '30 ngày qua': [moment().subtract(29, 'days'), moment()],
+           'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+           'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        locale: {
+            format: 'DD/MM/YYYY', separator: " - ", applyLabel: "Đồng ý", cancelLabel: "Hủy",
+            fromLabel: "Từ", toLabel: "Đến", customRangeLabel: "Tùy chọn ngày...",
+            daysOfWeek: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+            monthNames: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
+            firstDay: 1 
+        }
+    }, cb);
+    cb(start, end);
+
+    $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+        $('#reportForm').submit();
+    });
+});
 </script>

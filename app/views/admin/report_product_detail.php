@@ -70,9 +70,14 @@
             <span class="card-date">Ngày <?= date('d/m/Y', strtotime($_GET['end'])) ?></span>
             <div class="card-value" style="color: #1e40af;"><?= number_format($stats['closing_stock']) ?> <small style="font-size: 12px; opacity: 0.7;">cái</small></div>
         </div>
-        <div class="report-card card-profit-focus">
-            <span class="card-label">Lợi nhuận bán hàng</span>
-            <span class="card-date">Dựa trên doanh thu thực tế từ đơn hàng đã giao</span>
+        <div class="report-card card-profit-focus" style="cursor: pointer; transition: 0.2s;" onclick="openProfitModal()" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span class="card-label">Lợi nhuận gộp (Gross Profit)</span>
+                    <span class="card-date">Nhấn vào để xem chi tiết từng đơn</span>
+                </div>
+                <i class="fa-solid fa-expand" style="color: #c4b5fd;"></i>
+            </div>
             <div class="card-value"><?= number_format($stats['profit'], 0, ',', '.') ?>đ</div>
         </div>
     </div>
@@ -177,5 +182,133 @@
                 x: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } }
             }
         }
+    });
+</script>
+<style>
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.3s; }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-box { background: #fff; width: 850px; max-width: 95%; max-height: 85vh; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; transform: translateY(20px); transition: 0.3s; }
+    .modal-overlay.active .modal-box { transform: translateY(0); }
+    .modal-header { padding: 20px 25px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-radius: 16px 16px 0 0; }
+    .modal-header h3 { margin: 0; font-size: 18px; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    .btn-close-modal { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 8px; color: #64748b; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; }
+    .btn-close-modal:hover { background: #e2e8f0; color: #ef4444; }
+    .modal-body { padding: 0; overflow-y: auto; }
+    
+    .profit-table { width: 100%; border-collapse: collapse; }
+    .profit-table th { position: sticky; top: 0; background: #f8fafc; padding: 15px; font-size: 12px; text-transform: uppercase; color: #64748b; text-align: left; border-bottom: 2px solid #e2e8f0; z-index: 10; }
+    .profit-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; vertical-align: middle; }
+    .profit-table tr:hover { background: #f8fafc; }
+</style>
+
+<div class="modal-overlay" id="profitModalOverlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-file-invoice-dollar" style="color: #7c3aed;"></i> Phân tích lợi nhuận chi tiết</h3>
+            <button class="btn-close-modal" onclick="closeProfitModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <table class="profit-table">
+                <thead>
+                    <tr>
+                        <th>Mã ĐH</th>
+                        <th>Ngày xuất bán</th>
+                        <th style="text-align: center;">SL</th>
+                        <th style="text-align: right;">Tổng vốn (WAC)</th>
+                        <th style="text-align: right;">Tổng thu (Bán ra)</th>
+                        <th style="text-align: right;">Lợi nhuận</th>
+                        <th style="text-align: right;">Tỷ lệ lãi (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                        $sum_qty = 0; $sum_cost = 0; $sum_revenue = 0; $sum_profit = 0;
+                    ?>
+                    <?php if(!empty($profit_details)): ?>
+                        <?php foreach($profit_details as $pd): 
+                            $total_cost = $pd['cost_price'] * $pd['quantity'];
+                            $total_rev = $pd['price'] * $pd['quantity'];
+                            
+                            // Cộng dồn vào tổng
+                            $sum_qty += $pd['quantity'];
+                            $sum_cost += $total_cost;
+                            $sum_revenue += $total_rev;
+                            $sum_profit += $pd['order_profit'];
+
+                            // SỬA Ở ĐÂY: Tính % Lãi dựa trên Giá Vốn (Markup on Cost)
+                            $markup_percent = ($total_cost > 0) ? round(($pd['order_profit'] / $total_cost) * 100, 1) : 0;
+                        ?>
+                            <tr>
+                                <td>
+                                    <span style="font-family: monospace; font-weight: 700; color: #3b82f6; background: #eff6ff; padding: 4px 8px; border-radius: 6px;">#DH-<?= $pd['order_id'] ?></span>
+                                </td>
+                                <td style="color: #64748b; font-size: 13px;">
+                                    <?= date('d/m/Y', strtotime($pd['created_at'])) ?> <br> 
+                                    <small><?= date('H:i', strtotime($pd['created_at'])) ?></small>
+                                </td>
+                                <td style="text-align: center; font-weight: 800; color: #1e293b;"><?= number_format($pd['quantity']) ?></td>
+                                <td style="text-align: right; color: #64748b;">
+                                    <?= number_format($total_cost, 0, ',', '.') ?>đ
+                                    <div style="font-size: 11px; opacity: 0.6;">(Đơn giá: <?= number_format($pd['cost_price'], 0, ',', '.') ?>đ)</div>
+                                </td>
+                                <td style="text-align: right; font-weight: 600; color: #1e293b;">
+                                    <?= number_format($total_rev, 0, ',', '.') ?>đ
+                                    <div style="font-size: 11px; opacity: 0.6;">(Đơn giá: <?= number_format($pd['price'], 0, ',', '.') ?>đ)</div>
+                                </td>
+                                <td style="text-align: right; font-weight: 800; color: <?= $pd['order_profit'] >= 0 ? '#10b981' : '#ef4444' ?>;">
+                                    <?= $pd['order_profit'] >= 0 ? '+' : '' ?><?= number_format($pd['order_profit'], 0, ',', '.') ?>đ
+                                </td>
+                                <td style="text-align: right; font-weight: 800; color: <?= $markup_percent >= 0 ? '#059669' : '#e11d48' ?>;">
+                                    <span style="background: <?= $markup_percent >= 0 ? '#ecfdf5' : '#fff1f2' ?>; padding: 4px 8px; border-radius: 6px;">
+                                        <?= $markup_percent >= 0 ? '+' : '' ?><?= $markup_percent ?>%
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">Không có dữ liệu bán hàng trong kỳ này.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+                
+                <?php if(!empty($profit_details)): 
+                    // TÍNH LẠI CHO DÒNG TỔNG: (Tổng lợi nhuận / Tổng vốn) * 100
+                    $sum_markup_percent = ($sum_cost > 0) ? round(($sum_profit / $sum_cost) * 100, 1) : 0;
+                ?>
+                <tfoot>
+                    <tr style="background: #fef08a; font-weight: 800; color: #1e293b;">
+                        <td colspan="2" style="text-align: right; text-transform: uppercase; border-top: 2px solid #eab308;">Tổng cộng:</td>
+                        <td style="text-align: center; border-top: 2px solid #eab308; font-size: 16px;"><?= number_format($sum_qty) ?></td>
+                        <td style="text-align: right; border-top: 2px solid #eab308; color: #64748b;"><?= number_format($sum_cost, 0, ',', '.') ?>đ</td>
+                        <td style="text-align: right; border-top: 2px solid #eab308; color: #1e293b;"><?= number_format($sum_revenue, 0, ',', '.') ?>đ</td>
+                        <td style="text-align: right; border-top: 2px solid #eab308; font-size: 16px; color: <?= $sum_profit >= 0 ? '#166534' : '#991b1b' ?>;">
+                            <?= $sum_profit >= 0 ? '+' : '' ?><?= number_format($sum_profit, 0, ',', '.') ?>đ
+                        </td>
+                        <td style="text-align: right; border-top: 2px solid #eab308; font-size: 16px; color: <?= $sum_markup_percent >= 0 ? '#166534' : '#991b1b' ?>;">
+                            <?= $sum_markup_percent >= 0 ? '+' : '' ?><?= $sum_markup_percent ?>%
+                        </td>
+                    </tr>
+                </tfoot>
+                <?php endif; ?>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openProfitModal() {
+        document.getElementById('profitModalOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden'; // Khóa cuộn trang nền
+    }
+    
+    function closeProfitModal() {
+        document.getElementById('profitModalOverlay').classList.remove('active');
+        document.body.style.overflow = 'auto'; // Mở lại cuộn trang nền
+    }
+
+    // Bấm ra ngoài vùng tối để đóng modal
+    document.getElementById('profitModalOverlay').addEventListener('click', function(e) {
+        if(e.target === this) closeProfitModal();
     });
 </script>

@@ -58,8 +58,8 @@
     .filter-threshold-label { font-size: 12px; font-weight: 700; color: #475569; padding: 0 10px; white-space: nowrap; }
     .filter-threshold-input { border: 1px solid #e2e8f0; background: #fff; height: 34px; border-radius: 6px; width: 90px; padding: 0 10px; outline: none; font-size: 13px; }
     .filter-threshold-input:focus { border-color: #3b82f6; }
-    .filter-threshold-btn { background: #3b82f6; color: #fff; height: 34px; padding: 0 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; margin-left: 4px; font-size: 12px; }
-    .filter-threshold-btn:hover { background: #2563eb; }
+    .filter-threshold-btn { background: #ff390d; color: #fff; height: 34px; padding: 0 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; margin-left: 4px; font-size: 12px; }
+    .filter-threshold-btn:hover { background: #8e1a00; }
     
     .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
     .page-link { padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #475569; background: #fff; font-weight: 600; transition: 0.2s; }

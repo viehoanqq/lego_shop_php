@@ -7,10 +7,29 @@ class OrderModel extends Database {
     // Lưu chi tiết từng món hàng
     public function addOrderItem($order_id, $product_id, $quantity, $price) {
         $db = $this->getConnection();
-        $sql = "INSERT INTO order_details (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
+        
+        // 1. LẤY GIÁ VỐN (WAC) HIỆN TẠI TỪ KHO (Bảng products)
+        $sqlCost = "SELECT import_price FROM products WHERE id = ?";
+        $stmtCost = $db->prepare($sqlCost);
+        $stmtCost->bind_param("i", $product_id);
+        $stmtCost->execute();
+        $result = $stmtCost->get_result();
+        $row = $result->fetch_assoc();
+        
+        // Nếu không tìm thấy sản phẩm, gán tạm giá vốn = 0 để không bị lỗi
+        $cost_price = $row ? $row['import_price'] : 0; 
+        
+        // 2. THÊM VÀO CHI TIẾT ĐƠN HÀNG (Lưu cả Giá Bán và Giá Vốn)
+        $sql = "INSERT INTO order_details (order_id, product_id, quantity, price, cost_price) 
+                VALUES (?, ?, ?, ?, ?)";
         
         $stmt = $db->prepare($sql);
-        $stmt->bind_param("iiid", $order_id, $product_id, $quantity, $price);
+        
+        // Giải thích bind_param: 
+        // i = integer (order_id, product_id, quantity)
+        // d = double/decimal (price, cost_price)
+        $stmt->bind_param("iiidd", $order_id, $product_id, $quantity, $price, $cost_price);
+        
         return $stmt->execute();
     }
     public function getOrderById($order_id) {
