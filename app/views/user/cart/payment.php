@@ -11,7 +11,7 @@ $current_order_id = $order_id ?? 0;
 $current_total_price = $total_price ?? 0;
 
 // Link tạo mã VietQR tự động (Thay MB bằng ngân hàng của bạn, 0961589023 là STK)
-$qr_code_url = "/lego_shop_php/public/assets/images/qrcode.png"; // Thay bằng link tạo mã QR động nếu có
+$qr_code_url = "/public/assets/images/qrcode.png"; // Thay bằng link tạo mã QR động nếu có
 ?>
 
 <!DOCTYPE html>
@@ -199,7 +199,7 @@ $qr_code_url = "/lego_shop_php/public/assets/images/qrcode.png"; // Thay bằng 
                 return;
             }
             // Chuyển hướng chuẩn xác mang theo mã đơn hàng
-            window.location.href = '/lego_shop_php/checkout/success?order_id=' + orderId;
+            window.location.href = '/checkout/success?order_id=' + orderId;
         }
     </script>
 </body>

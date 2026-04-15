@@ -23,11 +23,11 @@
     <title><?= isset($title) ? $title . ' - ' . htmlspecialchars($shop_name) : htmlspecialchars($shop_name) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
     
-    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/global.css">
-    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/components/header.css">
-    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/components/footer.css">
-    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/components/productCard.css">
-    <script src="/lego_shop_php/public/assets/js/main.js" defer></script>
+    <link rel="stylesheet" href="/public/assets/css/global.css">
+    <link rel="stylesheet" href="/public/assets/css/components/header.css">
+    <link rel="stylesheet" href="/public/assets/css/components/footer.css">
+    <link rel="stylesheet" href="/public/assets/css/components/productCard.css">
+    <script src="/public/assets/js/main.js" defer></script>
 </head>
 <body>
   <header>
@@ -41,13 +41,13 @@
 
     <div class="main-header">
       <div class="logo">
-        <a href="/lego_shop_php/home">
-          <img src="/lego_shop_php/public/assets/images/<?= htmlspecialchars($logo_url) ?>" alt="<?= htmlspecialchars($shop_name) ?>" />
+        <a href="/home">
+          <img src="/public/assets/images/<?= htmlspecialchars($logo_url) ?>" alt="<?= htmlspecialchars($shop_name) ?>" />
         </a>
       </div>
 
       <div class="search-bar" style="position: relative; display: flex; align-items: center;">
-        <form action="/lego_shop_php/product/search" method="GET" style="display: flex; flex: 1;">
+        <form action="/product/search" method="GET" style="display: flex; flex: 1;">
             <input class="search-input" name="keyword" type="text" id="liveSearchInput" autocomplete="off" placeholder="Nhập từ khóa (ví dụ: lắp ráp, mô hình...)">
             <button type="submit" class="normal-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
         </form>
@@ -64,7 +64,7 @@
             <button type="button" class="close-popup" id="closeAdvancedSearch">&times;</button>
           </div>
 
-          <form id="advancedSearchForm" class="advanced-search-form" action="/lego_shop_php/product/filter" method="GET">
+          <form id="advancedSearchForm" class="advanced-search-form" action="/product/filter" method="GET">
             <div class="form-group">
               <label><i class="fa-solid fa-magnifying-glass"></i> Từ khóa</label>
               <input type="text" name="keyword" id="keyword" placeholder="Tên sản phẩm, mã SKU...">
@@ -120,25 +120,25 @@
       <div class="user-options">
         <?php if(isset($_SESSION['user_fullname'])): ?>
             <div class="user-dropdown-wrapper" style="position: relative; display: inline-block;">
-                <a href="/lego_shop_php/profile" id="account-link">
+                <a href="/profile" id="account-link">
                     <i class="fa-solid fa-user"></i> <span id="name"><?= htmlspecialchars($_SESSION['user_fullname']) ?></span>
                 </a>
                 <ul class="user-dropdown-menu">
-                     <li><a href="/lego_shop_php/profile/edit"><i class="fa-solid fa-user-pen"></i> Xem trang cá nhân</a></li>
-                    <li><a href="/lego_shop_php/wishlist"><i class="fa-solid fa-heart"></i> Sản phẩm yêu thích</a></li>
-                    <li><a href="/lego_shop_php/account/logout" style="color: #dc3545;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+                     <li><a href="/profile/edit"><i class="fa-solid fa-user-pen"></i> Xem trang cá nhân</a></li>
+                    <li><a href="/wishlist"><i class="fa-solid fa-heart"></i> Sản phẩm yêu thích</a></li>
+                    <li><a href="/account/logout" style="color: #dc3545;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
                 </ul>
             </div>
             
-            <a href="/lego_shop_php/cart" id="cart-link">
+            <a href="/cart" id="cart-link">
               <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
             </a>
 
         <?php else: ?>
-            <a href="/lego_shop_php/account/login" id="account-link">
+            <a href="/account/login" id="account-link">
                 <i class="fa-solid fa-user"></i> <span id="name">Đăng nhập</span>
             </a>
-            <a href="javascript:void(0);" id="cart-link" onclick="showToast('Bạn cần đăng nhập để xem giỏ hàng!', 'error'); setTimeout(() => window.location.href='/lego_shop_php/account/login', 1000);">
+            <a href="javascript:void(0);" id="cart-link" onclick="showToast('Bạn cần đăng nhập để xem giỏ hàng!', 'error'); setTimeout(() => window.location.href='/account/login', 1000);">
               <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
             </a>
         <?php endif; ?>
@@ -147,8 +147,8 @@
 
     <nav class="nav-bar">
       <ul class="header-menu-ul" style="display: flex; gap: 30px; justify-content: center; padding: 15px 0; background-color: #a4161a; margin: 0;">
-        <li><a href="/lego_shop_php/home" style="color: white; font-weight: 700;">TRANG CHỦ</a></li>
-        <li><a href="/lego_shop_php/product" style="color: white; font-weight: 700;">SẢN PHẨM</a></li>
+        <li><a href="/home" style="color: white; font-weight: 700;">TRANG CHỦ</a></li>
+        <li><a href="/product" style="color: white; font-weight: 700;">SẢN PHẨM</a></li>
         
         <?php if(!empty($header_categories)): ?>
             <li style="position: relative;" class="dropdown-chu-de">
@@ -156,7 +156,7 @@
                 <ul class="dropdown-menu" style="position: absolute; top: 100%; left: 0; background: white; width: auto; min-width: 200px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 10px 0; z-index: 1000;">
                     <?php foreach($header_categories as $cat): ?>
                         <li>
-                            <a href="/lego_shop_php/product/category/<?= $cat['id'] ?>" 
+                            <a href="/product/category/<?= $cat['id'] ?>" 
                                style="color: #333; display: block; padding: 10px 15px; text-transform: none; font-weight: 500;">
                                 <?= htmlspecialchars($cat['name']) ?>
                             </a>

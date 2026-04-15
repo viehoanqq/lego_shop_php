@@ -24,7 +24,7 @@ function updateCartQty(itemId, action) {
     formData.append('item_id', itemId);
     formData.append('action', action);
 
-    fetch('/lego_shop_php/cart/updateQty', { method: 'POST', body: formData })
+    fetch('/cart/updateQty', { method: 'POST', body: formData })
     .then(res => res.json())
     .then(data => {
         if (data.status === 'success') {
@@ -39,7 +39,7 @@ function removeCartItem(itemId) {
     const formData = new FormData();
     formData.append('item_id', itemId);
 
-    fetch('/lego_shop_php/cart/remove', { method: 'POST', body: formData })
+    fetch('/cart/remove', { method: 'POST', body: formData })
     .then(res => res.json())
     .then(data => {
         if (data.status === 'success') {

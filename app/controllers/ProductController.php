@@ -43,7 +43,7 @@
 
         public function search() {
             $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
-            if (empty($keyword)) { header("Location: /lego_shop_php/product"); exit; }
+            if (empty($keyword)) { header("Location: /product"); exit; }
             
             $filters = $_GET;
             $filters['keyword'] = $keyword;
@@ -51,7 +51,7 @@
         }
 
         public function detail($id = 0) {
-            if ($id == 0) { header("Location: /lego_shop_php/product"); exit; }
+            if ($id == 0) { header("Location: /product"); exit; }
             $prodModel = $this->model('ProductModel');
             $product = $prodModel->getProductById($id);
             if (!$product) die("Sản phẩm không tồn tại!");
@@ -64,7 +64,7 @@
                 'reviews' => $prodModel->getReviewsByProductId($id),
                 'category_name' => $product['category_name'],
                 'parent_title' => 'Sản phẩm',
-                'parent_link' => '/lego_shop_php/product'
+                'parent_link' => '/product'
             ]);
         }
 
@@ -79,7 +79,7 @@
 
         public function category($id = 0) {
             if ($id == 0) {
-                header("Location: /lego_shop_php/product");
+                header("Location: /product");
                 exit;
             }
 
@@ -98,7 +98,7 @@
         }
         public function orders() {
         if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['user_id'])) { header("Location: /lego_shop_php/account/login"); exit; }
+        if (!isset($_SESSION['user_id'])) { header("Location: /account/login"); exit; }
 
         $orderModel = $this->model('OrderModel');
         $orders = $orderModel->getOrdersByUserId($_SESSION['user_id']);

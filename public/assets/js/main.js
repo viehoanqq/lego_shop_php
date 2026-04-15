@@ -16,19 +16,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Đợi người dùng dừng gõ 300ms mới gửi Request
             typingTimer = setTimeout(() => {
-                fetch(`/lego_shop_php/product/liveSearch?keyword=${encodeURIComponent(keyword)}`)
+                fetch(`/product/liveSearch?keyword=${encodeURIComponent(keyword)}`)
                     .then(response => response.json())
                     .then(data => {
                         let html = '';
                         if (data.length > 0) {
                             // Duyệt qua mảng JSON để tạo HTML
                             data.forEach(item => {
-                                const imgUrl = item.main_image ? `/lego_shop_php/public/assets/images/${item.main_image}` : '/lego_shop_php/public/assets/images/default-lego.jpg';
+                                const imgUrl = item.main_image ? `/public/assets/images/${item.main_image}` : '/public/assets/images/default-lego.jpg';
                                 // Format giá tiền VNĐ
                                 const price = new Intl.NumberFormat('vi-VN').format(item.selling_price) + 'đ';
                                 
                                 html += `
-                                <a href="/lego_shop_php/product/detail/${item.id}" class="suggest-item">
+                                <a href="/product/detail/${item.id}" class="suggest-item">
                                     <img src="${imgUrl}" class="suggest-img" alt="${item.name}">
                                     <div class="suggest-info">
                                         <span class="suggest-name">${item.name}</span>
@@ -81,16 +81,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             typingTimer = setTimeout(() => {
-                fetch(`/lego_shop_php/product/liveSearch?keyword=${encodeURIComponent(keyword)}`)
+                fetch(`/product/liveSearch?keyword=${encodeURIComponent(keyword)}`)
                     .then(response => response.json())
                     .then(data => {
                         let html = '';
                         if (data.length > 0) {
                             data.forEach(item => {
-                                const imgUrl = item.main_image ? `/lego_shop_php/public/assets/images/${item.main_image}` : '/lego_shop_php/public/assets/images/logo.png';
+                                const imgUrl = item.main_image ? `/public/assets/images/${item.main_image}` : '/public/assets/images/logo.png';
                                 const price = new Intl.NumberFormat('vi-VN').format(item.selling_price) + 'đ';
                                 html += `
-                                <a href="/lego_shop_php/product/detail/${item.id}" class="suggest-item">
+                                <a href="/product/detail/${item.id}" class="suggest-item">
                                     <img src="${imgUrl}" class="suggest-img">
                                     <div class="suggest-info">
                                         <span class="suggest-name">${item.name}</span>
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const pMin = rangeMin?.value || "0";
             const pMax = rangeMax?.value || "10000000";
 
-            let url = `/lego_shop_php/product/filter?keyword=${encodeURIComponent(keyword)}&category=${category}&pieces=${encodeURIComponent(pieces)}&min_price=${pMin}&max_price=${pMax}`;
+            let url = `/product/filter?keyword=${encodeURIComponent(keyword)}&category=${category}&pieces=${encodeURIComponent(pieces)}&min_price=${pMin}&max_price=${pMax}`;
             window.location.href = url;
         };
     }
@@ -234,7 +234,7 @@ function showToast(message, type = 'error') {
         formData.append('product_id', productId);
 
         // Gửi yêu cầu đến Controller
-        fetch('/lego_shop_php/wishlist/toggle', {
+        fetch('/wishlist/toggle', {
             method: 'POST',
             body: formData
         })
@@ -277,7 +277,7 @@ function addToCart(productId, isBuyNow = false) {
     formData.append('quantity', 1); // Ở trang ngoài luôn mặc định thêm 1 cái
 
     // Gửi AJAX bằng Fetch API
-    fetch('/lego_shop_php/cart/add', {
+    fetch('/cart/add', {
         method: 'POST',
         body: formData
     })
@@ -286,7 +286,7 @@ function addToCart(productId, isBuyNow = false) {
         if (data.status === 'success') {
             if (isBuyNow) {
                 // Nếu là Mua Ngay -> Chuyển hướng
-                window.location.href = '/lego_shop_php/cart';
+                window.location.href = '/cart';
             } else {
                 // Nếu là Thêm Giỏ -> Báo Toast xanh lá
                 showToast(data.msg, "success");

@@ -11,7 +11,7 @@
         <div class="discount-badge">-<?= $discount_percent ?>%</div>
     <?php endif; ?>
 
-    <a href="/lego_shop_php/product/detail/<?= $product['id'] ?? 1 ?>" class="product-image">
+    <a href="/product/detail/<?= $product['id'] ?? 1 ?>" class="product-image">
         <?php 
             // 2. XỬ LÝ ẢNH (QUAN TRỌNG): Kiểm tra cả 2 trường hợp main_image và image_url
             $img_name = '';
@@ -23,8 +23,8 @@
 
             // 3. Tạo đường dẫn cuối cùng
             $final_image_src = ($img_name !== '') 
-                ? "/lego_shop_php/public/assets/images/" . $img_name 
-                : "/lego_shop_php/public/assets/images/default-lego.jpg"; 
+                ? "/public/assets/images/" . $img_name 
+                : "/public/assets/images/default-lego.jpg"; 
         ?>
         <img src="<?= htmlspecialchars($final_image_src) ?>" 
              alt="<?= htmlspecialchars($product['name'] ?? 'Sản phẩm LEGO') ?>">
@@ -34,7 +34,7 @@
         <div class="product-sku">SKU: <?= htmlspecialchars($product['sku'] ?? 'N/A') ?></div>
         
         <h3 class="product-name">
-            <a href="/lego_shop_php/product/detail/<?= $product['id'] ?>"><?= htmlspecialchars($product['name'] ?? 'Sản phẩm') ?></a>
+            <a href="/product/detail/<?= $product['id'] ?>"><?= htmlspecialchars($product['name'] ?? 'Sản phẩm') ?></a>
         </h3>
 
         <div class="product-price">

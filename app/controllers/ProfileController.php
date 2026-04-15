@@ -5,7 +5,7 @@ class ProfileController extends Controller {
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         if (!isset($_SESSION['user_account_id'])) {
-            header("Location: /lego_shop_php/account/login");
+            header("Location: /account/login");
             exit;
         }
     }
@@ -38,21 +38,21 @@ class ProfileController extends Controller {
             if (empty($fullname) || empty($phone)) {
                 $_SESSION['profile_msg'] = "Vui lòng nhập đầy đủ Họ tên và Số điện thoại!";
                 $_SESSION['profile_msg_type'] = "error";
-                header("Location: /lego_shop_php/profile/index");
+                header("Location: /profile/index");
                 exit;
             }
 
             if (strlen($fullname) < 2 || strlen($fullname) > 50) {
                 $_SESSION['profile_msg'] = "Họ tên phải từ 2 đến 50 ký tự!";
                 $_SESSION['profile_msg_type'] = "error";
-                header("Location: /lego_shop_php/profile/index");
+                header("Location: /profile/index");
                 exit;
             }
 
             if (!preg_match('/^(0[3|5|7|8|9])+([0-9]{8})$/', $phone)) {
                 $_SESSION['profile_msg'] = "Số điện thoại không hợp lệ!";
                 $_SESSION['profile_msg_type'] = "error";
-                header("Location: /lego_shop_php/profile/index");
+                header("Location: /profile/index");
                 exit;
             }
 
@@ -63,7 +63,7 @@ class ProfileController extends Controller {
             if ($currentInfo['fullname'] === $fullname && $currentInfo['phone'] === $phone) {
                 $_SESSION['profile_msg'] = "Bạn chưa thay đổi thông tin nào!";
                 $_SESSION['profile_msg_type'] = "error"; // Sẽ hiển thị Toast màu đỏ
-                header("Location: /lego_shop_php/profile/index");
+                header("Location: /profile/index");
                 exit;
             }
 
@@ -84,7 +84,7 @@ class ProfileController extends Controller {
                 }
             }
             
-            header("Location: /lego_shop_php/profile/index");
+            header("Location: /profile/index");
             exit;
         }
     }
@@ -140,7 +140,7 @@ class ProfileController extends Controller {
             }
             
             // Xong việc thì quay lại trang danh sách địa chỉ
-            header("Location: /lego_shop_php/profile/addresses");
+            header("Location: /profile/addresses");
             exit;
         }
     }
@@ -166,7 +166,7 @@ class ProfileController extends Controller {
                 $_SESSION['address_msg_type'] = "success";
             }
         }
-        header("Location: /lego_shop_php/profile/addresses");
+        header("Location: /profile/addresses");
         exit;
     }
 
@@ -189,7 +189,7 @@ class ProfileController extends Controller {
                     $_SESSION['address_msg_type'] = "error";
                 }
             }
-            header("Location: /lego_shop_php/profile/addresses");
+            header("Location: /profile/addresses");
             exit;
         }
     }
@@ -209,7 +209,7 @@ class ProfileController extends Controller {
         }
         
         // Xóa xong thì quay lại trang danh sách
-        header("Location: /lego_shop_php/profile/addresses");
+        header("Location: /profile/addresses");
         exit;
     }
 
@@ -244,7 +244,7 @@ class ProfileController extends Controller {
                 }
             }
             
-            header("Location: /lego_shop_php/profile/password");
+            header("Location: /profile/password");
             exit;
         }
     }
@@ -287,7 +287,7 @@ class ProfileController extends Controller {
         
         // Phải đăng nhập mới xem được lịch sử
         if (!isset($_SESSION['user_id'])) {
-            header("Location: /lego_shop_php/account/login");
+            header("Location: /account/login");
             exit;
         }
 

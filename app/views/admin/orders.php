@@ -89,7 +89,7 @@
     
 </div>
 
-<form method="GET" action="/lego_shop_php/adminorder" class="filter-bar" id="filterForm">
+<form method="GET" action="/adminorder" class="filter-bar" id="filterForm">
     <div class="filter-group" style="flex: 2;">
         <label><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm nhanh</label>
         <div class="search-wrapper">
@@ -134,7 +134,7 @@
 
     <div class="filter-group" style="flex: 0; min-width: auto; flex-direction: row; gap: 8px;">
         <button type="submit" class="btn-submit-filter" title="Lọc theo ngày"><i class="fa-solid fa-filter"></i> Lọc</button>
-        <a href="/lego_shop_php/adminorder" class="btn-reset" title="Xóa tất cả bộ lọc"><i class="fa-solid fa-rotate-right"></i></a>
+        <a href="/adminorder" class="btn-reset" title="Xóa tất cả bộ lọc"><i class="fa-solid fa-rotate-right"></i></a>
     </div>
 </form>
 
@@ -210,7 +210,7 @@ $payment_map = [
                     ?>
                     <tr>
                         <td style="text-align: center;">
-                            <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" style="background: #f1f5f9; color: #3182ce; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-family: monospace; border: 1px solid #e2e8f0; text-decoration: none; display: inline-block; transition: 0.2s;">
+                            <a href="/adminorder/detail/<?= $item['id'] ?>" style="background: #f1f5f9; color: #3182ce; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-family: monospace; border: 1px solid #e2e8f0; text-decoration: none; display: inline-block; transition: 0.2s;">
                                 #<?= $item['id'] ?>
                             </a>
                         </td>
@@ -241,7 +241,7 @@ $payment_map = [
                         </td>
                         
                         <td style="text-align: center;">
-                            <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" class="btn-action" title="Xem chi tiết đơn hàng này">
+                            <a href="/adminorder/detail/<?= $item['id'] ?>" class="btn-action" title="Xem chi tiết đơn hàng này">
                                 <i class="fa-solid fa-eye"></i> Chi tiết
                             </a>
                         </td>
@@ -274,7 +274,7 @@ $payment_map = [
         if (!empty($filters['sort'])) $query_params['sort'] = $filters['sort'];
         
         $base_query = http_build_query($query_params);
-        $url_prefix = "/lego_shop_php/adminorder?" . (!empty($base_query) ? $base_query . "&" : "");
+        $url_prefix = "/adminorder?" . (!empty($base_query) ? $base_query . "&" : "");
     ?>
     
     <div class="pagination">

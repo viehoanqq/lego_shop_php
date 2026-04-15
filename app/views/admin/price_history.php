@@ -11,13 +11,13 @@
         <h2 style="margin: 0; color: #1e293b; font-weight: 800;">
             <i class="fa-solid fa-clock-rotate-left" style="color: #3b82f6; margin-right: 10px;"></i> TRA CỨU GIÁ THEO LÔ HÀNG
         </h2>
-        <a href="/lego_shop_php/adminprice" style="color: #64748b; text-decoration: none; font-weight: 600; background: #f1f5f9; padding: 8px 15px; border-radius: 6px; border: 1px solid #e2e8f0;">
+        <a href="/adminprice" style="color: #64748b; text-decoration: none; font-weight: 600; background: #f1f5f9; padding: 8px 15px; border-radius: 6px; border: 1px solid #e2e8f0;">
             <i class="fa-solid fa-arrow-left"></i> Quay lại
         </a>
     </div>
 
     <div class="product-header">
-        <img src="/lego_shop_php/public/assets/images/<?= !empty($product['main_image']) ? $product['main_image'] : 'default.jpg' ?>" 
+        <img src="/public/assets/images/<?= !empty($product['main_image']) ? $product['main_image'] : 'default.jpg' ?>" 
              style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover; border: 1px solid #cbd5e1;" 
              onerror="this.src='https://placehold.co/80x80?text=LEGO'">
         <div>
@@ -49,7 +49,7 @@
                 ?>
                 <tr class="table-row-hover">
                     <td style="text-align: center;">
-                        <a href="/lego_shop_php/adminimport/detail/<?= $h['receipt_id'] ?>" style="background: #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-family: monospace; text-decoration: none;">
+                        <a href="/adminimport/detail/<?= $h['receipt_id'] ?>" style="background: #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-family: monospace; text-decoration: none;">
                             #PN-<?= $h['receipt_id'] ?>
                         </a>
                     </td>

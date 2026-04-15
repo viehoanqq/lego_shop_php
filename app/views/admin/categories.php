@@ -105,7 +105,7 @@ $session_error = get_flash_message('error');
     
     <div class="header">
         <div class="header-left-group" style="flex: 1; display: flex; flex-direction: column;">
-            <form action="/lego_shop_php/admincategory" method="GET" class="filter-form">
+            <form action="/admincategory" method="GET" class="filter-form">
                 <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" name="keyword" class="form-control" placeholder="Nhập tên danh mục cần tìm..." value="<?= htmlspecialchars($filters['keyword'] ?? '') ?>">
@@ -119,7 +119,7 @@ $session_error = get_flash_message('error');
                 </select>
             </form>
         </div>
-        <a href="/lego_shop_php/admincategory/add" class="btn-add-sync"><i class="fa-solid fa-plus"></i> Thêm danh mục</a>
+        <a href="/admincategory/add" class="btn-add-sync"><i class="fa-solid fa-plus"></i> Thêm danh mục</a>
     </div>
 
     <div class="category-grid">
@@ -133,7 +133,7 @@ $session_error = get_flash_message('error');
                     $grayscale = $is_hidden ? 'grayscale(1)' : ($is_locked ? 'grayscale(0.5)' : 'none');
                 ?>
                 <div class="card-cat" style="cursor: pointer; opacity: <?= $opacity ?>; background: <?= $bg ?>;" 
-                     onclick="window.location.href='/lego_shop_php/admincategory/edit/<?= $cat['id'] ?>'">
+                     onclick="window.location.href='/admincategory/edit/<?= $cat['id'] ?>'">
                     
                     <div class="cat-img-wrapper">
                         <?php if($is_hidden): ?>
@@ -146,7 +146,7 @@ $session_error = get_flash_message('error');
                             </span>
                         <?php endif; ?>
 
-                        <img src="/lego_shop_php/public/assets/images/<?= !empty($cat['image_url']) ? $cat['image_url'] : 'default.jpg' ?>" 
+                        <img src="/public/assets/images/<?= !empty($cat['image_url']) ? $cat['image_url'] : 'default.jpg' ?>" 
                              class="cat-img" style="filter: <?= $grayscale ?>;"
                              onerror="this.src='https://placehold.co/300x180?text=LEGO'">
                     </div>
@@ -159,18 +159,18 @@ $session_error = get_flash_message('error');
                             <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">ID: #CAT-<?= $cat['id'] ?></span>
                             
                             <div style="display: flex; gap: 5px;">
-                                <a href="/lego_shop_php/admincategory/edit/<?= $cat['id'] ?>" class="btn-edit" style="color: #3182ce;" title="Chỉnh sửa"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <a href="/admincategory/edit/<?= $cat['id'] ?>" class="btn-edit" style="color: #3182ce;" title="Chỉnh sửa"><i class="fa-solid fa-pen-to-square"></i></a>
 
                                 <?php if($is_hidden): ?>
-                                    <a href="/lego_shop_php/admincategory/restore/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #38a169;" title="Khôi phục danh mục" onclick="return confirm('Bạn muốn khôi phục danh mục này?')"><i class="fa-solid fa-rotate-left"></i></a>
+                                    <a href="/admincategory/restore/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #38a169;" title="Khôi phục danh mục" onclick="return confirm('Bạn muốn khôi phục danh mục này?')"><i class="fa-solid fa-rotate-left"></i></a>
                                 <?php else: ?>
                                     <?php if($is_locked): ?>
-                                        <a href="/lego_shop_php/admincategory/unlock/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #38a169;" title="Mở khóa"><i class="fa-solid fa-lock-open"></i></a>
+                                        <a href="/admincategory/unlock/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #38a169;" title="Mở khóa"><i class="fa-solid fa-lock-open"></i></a>
                                     <?php else: ?>
-                                        <a href="/lego_shop_php/admincategory/lock/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #dd6b20;" title="Khóa danh mục" onclick="return confirm('Khóa danh mục này sẽ TẠM ẨN tất cả sản phẩm bên trong?')"><i class="fa-solid fa-lock"></i></a>
+                                        <a href="/admincategory/lock/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #dd6b20;" title="Khóa danh mục" onclick="return confirm('Khóa danh mục này sẽ TẠM ẨN tất cả sản phẩm bên trong?')"><i class="fa-solid fa-lock"></i></a>
                                     <?php endif; ?>
                                     
-                                    <a href="/lego_shop_php/admincategory/delete/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #e53e3e;" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa/ẩn danh mục này khỏi hệ thống?')"><i class="fa-solid fa-trash"></i></a>
+                                    <a href="/admincategory/delete/<?= $cat['id'] ?>" class="btn-action-icon" style="color: #e53e3e;" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa/ẩn danh mục này khỏi hệ thống?')"><i class="fa-solid fa-trash"></i></a>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -208,7 +208,7 @@ $session_error = get_flash_message('error');
             <?= isset($category) ? 'Chỉnh sửa Danh mục: <span style="color:#dd6b20;">'.htmlspecialchars($category['name']).'</span>' : 'Thêm Danh mục mới' ?>
         </h3>
         
-        <form id="categoryForm" action="<?= isset($category) ? '/lego_shop_php/admincategory/update/'.$category['id'] : '/lego_shop_php/admincategory/store' ?>" method="POST" enctype="multipart/form-data">
+        <form id="categoryForm" action="<?= isset($category) ? '/admincategory/update/'.$category['id'] : '/admincategory/store' ?>" method="POST" enctype="multipart/form-data">
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
                 <div>
                     <div class="form-group">
@@ -233,7 +233,7 @@ $session_error = get_flash_message('error');
                             <?php if(isset($category['image_url']) && !empty($category['image_url'])): ?>
                                 <div style="margin-top: 10px;">
                                     <p style="font-size: 13px; color: #64748b; margin-bottom: 5px;">Ảnh hiện tại:</p>
-                                    <img src="/lego_shop_php/public/assets/images/<?= $category['image_url'] ?>" style="max-width: 100%; height: 120px; object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; padding: 5px;">
+                                    <img src="/public/assets/images/<?= $category['image_url'] ?>" style="max-width: 100%; height: 120px; object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; padding: 5px;">
                                 </div>
                             <?php else: ?>
                                 <i class="fa-solid fa-image" style="font-size: 40px; color: #cbd5e1; margin-top: 10px;"></i>
@@ -245,7 +245,7 @@ $session_error = get_flash_message('error');
 
             <div style="margin-top: 10px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
                 <button type="submit" class="btn-submit"><i class="fa-solid fa-floppy-disk" style="margin-right: 8px;"></i> XÁC NHẬN LƯU</button>
-                <a href="/lego_shop_php/admincategory" class="btn-cancel-link">Hủy bỏ</a>
+                <a href="/admincategory" class="btn-cancel-link">Hủy bỏ</a>
             </div>
         </form>
     </div>

@@ -2,9 +2,9 @@
     
     <div class="banner-slider-container" style="position: relative; max-width: 1200px; margin: 0 auto 60px; overflow: hidden; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
         <div class="banner-slides" id="bannerSlides">
-            <img src="/lego_shop_php/public/assets/images/banner.webp" class="banner-slide active" alt="Banner 1">
-            <img src="/lego_shop_php/public/assets/images/banner1.webp" class="banner-slide" alt="Banner 2">
-            <img src="/lego_shop_php/public/assets/images/banner2.webp" class="banner-slide" alt="Banner 3" onerror="this.style.display='none'">
+            <img src="/public/assets/images/banner.webp" class="banner-slide active" alt="Banner 1">
+            <img src="/public/assets/images/banner1.webp" class="banner-slide" alt="Banner 2">
+            <img src="/public/assets/images/banner2.webp" class="banner-slide" alt="Banner 3" onerror="this.style.display='none'">
         </div>
         
         <button class="slider-btn prev" onclick="moveSlide(-1)"><i class="fa-solid fa-chevron-left"></i></button>
@@ -16,10 +16,10 @@
         <div class="category-grid">
             <?php if (!empty($header_categories)): ?>
                 <?php foreach ($header_categories as $cat): ?>
-                    <a href="/lego_shop_php/product/category/<?= $cat['id'] ?>" class="category-item">
+                    <a href="/product/category/<?= $cat['id'] ?>" class="category-item">
                         <div class="cat-img-wrapper"> 
                             <?php $cat_img = !empty($cat['image_url']) ? $cat['image_url'] : 'default-cat.png'; ?>
-                            <img src="/lego_shop_php/public/assets/images/<?= htmlspecialchars($cat_img) ?>" alt="<?= htmlspecialchars($cat['name']) ?>">
+                            <img src="/public/assets/images/<?= htmlspecialchars($cat_img) ?>" alt="<?= htmlspecialchars($cat['name']) ?>">
                         </div>
                         <h3 class="category-name"><?= htmlspecialchars($cat['name']) ?></h3>
                     </a>
@@ -32,11 +32,11 @@
 
     <div class="new-arrivals-section" style="max-width: 1200px; margin: 0 auto 80px; padding: 0 15px; text-align: center;">
         <h2 class="section-title">Hàng mới về – Bé thích mê</h2>
-        <a href="/lego_shop_php/product" class="btn-view-all">Xem tất cả</a>
+        <a href="/product" class="btn-view-all">Xem tất cả</a>
         
         <div class="new-products-grid">
             <div class="new-promo-banner">
-                <img src="/lego_shop_php/public/assets/images/new-product.webp" alt="Hàng Mới Về" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                <img src="/public/assets/images/new-product.webp" alt="Hàng Mới Về" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
             </div>
             
             <?php if (!empty($new_products)): ?>
@@ -55,7 +55,7 @@
     <div class="featured-products-section" style="max-width: 1200px; margin: 0 auto 80px; padding: 0 15px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
             <h2 class="section-title" style="margin: 0;">SẢN PHẨM NỔI BẬT</h2>
-            <a href="/lego_shop_php/product" class="link-view-all" style="color: #a4161a; font-weight: bold; text-decoration: none;">
+            <a href="/product" class="link-view-all" style="color: #a4161a; font-weight: bold; text-decoration: none;">
                 Xem tất cả <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>

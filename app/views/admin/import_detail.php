@@ -68,32 +68,32 @@
                 <i class="fa-solid fa-file-invoice" style="color: #3b82f6;"></i> CHI TIẾT PHIẾU NHẬP #PN-<?= $receipt['id'] ?>
             </h2>
         </div>
-        <a href="/lego_shop_php/adminimport" style="color: #64748b; text-decoration: none; font-weight: 600; background: #f1f5f9; padding: 8px 15px; border-radius: 6px;">
+        <a href="/adminimport" style="color: #64748b; text-decoration: none; font-weight: 600; background: #f1f5f9; padding: 8px 15px; border-radius: 6px;">
             <i class="fa-solid fa-arrow-left"></i> Quay lại
         </a>
     </div>
 
    <div class="action-buttons" style="display: flex; gap: 15px; align-items: center; margin-bottom: 25px; padding: 15px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.05);">
     
-    <a href="/lego_shop_php/adminimport" style="background: #f1f5f9; color: #475569; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: 600; border: 1px solid #cbd5e1;">
+    <a href="/adminimport" style="background: #f1f5f9; color: #475569; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: 600; border: 1px solid #cbd5e1;">
         <i class="fa-solid fa-arrow-left"></i> Quay lại
     </a>
 
     <?php if($receipt['status'] === 'draft'): ?>
         
-        <a href="/lego_shop_php/adminimport/edit/<?= $receipt['id'] ?>" 
+        <a href="/adminimport/edit/<?= $receipt['id'] ?>" 
            style="background: #f59e0b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: 600; transition: 0.2s;">
             <i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa phiếu
         </a>
 
-        <form action="/lego_shop_php/adminimport/complete/<?= $receipt['id'] ?>" method="POST" style="margin: 0;" onsubmit="return confirm('XÁC NHẬN HOÀN TẤT?\n\nSau khi hoàn tất, kho hàng sẽ được cộng thêm và bạn KHÔNG THỂ chỉnh sửa phiếu này nữa.');">
+        <form action="/adminimport/complete/<?= $receipt['id'] ?>" method="POST" style="margin: 0;" onsubmit="return confirm('XÁC NHẬN HOÀN TẤT?\n\nSau khi hoàn tất, kho hàng sẽ được cộng thêm và bạn KHÔNG THỂ chỉnh sửa phiếu này nữa.');">
             <button type="submit" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;">
                 <i class="fa-solid fa-check-double"></i> Hoàn tất phiếu nhập
             </button>
         </form>
         
     <?php else: ?>
-        <a href="/lego_shop_php/adminimport/print/<?= $receipt['id'] ?>" target="_blank" 
+        <a href="/adminimport/print/<?= $receipt['id'] ?>" target="_blank" 
            style="display: inline-block; background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; transition: 0.2s;">
             <i class="fa-solid fa-print"></i> In phiếu nhập
         </a>
@@ -152,7 +152,7 @@
             <tr>
                 <td>
                     <div class="product-cell">
-                        <img src="/lego_shop_php/public/assets/images/<?= !empty($d['main_image']) ? $d['main_image'] : 'default.jpg' ?>" 
+                        <img src="/public/assets/images/<?= !empty($d['main_image']) ? $d['main_image'] : 'default.jpg' ?>" 
                              class="img-product" 
                              onerror="this.src='https://placehold.co/60x60?text=LEGO'">
                         <div>

@@ -5,7 +5,7 @@ class WishlistController extends Controller {
         
         // 1. Kiểm tra đăng nhập (Bảo mật)
         if (!isset($_SESSION['user_account_id'])) {
-            header("Location: /lego_shop_php/account/login");
+            header("Location: /account/login");
             exit;
         }
 

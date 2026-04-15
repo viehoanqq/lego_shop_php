@@ -38,7 +38,7 @@ class CartController extends Controller {
     // Trang chủ Giỏ hàng 
     public function index() {
         if (!isset($_SESSION['user_id'])) {
-            header("Location: /lego_shop_php/account/login");
+            header("Location: /account/login");
             exit;
         }
 

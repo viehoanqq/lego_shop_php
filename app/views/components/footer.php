@@ -44,8 +44,8 @@
     <div class="footer-body">
         <div class="footer-subscribe">
             <div class="logo">
-                <a href="/lego_shop_php/home">
-                    <img src="/lego_shop_php/public/assets/images/<?= htmlspecialchars($logo_url) ?>" alt="<?= htmlspecialchars($shop_name) ?>" />
+                <a href="/home">
+                    <img src="/public/assets/images/<?= htmlspecialchars($logo_url) ?>" alt="<?= htmlspecialchars($shop_name) ?>" />
                 </a>
             </div>
             <div class="subscribe-box">

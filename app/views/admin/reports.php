@@ -48,7 +48,7 @@
     .badge-qty-out { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-weight: 700; font-size: 12px; display: inline-block; min-width: 40px; text-align: center; }
 </style>
 
-<form method="GET" action="/lego_shop_php/adminreport" id="reportForm" style="background: #fff; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9;">
+<form method="GET" action="/adminreport" id="reportForm" style="background: #fff; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9;">
     <div class="filter-split-layout">
         <div class="filter-col">
             <div class="filter-row">
@@ -90,7 +90,7 @@
             <div class="filter-row" style="align-items: flex-end; justify-content: flex-end; margin-top: 10px;">
                 <div style="display: flex; gap: 10px;">
                     <button type="submit" class="btn-submit-filter"><i class="fa-solid fa-filter"></i> ÁP DỤNG LỌC</button>
-                    <a href="/lego_shop_php/adminreport" class="btn-outline-danger" title="Xóa bộ lọc"><i class="fa-solid fa-rotate-right"></i></a>
+                    <a href="/adminreport" class="btn-outline-danger" title="Xóa bộ lọc"><i class="fa-solid fa-rotate-right"></i></a>
                     
                     <?php
                         $export_params = http_build_query([
@@ -101,7 +101,7 @@
                             'end_date' => $filters['end_date'] ?? date('Y-m-d')
                         ]);
                     ?>
-                    <a href="/lego_shop_php/adminreport?<?= $export_params ?>" class="btn-submit-filter" style="background: #10b981; color: #fff;">
+                    <a href="/adminreport?<?= $export_params ?>" class="btn-submit-filter" style="background: #10b981; color: #fff;">
                         <i class="fa-solid fa-file-excel"></i> XUẤT EXCEL
                     </a>
                 </div>
@@ -149,7 +149,7 @@
                     <td>
                         <div style="display: flex; align-items: center; gap: 15px; <?= $opacityStyle ?>">
                             
-                            <img src="/lego_shop_php/public/assets/images/<?= !empty($r['main_image']) ? $r['main_image'] : 'default.jpg' ?>" 
+                            <img src="/public/assets/images/<?= !empty($r['main_image']) ? $r['main_image'] : 'default.jpg' ?>" 
                                  class="img-report" 
                                  onerror="this.src='https://placehold.co/50x50?text=LEGO'"
                                  style="<?= $imgFilter ?>">
@@ -185,7 +185,7 @@
                     <td style="text-align: right; color: #10b981; font-weight: 600;"><?= number_format($r['total_revenue'], 0, ',', '.') ?>đ</td>
                     <td style="text-align: right; font-weight: 800; color: <?= $difference >= 0 ? '#10b981' : '#ef4444' ?>;"><?= number_format($difference, 0, ',', '.') ?>đ</td>
                     <td style="text-align: center;">
-                        <a href="/lego_shop_php/adminreport/productDetail/<?= $r['id'] ?>?start=<?= $filters['start_date'] ?? '' ?>&end=<?= $filters['end_date'] ?? '' ?>" class="btn-detail">
+                        <a href="/adminreport/productDetail/<?= $r['id'] ?>?start=<?= $filters['start_date'] ?? '' ?>&end=<?= $filters['end_date'] ?? '' ?>" class="btn-detail">
                             <i class="fa-solid fa-chart-line"></i> Phân tích
                         </a>
                     </td>

@@ -6,7 +6,7 @@ class AdminInventoryController extends Controller {
 
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['admin_id'])) { header("Location: /lego_shop_php/admin/login"); exit; }
+        if (!isset($_SESSION['admin_id'])) { header("Location: /admin/login"); exit; }
         $this->InventoryModel = $this->model('InventoryModel');
         $this->productModel = $this->model('ProductModel');
     }
@@ -20,7 +20,7 @@ class AdminInventoryController extends Controller {
     if (isset($_GET['threshold']) && is_numeric($_GET['threshold'])) {
         $new_threshold = intval($_GET['threshold']);
         $this->InventoryModel->updateAllMinStock($new_threshold);
-        header("Location: /lego_shop_php/admininventory?tab=alerts&keyword=" . urlencode($keyword));
+        header("Location: /admininventory?tab=alerts&keyword=" . urlencode($keyword));
         exit;
     }
 

@@ -3,7 +3,7 @@
         <ul style="display: flex; list-style: none; gap: 8px; font-size: 14px; color: #666; align-items: center; margin: 0;">
             
             <li>
-                <a href="/lego_shop_php/home" style="color: #a4161a; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 5px;">
+                <a href="/home" style="color: #a4161a; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 5px;">
                     <i class="fa-solid fa-house"></i> Trang chủ
                 </a>
             </li>

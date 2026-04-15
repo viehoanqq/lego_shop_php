@@ -8,7 +8,7 @@
                 <h2 class="section-title">Thông tin cá nhân</h2>
                 <p class="section-desc">Cập nhật thông tin để nhận ưu đãi và giao hàng nhanh hơn.</p>
 
-                <form id="profileForm" class="profile-form" action="/lego_shop_php/profile/updateInfo" method="POST">
+                <form id="profileForm" class="profile-form" action="/profile/updateInfo" method="POST">
                     
                     <div class="input-group">
                         <label>Họ và tên <span style="color: red;">*</span></label>

@@ -34,7 +34,7 @@
         </div>
     <?php endif; ?>
 
-    <form action="/lego_shop_php/adminsetting/update" method="POST" enctype="multipart/form-data">
+    <form action="/adminsetting/update" method="POST" enctype="multipart/form-data">
         <div class="settings-grid">
             
             <div class="dashboard-left">
@@ -120,7 +120,7 @@
                 <div class="admin-card">
                     <h3 class="card-title"><i class="fa-solid fa-image"></i> Logo Cửa Hàng</h3>
                     <div class="form-group">
-                        <img src="/lego_shop_php/public/assets/images/<?= $settings['logo_url'] ?>" alt="Logo" class="logo-preview">
+                        <img src="/public/assets/images/<?= $settings['logo_url'] ?>" alt="Logo" class="logo-preview">
                         <input type="file" name="logo_upload" class="form-control" accept="image/*">
                         <small style="color: #64748b; font-size: 12px; margin-top: 5px; display: block;">Chỉ tải lên khi muốn thay đổi logo mới (Khuyên dùng đuôi .png trong suốt).</small>
                     </div>

@@ -6,7 +6,7 @@ $error = $data['error'] ?? null;
 <style>
     /* Đồng bộ Background với trang Login */
     .register-wrapper { 
-        background: url('/lego_shop_php/public/assets/images/login-bgr.webp') no-repeat center center; 
+        background: url('/public/assets/images/login-bgr.webp') no-repeat center center; 
         background-size: cover; 
         padding: 40px 0; 
         min-height: 100vh; 
@@ -73,7 +73,7 @@ $error = $data['error'] ?? null;
 <div class="register-wrapper">
     <div class="register-card">
         <div class="register-header">
-            <img src="/lego_shop_php/public/assets/images/logo.png" alt="LEGO World">
+            <img src="/public/assets/images/logo.png" alt="LEGO World">
             <h2>ĐĂNG KÝ THÀNH VIÊN</h2>
         </div>
         
@@ -82,7 +82,7 @@ $error = $data['error'] ?? null;
                 <div class="alert-danger"><?= $error ?></div>
             <?php endif; ?>
 
-            <form id="registerForm" action="/lego_shop_php/account/actionRegister" method="POST" novalidate>
+            <form id="registerForm" action="/account/actionRegister" method="POST" novalidate>
                 <div class="form-section">TÀI KHOẢN</div>
                 <div class="form-row">
                     <div class="form-group">
@@ -157,7 +157,7 @@ $error = $data['error'] ?? null;
             </form>
 
             <div class="auth-links">
-                Đã có tài khoản? <a href="/lego_shop_php/account/login">Quay lại trang Đăng nhập</a>
+                Đã có tài khoản? <a href="/account/login">Quay lại trang Đăng nhập</a>
             </div>
         </div>
     </div>

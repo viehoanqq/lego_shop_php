@@ -7,7 +7,7 @@ class AdminCategoryController extends Controller {
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         if (!isset($_SESSION['admin_id'])) { 
-            header("Location: /lego_shop_php/admin/login"); 
+            header("Location: /admin/login"); 
             exit; 
         }
         $this->categoryModel = $this->model('CategoryModel');
@@ -65,14 +65,14 @@ class AdminCategoryController extends Controller {
             
             if (empty($name)) {
                 set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/admincategory/add');
+                header('Location: /admincategory/add');
                 exit();
             }
 
             // Kiểm tra trùng tên
             if ($this->categoryModel->isNameExists($name)) {
                 set_flash_message('error', 'name_exists');
-                header('Location: /lego_shop_php/admincategory/add');
+                header('Location: /admincategory/add');
                 exit();
             }
 
@@ -88,7 +88,7 @@ class AdminCategoryController extends Controller {
             } else {
                 set_flash_message('error', 'db');
             }
-            header('Location: /lego_shop_php/admincategory');
+            header('Location: /admincategory');
             exit();
         }
     }
@@ -96,7 +96,7 @@ class AdminCategoryController extends Controller {
     public function edit($id) {
         $category = $this->categoryModel->getCategoryById($id);
         if (!$category) {
-            header('Location: /lego_shop_php/admincategory');
+            header('Location: /admincategory');
             exit();
         }
 
@@ -117,14 +117,14 @@ class AdminCategoryController extends Controller {
 
             if (empty($name)) {
                 set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/admincategory/edit/'.$id);
+                header('Location: /admincategory/edit/'.$id);
                 exit();
             }
 
             // Kiểm tra trùng tên (loại trừ chính nó)
             if ($this->categoryModel->isNameExists($name, $id)) {
                 set_flash_message('error', 'name_exists');
-                header('Location: /lego_shop_php/admincategory/edit/'.$id);
+                header('Location: /admincategory/edit/'.$id);
                 exit();
             }
 
@@ -142,7 +142,7 @@ class AdminCategoryController extends Controller {
             } else {
                 set_flash_message('error', 'db');
             }
-            header('Location: /lego_shop_php/admincategory');
+            header('Location: /admincategory');
             exit();
         }
     }
@@ -157,7 +157,7 @@ class AdminCategoryController extends Controller {
         } else {
             set_flash_message('error', 'db');
         }
-        header('Location: /lego_shop_php/admincategory');
+        header('Location: /admincategory');
         exit();
     }
 
@@ -169,7 +169,7 @@ class AdminCategoryController extends Controller {
         } else {
             set_flash_message('error', 'db');
         }
-        header('Location: /lego_shop_php/admincategory');
+        header('Location: /admincategory');
         exit();
     }
 
@@ -194,7 +194,7 @@ class AdminCategoryController extends Controller {
             }
         }
         
-        header('Location: /lego_shop_php/admincategory');
+        header('Location: /admincategory');
         exit();
     }
     public function restore($id) {
@@ -205,7 +205,7 @@ class AdminCategoryController extends Controller {
         } else {
             set_flash_message('error', 'db');
         }
-        header('Location: /lego_shop_php/admincategory');
+        header('Location: /admincategory');
         exit();
     }
     private function handleUpload($file) {

@@ -6,7 +6,7 @@ class AdminCustomerController extends Controller {
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         if (!isset($_SESSION['admin_id'])) { 
-            header("Location: /lego_shop_php/admin/login"); 
+            header("Location: /admin/login"); 
             exit; 
         }
         $this->customerModel = $this->model('CustomerModel');
@@ -54,7 +54,7 @@ class AdminCustomerController extends Controller {
         // Tránh Admin tự xóa chính mình
         if ($id == $_SESSION['admin_id']) {
             set_flash_message('error', 'cannot_delete_self');
-            header("Location: /lego_shop_php/admincustomer");
+            header("Location: /admincustomer");
             exit();
         }
 
@@ -75,7 +75,7 @@ class AdminCustomerController extends Controller {
             }
         }
 
-        header("Location: /lego_shop_php/admincustomer");
+        header("Location: /admincustomer");
         exit();
     }
     // --- HÀM KHÔI PHỤC TÀI KHOẢN ---
@@ -87,7 +87,7 @@ class AdminCustomerController extends Controller {
         } else {
             set_flash_message('error', 'db');
         }
-        header("Location: /lego_shop_php/admincustomer");
+        header("Location: /admincustomer");
         exit();
     }
     public function toggleStatus($id) {
@@ -134,7 +134,7 @@ class AdminCustomerController extends Controller {
 
         // Kiểm tra nếu không có dữ liệu thì quay về danh sách
         if (!$customer) {
-            header('Location: /lego_shop_php/admincustomer');
+            header('Location: /admincustomer');
             exit();
         }
 
@@ -172,7 +172,7 @@ class AdminCustomerController extends Controller {
 
             if ($this->customerModel->updateCustomer($id, $data)) {
                 set_flash_message('msg', 'updated');
-                header('Location: /lego_shop_php/admincustomer');
+                header('Location: /admincustomer');
             } else {
                 set_flash_message('error', 'db');
                 header('Location: ' . $_SERVER['HTTP_REFERER']);
@@ -195,7 +195,7 @@ class AdminCustomerController extends Controller {
             // 1. Kiểm tra trống
             if (empty($data['email']) || empty($data['phone']) || empty($data['fullname'])) {
                 set_flash_message('error', 'Vui lòng điền đầy đủ thông tin.');
-                header('Location: /lego_shop_php/admincustomer/add');
+                header('Location: /admincustomer/add');
                 exit();
             }
 
@@ -211,7 +211,7 @@ class AdminCustomerController extends Controller {
             // 3. Tiến hành lưu
             if ($this->customerModel->addCustomer($data)) {
                 set_flash_message('msg', 'success'); // Đã sửa thành 'msg' để giống Category
-                header('Location: /lego_shop_php/admincustomer');
+                header('Location: /admincustomer');
             } else {
                 set_flash_message('error', 'db');
                 header('Location: ' . $_SERVER['HTTP_REFERER']);

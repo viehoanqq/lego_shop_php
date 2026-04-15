@@ -3,8 +3,8 @@ class Database {
     private $host = "localhost";
     private $port = 3306;
     private $db_name = "lego_shop";
-    private $username = "root";
-    private $password = "";
+    private $username = "admin";
+    private $password = "mypassword";
     public $conn;
 
     public function getConnection() {

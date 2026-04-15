@@ -3,7 +3,7 @@ class AdminReportController extends Controller {
     
     public function __construct() {
         if (!isset($_SESSION['admin_id'])) { 
-            header("Location: /lego_shop_php/admin/login"); 
+            header("Location: /admin/login"); 
             exit; 
         }
     }

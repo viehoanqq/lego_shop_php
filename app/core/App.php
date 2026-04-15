@@ -8,7 +8,6 @@ class App {
         $url = $this->parseUrl();
 
         // 1. XỬ LÝ CONTROLLER
-        if (isset($url[0])) {
     // Thử trường hợp viết hoa chữ đầu (chuẩn thường)
     $name = ucfirst($url[0]) . 'Controller';
     
@@ -21,12 +20,12 @@ class App {
 
     $file = 'app/controllers/' . $name . '.php';
 
+
     if (file_exists($file)) {
         $this->controller = $name;
         unset($url[0]);
     }
 }
-
         // Kiểm tra lại đường dẫn file trước khi require
         $fullPath = 'app/controllers/' . $this->controller . '.php';
         if(file_exists($fullPath)){

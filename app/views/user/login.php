@@ -5,7 +5,7 @@ $success = $data['success'] ?? null;
 ?>
 
 <style>
-    .login-wrapper { background: url('/lego_shop_php/public/assets/images/login-bgr.webp') no-repeat center center; background-size: cover; padding: 60px 0; min-height: 100vh; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; }
+    .login-wrapper { background: url('/public/assets/images/login-bgr.webp') no-repeat center center; background-size: cover; padding: 60px 0; min-height: 100vh; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; }
     .login-card { width: 100%; max-width: 420px; background: rgba(255, 255, 255, 0.96); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); overflow: hidden; }
     .login-header { text-align: center; padding: 30px 20px 10px; }
     .login-header img { width: 140px; margin-bottom: 15px; }
@@ -32,7 +32,7 @@ $success = $data['success'] ?? null;
 <div class="login-wrapper">
     <div class="login-card">
         <div class="login-header">
-            <img src="/lego_shop_php/public/assets/images/logo.png" alt="LEGO World">
+            <img src="/public/assets/images/logo.png" alt="LEGO World">
             <h2>ĐĂNG NHẬP</h2>
         </div>
 
@@ -45,7 +45,7 @@ $success = $data['success'] ?? null;
                 <div class="alert-danger"><?= $error ?></div>
             <?php endif; ?>
 
-            <form id="loginForm" action="/lego_shop_php/account/actionLogin" method="POST" novalidate>
+            <form id="loginForm" action="/account/actionLogin" method="POST" novalidate>
                 <div class="form-group">
                     <label>Email hoặc Số điện thoại</label>
                     <input type="text" name="username" id="username" value="<?= $old['username'] ?? '' ?>" placeholder="Nhập Email hoặc SĐT của bạn" required>
@@ -59,13 +59,13 @@ $success = $data['success'] ?? null;
                 </div>
 
                 <div style="text-align: right; margin-bottom: 20px; font-size: 13px;">
-                    <a href="/lego_shop_php/account/forgot" style="color: #666; text-decoration: none;">Quên mật khẩu?</a>    </div>
+                    <a href="/account/forgot" style="color: #666; text-decoration: none;">Quên mật khẩu?</a>    </div>
 
                 <button type="submit" class="btn-submit">ĐĂNG NHẬP</button>
             </form>
 
             <div class="auth-links">
-                Chưa có tài khoản? <a href="/lego_shop_php/account/register">Đăng ký ngay</a>
+                Chưa có tài khoản? <a href="/account/register">Đăng ký ngay</a>
             </div>
         </div>
     </div>

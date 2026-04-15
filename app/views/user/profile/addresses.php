@@ -43,7 +43,7 @@
                                            data-default="<?= $addr['is_default'] ?>">Cập nhật</a>
                                         
                                         <?php if($addr['is_default'] == 0): ?>
-                                            <a href="/lego_shop_php/profile/deleteAddress?id=<?= $addr['id'] ?>" class="text-red btn-delete-address">Xóa</a>
+                                            <a href="/profile/deleteAddress?id=<?= $addr['id'] ?>" class="text-red btn-delete-address">Xóa</a>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -53,7 +53,7 @@
                                         <p><?= htmlspecialchars($addr['ward']) ?>, <?= htmlspecialchars($addr['district']) ?>, <?= htmlspecialchars($addr['city']) ?></p>
                                     </div>
                                     <div class="address-set-default">
-                                        <form action="/lego_shop_php/profile/setDefaultAddress" method="POST" style="margin: 0;">
+                                        <form action="/profile/setDefaultAddress" method="POST" style="margin: 0;">
                                             <input type="hidden" name="address_id" value="<?= $addr['id'] ?>">
                                             <button type="submit" class="btn-set-default <?= $addr['is_default'] == 1 ? 'disabled' : '' ?>" <?= $addr['is_default'] == 1 ? 'disabled' : '' ?>>
                                                 Thiết lập mặc định
@@ -79,7 +79,7 @@
             <button type="button" class="btn-close-modal" id="closeModalBtn">&times;</button>
         </div>
         
-        <form id="addressForm" action="/lego_shop_php/profile/addAddress" method="POST" novalidate class="modal-form">
+        <form id="addressForm" action="/profile/addAddress" method="POST" novalidate class="modal-form">
             <div class="form-row">
                 <div class="form-group">
                     <label>Tên người nhận <span class="text-red">*</span></label>
@@ -309,7 +309,7 @@
         openBtn.addEventListener('click', (e) => { 
             e.preventDefault(); 
             title.innerText = "Thêm địa chỉ mới";
-            form.action = "/lego_shop_php/profile/addAddress";
+            form.action = "/profile/addAddress";
             form.reset(); hiddenIdInput.value = '';
             document.getElementById("district").innerHTML = '<option value="">Chọn Quận/Huyện</option>';
             document.getElementById("ward").innerHTML = '<option value="">Chọn Phường/Xã</option>';
@@ -324,7 +324,7 @@
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 title.innerText = "Cập nhật địa chỉ";
-                form.action = "/lego_shop_php/profile/editAddress";
+                form.action = "/profile/editAddress";
                 
                 hiddenIdInput.value = btn.getAttribute('data-id');
                 document.getElementById('receiver_name').value = btn.getAttribute('data-name');

@@ -2,7 +2,7 @@
     <div class="profile-sidebar">
         <div class="profile-card text-center">
             <div class="avatar-wrapper">
-                <img src="/lego_shop_php/public/assets/images/avt.png" 
+                <img src="/public/assets/images/avt.png" 
                      class="profile-avatar-large" 
                      onerror="this.src='https://ui-avatars.com/api/?name=<?= $_SESSION['admin_name'] ?? 'A' ?>&background=6366f1&color=fff&size=150&bold=true'" 
                      alt="Avatar">
@@ -53,7 +53,7 @@
     ?>
 <?php endif; ?>
 
-            <form action="/lego_shop_php/admin/actionUpdateProfile" method="POST" class="profile-form">
+            <form action="/admin/actionUpdateProfile" method="POST" class="profile-form">
                 <div class="form-group full-width">
                     <label>Họ và tên <span style="color:red">*</span></label>
                     <div class="input-with-icon">
@@ -104,7 +104,7 @@
                 </div>
             <?php endif; ?>
 
-            <form action="/lego_shop_php/admin/actionUpdatePassword" method="POST" class="profile-form">
+            <form action="/admin/actionUpdatePassword" method="POST" class="profile-form">
                 <div class="form-group full-width">
                     <label>Mật khẩu hiện tại <span style="color:red">*</span></label>
                     <div class="input-with-icon">

@@ -39,7 +39,7 @@
 
 <div class="report-container">
     <div style="margin-bottom: 25px;">
-        <a href="/lego_shop_php/adminreport" style="text-decoration: none; color: #3182ce; font-size: 14px; font-weight: 700;">
+        <a href="/adminreport" style="text-decoration: none; color: #3182ce; font-size: 14px; font-weight: 700;">
             <i class="fa-solid fa-arrow-left"></i> QUAY LẠI DANH SÁCH BÁO CÁO
         </a>
         <h2><?= $product['name'] ?></h2>
@@ -122,7 +122,7 @@
             if(!empty($history_asc)): ?>
                 <?php foreach($history_asc as $h): 
                     $is_in = ($h['qty'] > 0);
-                    $link = "/lego_shop_php/admin" . ($is_in ? 'import' : 'order') . "/detail/" . $h['ref'];
+                    $link = "/admin" . ($is_in ? 'import' : 'order') . "/detail/" . $h['ref'];
                 ?>
                 <a href="<?= $link ?>" class="timeline-row">
                     <div class="tm-date">

@@ -15,7 +15,7 @@
                         <div style="text-align: center; padding: 40px; color: #888;">
                             <i class="fa-solid fa-box-open" style="font-size: 45px; margin-bottom: 15px; color: #ddd;"></i>
                             <p style="font-size: 16px;">Bạn chưa có đơn hàng nào.</p>
-                            <a href="/lego_shop_php/home" class="btn-submit-modal" style="display: inline-block; margin-top: 15px; text-decoration: none;">Mua sắm ngay</a>
+                            <a href="/home" class="btn-submit-modal" style="display: inline-block; margin-top: 15px; text-decoration: none;">Mua sắm ngay</a>
                         </div>
                     <?php else: ?>
                         <?php 
@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function() {
             cancelBtn.setAttribute('data-id', orderId);
             hideCancelInput(); 
 
-            fetch('/lego_shop_php/profile/getOrderDetailsAjax', {
+            fetch('/profile/getOrderDetailsAjax', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ order_id: orderId })
@@ -362,7 +362,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         const tr = `
                             <tr>
                                 <td style="padding: 12px 15px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; gap: 12px;">
-                                    <img src="/lego_shop_php/public/assets/images/${imgUrl}" style="width:45px; height:45px; object-fit:contain; border:1px solid #ddd; border-radius:6px; background:#fff;">
+                                    <img src="/public/assets/images/${imgUrl}" style="width:45px; height:45px; object-fit:contain; border:1px solid #ddd; border-radius:6px; background:#fff;">
                                     <div>
                                         <span style="font-weight: 500; color: #333;">${item.name}</span>
                                         ${reviewBtnHtml}
@@ -400,7 +400,7 @@ document.addEventListener("DOMContentLoaded", function() {
         this.innerText = 'ĐANG XỬ LÝ...';
         this.disabled = true;
 
-        fetch('/lego_shop_php/checkout/cancelOrderAjax', {
+        fetch('/checkout/cancelOrderAjax', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_id: orderId, reason: reason })
@@ -483,7 +483,7 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.innerHTML = 'ĐANG GỬI...';
         btn.style.pointerEvents = 'none';
 
-        fetch('/lego_shop_php/checkout/submitReviewAjax', {
+        fetch('/checkout/submitReviewAjax', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ product_id: productId, rating: rating, comment: comment })
@@ -526,7 +526,7 @@ function openReviewModal(productId, productName) {
 
     document.getElementById('reviewModal').classList.add('show');
 
-    fetch(`/lego_shop_php/checkout/getReviewAjax?product_id=${productId}`)
+    fetch(`/checkout/getReviewAjax?product_id=${productId}`)
     .then(res => res.json())
     .then(data => {
         submitBtn.style.pointerEvents = 'auto';

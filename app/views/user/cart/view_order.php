@@ -94,7 +94,7 @@
                             <tr>
                                 <td>
                                     <div class="item-product">
-                                        <img src="/lego_shop_php/public/assets/images/<?= htmlspecialchars($item['image_url']) ?>" alt="IMG">
+                                        <img src="/public/assets/images/<?= htmlspecialchars($item['image_url']) ?>" alt="IMG">
                                         <span class="item-name"><?= htmlspecialchars($item['name']) ?></span>
                                     </div>
                                 </td>
@@ -123,8 +123,8 @@
             </div>
             
             <div class="btn-wrap">
-                                <a href="/lego_shop_php/home" class="btn-continue"><i class="fa-solid fa-shopping-bag"></i>   Tiếp tục mua sắm</a>
-                <a href="/lego_shop_php/profile/orders" class="btn-continue"><i class="fa-solid fa-shopping-cart"></i>   Danh sách đơn hàng</a>
+                                <a href="/home" class="btn-continue"><i class="fa-solid fa-shopping-bag"></i>   Tiếp tục mua sắm</a>
+                <a href="/profile/orders" class="btn-continue"><i class="fa-solid fa-shopping-cart"></i>   Danh sách đơn hàng</a>
             </div>
         </div>
     </div>

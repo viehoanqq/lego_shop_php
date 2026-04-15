@@ -3,7 +3,7 @@ class CheckoutController extends Controller {
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         if (!isset($_SESSION['user_id'])) {
-            header("Location: /lego_shop_php/account/login");
+            header("Location: /account/login");
             exit;
         }
     }
@@ -14,7 +14,7 @@ class CheckoutController extends Controller {
 
         $cart_items = $cartModel->getCartItems($_SESSION['user_id']);
         if (empty($cart_items)) {
-            header("Location: /lego_shop_php/cart");
+            header("Location: /cart");
             exit;
         }
 
@@ -47,7 +47,7 @@ class CheckoutController extends Controller {
             $cartModel = $this->model('CartModel');
             $cart_items = $cartModel->getCartItems($user_id);
             if (empty($cart_items)) {
-                header("Location: /lego_shop_php/cart");
+                header("Location: /cart");
                 exit;
             }
 
@@ -62,7 +62,7 @@ class CheckoutController extends Controller {
                 if (!$product || $product['stock_quantity'] < $item['quantity']) {
                     $p_name = $product ? $product['name'] : 'Sản phẩm';
                     // Đá về trang giỏ hàng và báo lỗi hết hàng
-                    echo "<script>alert('LỖI: Sản phẩm \"{$p_name}\" không đủ số lượng trong kho!'); window.location.href='/lego_shop_php/cart';</script>";
+                    echo "<script>alert('LỖI: Sản phẩm \"{$p_name}\" không đủ số lượng trong kho!'); window.location.href='/cart';</script>";
                     exit;
                 }
             }
@@ -114,9 +114,9 @@ class CheckoutController extends Controller {
 
                 // Chuyển hướng
                 if ($payment_method === 'transfer') {
-                    header("Location: /lego_shop_php/checkout/payment?order_id=" . $order_id);
+                    header("Location: /checkout/payment?order_id=" . $order_id);
                 } else {
-                    header("Location: /lego_shop_php/checkout/success?order_id=" . $order_id);
+                    header("Location: /checkout/success?order_id=" . $order_id);
                 }
                 exit;
             } else {
@@ -155,7 +155,7 @@ class CheckoutController extends Controller {
         $order_id = $_GET['order_id'] ?? 0;
         
         if (!$order_id) {
-            header("Location: /lego_shop_php/home");
+            header("Location: /home");
             exit;
         }
 
@@ -163,7 +163,7 @@ class CheckoutController extends Controller {
         $order = $orderModel->getOrderById($order_id);
         
         if (!$order || $order['user_id'] != $_SESSION['user_id']) {
-            echo "<script>alert('Bạn không có quyền xem đơn hàng này!'); window.location.href='/lego_shop_php/home';</script>";
+            echo "<script>alert('Bạn không có quyền xem đơn hàng này!'); window.location.href='/home';</script>";
             exit;
         }
 

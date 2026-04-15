@@ -28,7 +28,7 @@ class AccountController extends Controller {
             if (empty(trim($data['phone'])) || empty(trim($data['email'])) || empty(trim($data['password'])) || empty(trim($data['fullname'])) || empty(trim($data['city']))) {
                 $_SESSION['register_error'] = "Vui lòng điền đầy đủ các thông tin bắt buộc!";
                 $_SESSION['old_data'] = $data;
-                header("Location: /lego_shop_php/account/register");
+                header("Location: /account/register");
                 exit();
             }
 
@@ -36,7 +36,7 @@ class AccountController extends Controller {
             if (!isset($data['terms'])) {
                 $_SESSION['register_error'] = "Bạn phải đồng ý với Điều khoản dịch vụ!";
                 $_SESSION['old_data'] = $data;
-                header("Location: /lego_shop_php/account/register");
+                header("Location: /account/register");
                 exit();
             }
 
@@ -44,7 +44,7 @@ class AccountController extends Controller {
             if ($data['password'] !== $data['confirm_password']) {
                 $_SESSION['register_error'] = "Mật khẩu xác nhận không khớp!";
                 $_SESSION['old_data'] = $data;
-                header("Location: /lego_shop_php/account/register");
+                header("Location: /account/register");
                 exit();
             }
 
@@ -54,11 +54,11 @@ class AccountController extends Controller {
 
             if ($result === true) {
                 $_SESSION['success_msg'] = "Đăng ký thành công! Mời bạn đăng nhập.";
-                header("Location: /lego_shop_php/account/login");
+                header("Location: /account/login");
             } else {
                 $_SESSION['register_error'] = $result; 
                 $_SESSION['old_data'] = $data;
-                header("Location: /lego_shop_php/account/register");
+                header("Location: /account/register");
             }
             exit();
         }
@@ -101,11 +101,11 @@ class AccountController extends Controller {
                 $_SESSION['user_fullname'] = $user['fullname'];
                 $_SESSION['user_role'] = $user['role'];
                 
-                header("Location: /lego_shop_php/home");
+                header("Location: /home");
             } else {
                 $_SESSION['login_error'] = "Tài khoản hoặc mật khẩu không chính xác!";
                 $_SESSION['old_login'] = ['username' => $username];
-                header("Location: /lego_shop_php/account/login");
+                header("Location: /account/login");
             }
             exit();
         }
@@ -116,7 +116,7 @@ class AccountController extends Controller {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         session_unset();
         session_destroy();
-        header("Location: /lego_shop_php/home");
+        header("Location: /home");
         exit();
     }
 
@@ -139,10 +139,10 @@ class AccountController extends Controller {
 
             if ($account) {
                 $_SESSION['reset_account_id'] = $account['id'];
-                header("Location: /lego_shop_php/account/reset");
+                header("Location: /account/reset");
             } else {
                 $_SESSION['forgot_error'] = "Không tìm thấy tài khoản với Email/SĐT này!";
-                header("Location: /lego_shop_php/account/forgot");
+                header("Location: /account/forgot");
             }
             exit();
         }
@@ -153,7 +153,7 @@ class AccountController extends Controller {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         
         if (!isset($_SESSION['reset_account_id'])) {
-            header("Location: /lego_shop_php/account/login");
+            header("Location: /account/login");
             exit();
         }
 
@@ -172,7 +172,7 @@ class AccountController extends Controller {
 
             if ($password !== $confirm_password) {
                 $_SESSION['reset_error'] = "Mật khẩu xác nhận không khớp!";
-                header("Location: /lego_shop_php/account/reset");
+                header("Location: /account/reset");
                 exit();
             }
 
@@ -181,7 +181,7 @@ class AccountController extends Controller {
 
             unset($_SESSION['reset_account_id']);
             $_SESSION['success_msg'] = "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.";
-            header("Location: /lego_shop_php/account/login");
+            header("Location: /account/login");
             exit();
         }
     }

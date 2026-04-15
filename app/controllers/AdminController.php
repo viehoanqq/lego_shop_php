@@ -3,16 +3,16 @@ class AdminController extends Controller {
     
     public function index() {
         if (!isset($_SESSION['admin_id'])) {
-            header("Location: /lego_shop_php/admin/login");
+            header("Location: /admin/login");
             exit;
         }
-        header("Location: /lego_shop_php/admindashboard");
+        header("Location: /admindashboard");
         exit;
     }
 
     public function login() {
         if (isset($_SESSION['admin_id'])) {
-            header("Location: /lego_shop_php/admindashboard");
+            header("Location: /admindashboard");
             exit;
         }
 
@@ -31,7 +31,7 @@ class AdminController extends Controller {
                 $_SESSION['admin_name'] = $adminUser['fullname'];
                 $_SESSION['admin_role'] = $adminUser['role'];
                 
-                header("Location: /lego_shop_php/admindashboard");
+                header("Location: /admindashboard");
                 exit;
             } else {
                 $error = "Tài khoản hoặc mật khẩu không chính xác, hoặc bạn không có quyền Admin!";
@@ -48,13 +48,13 @@ class AdminController extends Controller {
         unset($_SESSION['admin_name']);
         unset($_SESSION['admin_role']);
         
-        header("Location: /lego_shop_php/admin/login");
+        header("Location: /admin/login");
         exit;
     }
     
     public function dashboard() {
         if (!isset($_SESSION['admin_id'])) {
-            header("Location: /lego_shop_php/admin/login");
+            header("Location: /admin/login");
             exit;
         }
         $this->view('admin/dashboard', [
@@ -65,7 +65,7 @@ class AdminController extends Controller {
     /* ================= HỒ SƠ CÁ NHÂN ADMIN (PROFILE) ================= */
     public function profile() {
         if (!isset($_SESSION['admin_id'])) {
-            header("Location: /lego_shop_php/admin/login");
+            header("Location: /admin/login");
             exit;
         }
 
@@ -85,7 +85,7 @@ class AdminController extends Controller {
     /* ================= XỬ LÝ LƯU THÔNG TIN ADMIN ================= */
     public function actionUpdateProfile() {
         if (!isset($_SESSION['admin_id'])) {
-            header("Location: /lego_shop_php/admin/login");
+            header("Location: /admin/login");
             exit;
         }
 
@@ -117,7 +117,7 @@ class AdminController extends Controller {
                     $_SESSION['old_profile'] = $_POST;
                 }
             }
-            header("Location: /lego_shop_php/admin/profile");
+            header("Location: /admin/profile");
             exit;
         }
     }
@@ -125,7 +125,7 @@ class AdminController extends Controller {
     /* ================= XỬ LÝ CẬP NHẬT MẬT KHẨU ADMIN ================= */
     public function actionUpdatePassword() {
         if (!isset($_SESSION['admin_id'])) {
-            header("Location: /lego_shop_php/admin/login");
+            header("Location: /admin/login");
             exit;
         }
 
@@ -156,7 +156,7 @@ class AdminController extends Controller {
                     $_SESSION['toast_type'] = "error";
                 }
             }
-            header("Location: /lego_shop_php/admin/profile");
+            header("Location: /admin/profile");
             exit;
         }
     }

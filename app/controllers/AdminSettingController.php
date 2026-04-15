@@ -4,7 +4,7 @@ class AdminSettingController extends Controller {
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         if (!isset($_SESSION['admin_id'])) { 
-            header("Location: /lego_shop_php/admin/login"); 
+            header("Location: /admin/login"); 
             exit; 
         }
     }
@@ -33,9 +33,9 @@ class AdminSettingController extends Controller {
             }
 
             if ($settingModel->updateSettings($_POST, $logo_name)) {
-                header("Location: /lego_shop_php/adminsetting?msg=success");
+                header("Location: /adminsetting?msg=success");
             } else {
-                header("Location: /lego_shop_php/adminsetting?error=1");
+                header("Location: /adminsetting?error=1");
             }
             exit;
         }

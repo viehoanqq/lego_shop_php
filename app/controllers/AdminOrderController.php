@@ -6,7 +6,7 @@ class AdminOrderController extends Controller {
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         if (!isset($_SESSION['admin_id'])) { 
-            header("Location: /lego_shop_php/admin/login"); 
+            header("Location: /admin/login"); 
             exit; 
         }
     }
@@ -46,7 +46,7 @@ class AdminOrderController extends Controller {
         $order = $orderModel->getOrderById($id);
         
         if (!$order) {
-            header("Location: /lego_shop_php/adminorder?error=notfound");
+            header("Location: /adminorder?error=notfound");
             exit;
         }
 
@@ -78,7 +78,7 @@ class AdminOrderController extends Controller {
             $order = $orderModel->getOrderById($id);
             
             if (!$order) {
-                header("Location: /lego_shop_php/adminorder?error=notfound");
+                header("Location: /adminorder?error=notfound");
                 exit;
             }
 
@@ -125,19 +125,19 @@ class AdminOrderController extends Controller {
                     $orderModel->updateOrderStatusAdmin($id, $new_status, $note);
                     
                     $db->commit();
-                    header("Location: /lego_shop_php/adminorder/detail/$id?msg=status_success");
+                    header("Location: /adminorder/detail/$id?msg=status_success");
                 } catch (Exception $e) {
                     $db->rollback();
-                    header("Location: /lego_shop_php/adminorder/detail/$id?error=stock_error");
+                    header("Location: /adminorder/detail/$id?error=stock_error");
                 }
                 exit;
             }   
             // --- KẾT THÚC LOGIC TRỪ KHO ---
 
             if ($orderModel->updateOrderStatusAdmin($id, $new_status, $note)) {
-                header("Location: /lego_shop_php/adminorder/detail/$id?msg=status_success");
+                header("Location: /adminorder/detail/$id?msg=status_success");
             } else {
-                header("Location: /lego_shop_php/adminorder/detail/$id?error=1");
+                header("Location: /adminorder/detail/$id?error=1");
             }
             exit;
         }
@@ -151,9 +151,9 @@ class AdminOrderController extends Controller {
             $orderModel = $this->model('OrderModel');
             
             if ($orderModel->updatePaymentStatusAdmin($id, $payment_status)) {
-                header("Location: /lego_shop_php/adminorder/detail/$id?msg=payment_success");
+                header("Location: /adminorder/detail/$id?msg=payment_success");
             } else {
-                header("Location: /lego_shop_php/adminorder/detail/$id?error=1");
+                header("Location: /adminorder/detail/$id?error=1");
             }
             exit;
         }

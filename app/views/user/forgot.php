@@ -1,6 +1,6 @@
 <?php $error = $data['error'] ?? null; ?>
 <style>
-    .forgot-wrapper { background: url('/lego_shop_php/public/assets/images/login-bgr.webp') no-repeat center center; background-size: cover; padding: 60px 0; min-height: 100vh; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; }
+    .forgot-wrapper { background: url('/public/assets/images/login-bgr.webp') no-repeat center center; background-size: cover; padding: 60px 0; min-height: 100vh; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; }
     .forgot-card { width: 100%; max-width: 420px; background: rgba(255, 255, 255, 0.96); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); overflow: hidden; }
     .forgot-header { text-align: center; padding: 30px 20px 10px; }
     .forgot-header img { width: 120px; margin-bottom: 10px; }
@@ -25,14 +25,14 @@
 <div class="forgot-wrapper">
     <div class="forgot-card">
         <div class="forgot-header">
-            <img src="/lego_shop_php/public/assets/images/logo.png" alt="LEGO">
+            <img src="/public/assets/images/logo.png" alt="LEGO">
             <h2>Quên mật khẩu</h2>
             <p>Nhập Email hoặc SĐT để tìm lại tài khoản</p>
         </div>
         <div class="forgot-body">
             <?php if ($error): ?> <div class="alert-danger">⚠️ <?= $error ?></div> <?php endif; ?>
 
-            <form id="forgotForm" action="/lego_shop_php/account/actionForgot" method="POST" novalidate>
+            <form id="forgotForm" action="/account/actionForgot" method="POST" novalidate>
                 <div style="margin-bottom: 20px;">
                     <label>Email hoặc Số điện thoại</label>
                     <input type="text" name="username" id="username" required>
@@ -41,7 +41,7 @@
                 <button type="submit" class="btn-submit">TIẾP TỤC</button>
             </form>
             <div class="auth-links">
-                <a href="/lego_shop_php/account/login"><i class="fa-solid fa-arrow-left"></i> Quay lại Đăng nhập</a>
+                <a href="/account/login"><i class="fa-solid fa-arrow-left"></i> Quay lại Đăng nhập</a>
             </div>
         </div>
     </div>

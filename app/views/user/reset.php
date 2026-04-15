@@ -1,7 +1,7 @@
 <?php $error = $data['error'] ?? null; ?>
 <style>
     /* Dùng chung style với trang forgot, chỉ đổi tên class để khóa vùng */
-    .reset-wrapper { background: url('/lego_shop_php/public/assets/images/login-bgr.webp') no-repeat center center; background-size: cover; padding: 60px 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif;}
+    .reset-wrapper { background: url('/public/assets/images/login-bgr.webp') no-repeat center center; background-size: cover; padding: 60px 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif;}
     .reset-card { width: 100%; max-width: 420px; background: rgba(255, 255, 255, 0.96); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); overflow: hidden; }
     .reset-header { text-align: center; padding: 30px 20px 10px; }
     .reset-header h2 { margin: 0; font-size: 22px; color: #a4161a; font-weight: 700; text-transform: uppercase; }
@@ -26,7 +26,7 @@
         <div class="reset-body">
             <?php if ($error): ?> <div class="alert-danger">⚠️ <?= $error ?></div> <?php endif; ?>
 
-            <form id="resetForm" action="/lego_shop_php/account/actionReset" method="POST" novalidate>
+            <form id="resetForm" action="/account/actionReset" method="POST" novalidate>
                 <div style="margin-bottom: 20px;">
                     <label>Mật khẩu mới</label>
                     <input type="password" name="password" id="password" required>

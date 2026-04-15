@@ -72,7 +72,7 @@
     
     <div class="order-header-top">
         <h2><i class="fa-solid fa-file-invoice-dollar" style="color: #3b82f6;"></i> Đơn hàng #DH-<?= $order['id'] ?></h2>
-        <a href="/lego_shop_php/adminorder" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+        <a href="/adminorder" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
     </div>
 
     <?php if(isset($_GET['msg'])): ?>
@@ -117,7 +117,7 @@
                             <?php foreach ($items as $item): ?>
                             <tr>
                                 <td style="display: flex; align-items: center; gap: 10px;">
-                                    <img src="/lego_shop_php/public/assets/images/<?= $item['image_url'] ?? 'default-lego.jpg' ?>" width="40" style="border-radius: 4px; border: 1px solid #e2e8f0; padding: 2px;">
+                                    <img src="/public/assets/images/<?= $item['image_url'] ?? 'default-lego.jpg' ?>" width="40" style="border-radius: 4px; border: 1px solid #e2e8f0; padding: 2px;">
                                     <strong><?= htmlspecialchars($item['name']) ?></strong>
                                 </td>
                                 <td style="text-align: center; font-weight: 600;"><?= $item['quantity'] ?></td>
@@ -150,7 +150,7 @@
                             <i class="fa-solid fa-check-double"></i> Đã xác nhận Thanh toán
                         </div>
                     <?php else: ?>
-                        <form action="/lego_shop_php/adminorder/update_payment/<?= $order['id'] ?>" method="POST" onsubmit="return confirm('XÁC NHẬN:\nBạn đã nhận được tiền từ khách hàng này chưa?')">
+                        <form action="/adminorder/update_payment/<?= $order['id'] ?>" method="POST" onsubmit="return confirm('XÁC NHẬN:\nBạn đã nhận được tiền từ khách hàng này chưa?')">
                             <select name="payment_status" class="form-control">
                                 <option value="unpaid" selected>Chưa thanh toán</option>
                                 <option value="paid">Đã thanh toán (Nhận được tiền)</option>
@@ -185,7 +185,7 @@
                         <i class="fa-solid fa-ban"></i> Đơn hàng đã bị hủy.
                     </div>
                 <?php else: ?>
-                    <form action="/lego_shop_php/adminorder/update_status/<?= $order['id'] ?>" method="POST" id="statusUpdateForm">
+                    <form action="/adminorder/update_status/<?= $order['id'] ?>" method="POST" id="statusUpdateForm">
                         
                         <div style="margin-bottom: 12px;">
                             <label class="form-label">Chọn trạng thái mới:</label>

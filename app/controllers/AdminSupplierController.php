@@ -6,7 +6,7 @@ class AdminSupplierController extends Controller {
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         if (!isset($_SESSION['admin_id'])) { 
-            header("Location: /lego_shop_php/admin/login"); exit; 
+            header("Location: /admin/login"); exit; 
         }
         $this->supplierModel = $this->model('SupplierModel');
     }
@@ -54,7 +54,7 @@ class AdminSupplierController extends Controller {
     public function edit($id) {
         $supplier = $this->supplierModel->getSupplierById($id);
         if (!$supplier) {
-            header('Location: /lego_shop_php/adminsupplier'); exit;
+            header('Location: /adminsupplier'); exit;
         }
 
         $filters = ['keyword' => '', 'status' => 'all'];
@@ -78,21 +78,21 @@ class AdminSupplierController extends Controller {
 
             if (empty($data['name']) || empty($data['phone'])) {
                 set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/adminsupplier/add'); exit;
+                header('Location: /adminsupplier/add'); exit;
             }
 
             // --- KIỂM TRA TRÙNG LẶP LÚC THÊM MỚI ---
             if ($this->supplierModel->isNameExists($data['name'])) {
                 set_flash_message('error', 'name_exists');
-                header('Location: /lego_shop_php/adminsupplier/add'); exit;
+                header('Location: /adminsupplier/add'); exit;
             }
             if ($this->supplierModel->isPhoneExists($data['phone'])) {
                 set_flash_message('error', 'phone_exists');
-                header('Location: /lego_shop_php/adminsupplier/add'); exit;
+                header('Location: /adminsupplier/add'); exit;
             }
             if (!empty($data['email']) && $this->supplierModel->isEmailExists($data['email'])) {
                 set_flash_message('error', 'email_exists');
-                header('Location: /lego_shop_php/adminsupplier/add'); exit;
+                header('Location: /adminsupplier/add'); exit;
             }
 
             if ($this->supplierModel->insertSupplier($data)) {
@@ -100,7 +100,7 @@ class AdminSupplierController extends Controller {
             } else {
                 set_flash_message('error', 'db');
             }
-            header('Location: /lego_shop_php/adminsupplier'); exit;
+            header('Location: /adminsupplier'); exit;
         }
     }
 
@@ -116,21 +116,21 @@ class AdminSupplierController extends Controller {
 
             if (empty($data['name']) || empty($data['phone'])) {
                 set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/adminsupplier/edit/'.$id); exit;
+                header('Location: /adminsupplier/edit/'.$id); exit;
             }
 
             // --- KIỂM TRA TRÙNG LẶP LÚC SỬA (BỎ QUA ID HIỆN TẠI) ---
             if ($this->supplierModel->isNameExists($data['name'], $id)) {
                 set_flash_message('error', 'name_exists');
-                header('Location: /lego_shop_php/adminsupplier/edit/'.$id); exit;
+                header('Location: /adminsupplier/edit/'.$id); exit;
             }
             if ($this->supplierModel->isPhoneExists($data['phone'], $id)) {
                 set_flash_message('error', 'phone_exists');
-                header('Location: /lego_shop_php/adminsupplier/edit/'.$id); exit;
+                header('Location: /adminsupplier/edit/'.$id); exit;
             }
             if (!empty($data['email']) && $this->supplierModel->isEmailExists($data['email'], $id)) {
                 set_flash_message('error', 'email_exists');
-                header('Location: /lego_shop_php/adminsupplier/edit/'.$id); exit;
+                header('Location: /adminsupplier/edit/'.$id); exit;
             }
 
             if ($this->supplierModel->updateSupplier($id, $data)) {
@@ -138,7 +138,7 @@ class AdminSupplierController extends Controller {
             } else {
                 set_flash_message('error', 'db');
             }
-            header('Location: /lego_shop_php/adminsupplier'); exit;
+            header('Location: /adminsupplier'); exit;
         }
     }
 
@@ -151,7 +151,7 @@ class AdminSupplierController extends Controller {
                 set_flash_message('error', 'db');
             }
         }
-        header('Location: /lego_shop_php/adminsupplier'); exit;
+        header('Location: /adminsupplier'); exit;
     }
 
     public function delete($id) {
@@ -174,7 +174,7 @@ class AdminSupplierController extends Controller {
             }
         }
         
-        header('Location: /lego_shop_php/adminsupplier');
+        header('Location: /adminsupplier');
         exit;
     }
     // THÊM HÀM MỚI: Khôi phục
@@ -185,7 +185,7 @@ class AdminSupplierController extends Controller {
         } else {
             set_flash_message('error', 'db');
         }
-        header('Location: /lego_shop_php/adminsupplier');
+        header('Location: /adminsupplier');
         exit;
     }
 }

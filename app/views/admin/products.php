@@ -167,7 +167,7 @@ $session_error = get_flash_message('error');
 <?php if(!isset($is_form) || $is_form === false): ?>
     <div class="header">
         <div class="header-left">
-            <form action="/lego_shop_php/adminproduct" method="GET" class="search-form">
+            <form action="/adminproduct" method="GET" class="search-form">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" name="keyword" placeholder="Tìm tên sản phẩm, mã SKU..." value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>">
@@ -187,7 +187,7 @@ $session_error = get_flash_message('error');
                 </select>
             </form>
         </div>
-        <a href="/lego_shop_php/adminproduct/add" class="btn-add-product">
+        <a href="/adminproduct/add" class="btn-add-product">
             <i class="fa-solid fa-plus"></i> Thêm sản phẩm
         </a>
     </div>
@@ -211,9 +211,9 @@ $session_error = get_flash_message('error');
                     <tr style="<?= $p['status'] == 3 ? 'opacity: 0.6; background: #f8fafc;' : '' ?>">
                         <td>
                             <div class="product-cell">
-                                <img src="/lego_shop_php/public/assets/images/<?= !empty($p['main_image']) ? $p['main_image'] : 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/60x60?text=LEGO'">
+                                <img src="/public/assets/images/<?= !empty($p['main_image']) ? $p['main_image'] : 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/60x60?text=LEGO'">
                                 <div>
-                                    <a href="/lego_shop_php/adminproduct/edit/<?= $p['id'] ?>" style="text-decoration: none; display: block;">
+                                    <a href="/adminproduct/edit/<?= $p['id'] ?>" style="text-decoration: none; display: block;">
                                         <div style="font-weight: 700; color: #3182ce;"><?= htmlspecialchars($p['name']) ?></div>
                                     </a>
                                     <div style="font-size: 11px; color: #a0aec0;">SKU: <?= strtoupper($p['sku']) ?></div>
@@ -243,11 +243,11 @@ $session_error = get_flash_message('error');
                         </td>
                         <td>
                             <div style="display: flex; gap: 8px; justify-content: center;">
-                                <a href="/lego_shop_php/adminproduct/edit/<?= $p['id'] ?>" class="btn-action" title="Chỉnh sửa" style="color: #3182ce; border-color: #3182ce;">
+                                <a href="/adminproduct/edit/<?= $p['id'] ?>" class="btn-action" title="Chỉnh sửa" style="color: #3182ce; border-color: #3182ce;">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
                                 <?php if($p['status'] == 3): ?>
-                                    <a href="/lego_shop_php/adminproduct/restore/<?= $p['id'] ?>" class="btn-action" style="color: #38a169; border-color: #38a169;" title="Khôi phục bán lại" onclick="return confirm('Bạn muốn khôi phục sản phẩm này?')">
+                                    <a href="/adminproduct/restore/<?= $p['id'] ?>" class="btn-action" style="color: #38a169; border-color: #38a169;" title="Khôi phục bán lại" onclick="return confirm('Bạn muốn khôi phục sản phẩm này?')">
                                         <i class="fa-solid fa-rotate-left"></i>
                                     </a>
                                 <?php else: ?>
@@ -256,10 +256,10 @@ $session_error = get_flash_message('error');
                                         $btnIcon  = $isActive ? 'fa-eye-slash' : 'fa-eye';
                                         $btnColor = $isActive ? '#dd6b20' : '#38a169'; 
                                     ?>
-                                    <a href="/lego_shop_php/adminproduct/toggleStatus/<?= $p['id'] ?>?current=<?= $p['status'] ?>" class="btn-action" style="color: <?= $btnColor ?>; border-color: <?= $btnColor ?>;" title="<?= $isActive ? 'Ẩn / Khóa' : 'Hiện / Mở bán' ?>">
+                                    <a href="/adminproduct/toggleStatus/<?= $p['id'] ?>?current=<?= $p['status'] ?>" class="btn-action" style="color: <?= $btnColor ?>; border-color: <?= $btnColor ?>;" title="<?= $isActive ? 'Ẩn / Khóa' : 'Hiện / Mở bán' ?>">
                                         <i class="fa-solid <?= $btnIcon ?>"></i>
                                     </a>
-                                    <a href="/lego_shop_php/adminproduct/delete/<?= $p['id'] ?>" class="btn-action" style="color: #e53e3e; border-color: #e53e3e;" onclick="return confirm('Bạn có chắc muốn xóa/ẩn sản phẩm này?')">
+                                    <a href="/adminproduct/delete/<?= $p['id'] ?>" class="btn-action" style="color: #e53e3e; border-color: #e53e3e;" onclick="return confirm('Bạn có chắc muốn xóa/ẩn sản phẩm này?')">
                                         <i class="fa-solid fa-trash"></i>
                                     </a>
                                 <?php endif; ?>
@@ -290,7 +290,7 @@ $session_error = get_flash_message('error');
             <?= isset($product) ? '<i class="fa-solid fa-pen-to-square" style="color: #3182ce;"></i> Chỉnh sửa: ' . htmlspecialchars($product['name']) : '<i class="fa-solid fa-folder-plus" style="color: #38a169;"></i> Thêm sản phẩm mới' ?>
         </h3>
         
-        <form id="productForm" action="<?= isset($product) ? '/lego_shop_php/adminproduct/update/'.$product['id'] : '/lego_shop_php/adminproduct/store' ?>" method="POST" enctype="multipart/form-data">
+        <form id="productForm" action="<?= isset($product) ? '/adminproduct/update/'.$product['id'] : '/adminproduct/store' ?>" method="POST" enctype="multipart/form-data">
             <div style="display: flex; gap: 25px; flex-wrap: wrap;">
                 <div style="flex: 2; min-width: 400px;">
                     <div class="section-block">
@@ -399,7 +399,7 @@ $session_error = get_flash_message('error');
                             </div>
                             <?php if(isset($product)): ?>
                                 <small style="color:#e53e3e; margin-top:6px; font-weight: 600;">
-                                    <i class="fa-solid fa-lock" style="margin-right: 4px;"></i> Đã khóa. Vui lòng cập nhật qua <a href="/lego_shop_php/adminprice" style="color: #3182ce; text-decoration: underline;">Quản lý Giá bán</a>.
+                                    <i class="fa-solid fa-lock" style="margin-right: 4px;"></i> Đã khóa. Vui lòng cập nhật qua <a href="/adminprice" style="color: #3182ce; text-decoration: underline;">Quản lý Giá bán</a>.
                                 </small>
                             <?php else: ?>
                                 <small style="color:#718096; margin-top:4px;">Hệ thống sẽ gợi ý giá bán dựa trên tỉ lệ này khi nhập hàng.</small>
@@ -451,10 +451,23 @@ $session_error = get_flash_message('error');
                         <button type="button" class="btn-remove-img" onclick="deleteExistingImage(<?= $img['id'] ?>)" title="Xóa vĩnh viễn ảnh này">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-            
+                        <h4 class="section-title-form">4. Hình ảnh đại diện</h4>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <input type="file" id="main_image" name="main_image" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                            <div class="image-upload-box" onclick="document.getElementById('main_image').click()">
+                                <?php if(!empty($product['main_image'])): ?>
+                                    <img id="image_preview" src="/public/assets/images/<?= $product['main_image'] ?>">
+                                    <div class="image-upload-placeholder" id="image_placeholder" style="display:none;">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i><br>Đổi ảnh khác
+                                    </div>
+                                <?php else: ?>
+                                    <img id="image_preview" src="" style="display:none;">
+                                    <div class="image-upload-placeholder" id="image_placeholder">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i><br>Nhấn để chọn ảnh
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
             </div>
     </div>
 </div>
@@ -462,7 +475,7 @@ $session_error = get_flash_message('error');
             </div>
             <div style="display: flex; gap: 12px; margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
                 <button type="submit" class="btn-submit"><i class="fa-solid fa-floppy-disk"></i> Lưu toàn bộ thông tin</button>
-                <a href="/lego_shop_php/adminproduct" style="padding: 10px 20px; color: #475569; text-decoration: none; font-weight: 600; background: #edf2f7; border-radius: 8px;">Quay lại</a>
+                <a href="/adminproduct" style="padding: 10px 20px; color: #475569; text-decoration: none; font-weight: 600; background: #edf2f7; border-radius: 8px;">Quay lại</a>
             </div>
         </form>
     </div>

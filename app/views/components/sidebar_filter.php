@@ -1,5 +1,5 @@
 <aside class="sidebar-filter">
-    <form action="/lego_shop_php/product/filter" method="GET" id="filterForm">
+    <form action="/product/filter" method="GET" id="filterForm">
         
         <div class="filter-group">
             <h3 class="filter-title"><i class="fa-solid fa-layer-group"></i> Danh mục</h3>
@@ -96,7 +96,7 @@
             <button type="submit" class="btn-apply-filter">
                 <i class="fa-solid fa-filter"></i> ÁP DỤNG BỘ LỌC
             </button>
-            <a href="/lego_shop_php/product" class="btn-clear-filter">
+            <a href="/product" class="btn-clear-filter">
                 <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
             </a>
         </div>

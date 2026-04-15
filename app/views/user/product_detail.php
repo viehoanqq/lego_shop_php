@@ -8,14 +8,14 @@
             <div class="product-gallery">
                 <div class="main-image-box">
                     <?php $main_image = !empty($images) ? $images[0]['image_url'] : 'default-lego.jpg'; ?>
-                    <img id="mainImage" src="/lego_shop_php/public/assets/images/<?= $main_image ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+                    <img id="mainImage" src="/public/assets/images/<?= $main_image ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                 </div>
                 
                 <div class="thumbnail-list">
                     <?php if(!empty($images)): ?>
                         <?php foreach($images as $img): ?>
                             <div class="thumb-item" onclick="changeMainImage('<?= $img['image_url'] ?>')">
-                                <img src="/lego_shop_php/public/assets/images/<?= $img['image_url'] ?>" alt="Thumbnail">
+                                <img src="/public/assets/images/<?= $img['image_url'] ?>" alt="Thumbnail">
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -339,7 +339,7 @@
 <script>
 // Chuyển đổi ảnh chính khi click thumbnail
 function changeMainImage(imgUrl) {
-    document.getElementById('mainImage').src = "/lego_shop_php/public/assets/images/" + imgUrl;
+    document.getElementById('mainImage').src = "/public/assets/images/" + imgUrl;
 }
 
 // Chuyển đổi Tabs Mô tả / Thông số / Đánh giá
@@ -369,7 +369,7 @@ function handleCartAction(action) {
     
     if (!isLoggedIn) {
         showToast("Vui lòng đăng nhập để mua hàng!", "error");
-        setTimeout(() => { window.location.href = '/lego_shop_php/account/login'; }, 1500);
+        setTimeout(() => { window.location.href = '/account/login'; }, 1500);
         return;
     }
 
@@ -383,7 +383,7 @@ function handleCartAction(action) {
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
     btn.style.pointerEvents = 'none';
 
-    fetch('/lego_shop_php/cart/addAjax', { 
+    fetch('/cart/addAjax', { 
         method: 'POST', 
         body: formData 
     })
@@ -395,7 +395,7 @@ function handleCartAction(action) {
 
         if(data.success) {
             if (action === 'buy_now') {
-                window.location.href = '/lego_shop_php/cart';
+                window.location.href = '/cart';
             } else {
                 showToast("Đã thêm vào giỏ hàng!", "success");
                 // Tự động cập nhật số trên icon giỏ hàng (Nếu bạn có hàm updateCartBadge)

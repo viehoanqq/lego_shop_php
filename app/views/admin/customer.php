@@ -153,7 +153,7 @@ $session_error = get_flash_message('error');
     <div class="header-sync">
         <div class="header-left-group">
             
-            <form action="/lego_shop_php/admincustomer/index" method="GET" class="filter-form-sync">
+            <form action="/admincustomer/index" method="GET" class="filter-form-sync">
                 <div class="search-wrapper-sync">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" name="search" class="form-control-sync search-input-sync" 
@@ -170,7 +170,7 @@ $session_error = get_flash_message('error');
                 </select>
             </form>
         </div>
-        <a href="/lego_shop_php/admincustomer/add" class="btn-add">
+        <a href="/admincustomer/add" class="btn-add">
             <i class="fa-solid fa-plus"></i> Thêm người dùng
         </a>
     </div>
@@ -229,11 +229,11 @@ $session_error = get_flash_message('error');
                         <td style="text-align: center; white-space: nowrap;">
                             <div style="display: flex; justify-content: center; gap: 5px;">
                                 <?php if($is_deleted): ?>
-                                    <a href="/lego_shop_php/admincustomer/restore/<?= $user['id'] ?>" class="btn-action btn-edit" style="color: #38a169; background: #f0fff4;" title="Khôi phục" onclick="return confirm('Bạn muốn khôi phục tài khoản này?')">
+                                    <a href="/admincustomer/restore/<?= $user['id'] ?>" class="btn-action btn-edit" style="color: #38a169; background: #f0fff4;" title="Khôi phục" onclick="return confirm('Bạn muốn khôi phục tài khoản này?')">
                                         <i class="fa-solid fa-rotate-left"></i> Khôi phục
                                     </a>
                                 <?php else: ?>
-                                    <a href="/lego_shop_php/admincustomer/edit/<?= $user['id'] ?>?search=<?= urlencode($search ?? '') ?>&status=<?= $status ?? '' ?>&page=<?= $currentPage ?? 1 ?>" class="btn-action btn-edit" title="Chỉnh sửa">
+                                    <a href="/admincustomer/edit/<?= $user['id'] ?>?search=<?= urlencode($search ?? '') ?>&status=<?= $status ?? '' ?>&page=<?= $currentPage ?? 1 ?>" class="btn-action btn-edit" title="Chỉnh sửa">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
 
@@ -241,11 +241,11 @@ $session_error = get_flash_message('error');
                                         $isLocked = ($user['status'] !== 'active');
                                         $statusClass = $isLocked ? 'is-unlocking' : 'is-locking';
                                     ?>
-                                    <a href="/lego_shop_php/admincustomer/toggleStatus/<?= $user['id'] ?>" class="btn-action btn-status-toggle <?= $statusClass ?>" onclick="return confirm('Xác nhận <?= $isLocked ? 'MỞ KHÓA' : 'KHÓA' ?> tài khoản này?')">
+                                    <a href="/admincustomer/toggleStatus/<?= $user['id'] ?>" class="btn-action btn-status-toggle <?= $statusClass ?>" onclick="return confirm('Xác nhận <?= $isLocked ? 'MỞ KHÓA' : 'KHÓA' ?> tài khoản này?')">
                                         <i class="fa-solid <?= $isLocked ? 'fa-unlock' : 'fa-lock' ?>"></i>
                                     </a>
 
-                                    <a href="/lego_shop_php/admincustomer/delete/<?= $user['id'] ?>" class="btn-action btn-delete" title="Xóa" onclick="return confirm('CẢNH BÁO: Xóa tài khoản này?\n\nNếu người dùng đã có đơn hàng, hệ thống sẽ chỉ TẠM ẨN để bảo lưu dữ liệu kế toán.')">
+                                    <a href="/admincustomer/delete/<?= $user['id'] ?>" class="btn-action btn-delete" title="Xóa" onclick="return confirm('CẢNH BÁO: Xóa tài khoản này?\n\nNếu người dùng đã có đơn hàng, hệ thống sẽ chỉ TẠM ẨN để bảo lưu dữ liệu kế toán.')">
                                         <i class="fa-solid fa-trash"></i>
                                     </a>
                                 <?php endif; ?>
@@ -259,7 +259,7 @@ $session_error = get_flash_message('error');
     </div>
 
     <?php 
-        $baseUrl = "/lego_shop_php/admincustomer/index";
+        $baseUrl = "/admincustomer/index";
         $queryString = "?search=" . urlencode($search ?? '') . "&status=" . ($status ?? '');
     ?>
 
@@ -294,7 +294,7 @@ $session_error = get_flash_message('error');
             </h3>
         </div>
         
-        <form action="/lego_shop_php/admincustomer/<?= (!empty($customer) && isset($customer['id'])) ? 'update/'.$customer['id'] : 'store' ?>" method="POST">    
+        <form action="/admincustomer/<?= (!empty($customer) && isset($customer['id'])) ? 'update/'.$customer['id'] : 'store' ?>" method="POST">    
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
                 <div>
@@ -364,7 +364,7 @@ $session_error = get_flash_message('error');
                     <i class="fa-solid fa-floppy-disk"></i> 
                     <?= (!empty($customer)) ? 'CẬP NHẬT TÀI KHOẢN' : 'TẠO MỚI NGƯỜI DÙNG' ?>
                 </button>
-                <a href="/lego_shop_php/admincustomer" class="btn-cancel-link">Hủy bỏ / Quay lại</a>
+                <a href="/admincustomer" class="btn-cancel-link">Hủy bỏ / Quay lại</a>
             </div>
         </form>
     </div>

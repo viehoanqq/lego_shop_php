@@ -8,7 +8,7 @@
                 <h2 class="section-title text-red" style="margin-bottom: 8px;">Đổi mật khẩu</h2>
                 <p class="section-desc" style="margin-bottom: 25px;">Để bảo mật tài khoản, vui lòng không chia sẻ mật khẩu cho người khác</p>
 
-                <form id="changePasswordForm" action="/lego_shop_php/profile/actionUpdatePassword" method="POST" novalidate class="modal-form">
+                <form id="changePasswordForm" action="/profile/actionUpdatePassword" method="POST" novalidate class="modal-form">
                     
                     <div class="form-group">
                         <label>Mật khẩu hiện tại <span class="text-red">*</span></label>
@@ -17,7 +17,7 @@
                             <i class="fa-solid fa-eye-slash toggle-pwd"></i>
                         </div>
                         <span class="error-msg" id="old_password-error"></span>
-                        <a href="/lego_shop_php/account/forgot" class="forgot-link">Quên mật khẩu?</a>
+                        <a href="/account/forgot" class="forgot-link">Quên mật khẩu?</a>
                     </div>
 
                     <div class="form-group" style="margin-top: 15px;">

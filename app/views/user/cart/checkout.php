@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/lego_shop_php/public/assets/css/cart.css?v=<?= time() ?>">
+<link rel="stylesheet" href="/public/assets/css/cart.css?v=<?= time() ?>">
 <div class="checkout-page-wrapper">
     <div class="checkout-container">
         <?php $current_step = 2; require __DIR__ . '/../../components/checkout_progress.php'; ?>
@@ -8,7 +8,7 @@
             <p style="color: #666;">Vui lòng kiểm tra lại thông tin trước khi xác nhận.</p>
         </div>
 
-        <form action="/lego_shop_php/checkout/process" method="POST" id="checkoutForm">
+        <form action="/checkout/process" method="POST" id="checkoutForm">
             <div class="checkout-layout">
                 
                 <div class="checkout-left">
@@ -103,7 +103,7 @@
                             </label>
                         </div>
                         <div class="back-to-cart-wrapper">
-                            <a href="/lego_shop_php/cart" class="btn-back-red">
+                            <a href="/cart" class="btn-back-red">
                                 <i class="fa-solid fa-arrow-left"></i> Quay lại giỏ hàng
                             </a>
                         </div>
@@ -118,7 +118,7 @@
                                 $img = !empty($item['main_image']) ? $item['main_image'] : 'default-lego.jpg';
                             ?>
                                 <div class="order-summary-item">
-                                    <img src="/lego_shop_php/public/assets/images/<?= $img ?>" alt="">
+                                    <img src="/public/assets/images/<?= $img ?>" alt="">
                                     <div class="order-item-info">
                                         <div class="order-item-name"><?= htmlspecialchars($item['name']) ?></div>
                                         <div class="order-item-qty">x<?= $item['quantity'] ?></div> </div>
@@ -208,7 +208,7 @@
         street: street
     };
 
-    fetch('/lego_shop_php/profile/addAddressAjax', {
+    fetch('/profile/addAddressAjax', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)

@@ -55,7 +55,7 @@ private $password = "";         // Mật khẩu DB (nếu có)
 Chỉnh sửa nếu bạn dùng tên database hoặc thông tin kết nối khác.
 
 ### Bước 4: Chạy ứng dụng
-- Mở trình duyệt và truy cập `http://localhost/lego_shop_php/`.
+- Mở trình duyệt và truy cập `http://localhost/`.
 
 ## Các tính năng nổi bật
 

@@ -134,7 +134,7 @@
 
 <div class="dashboard-wrapper">
     <div class="stat-top">
-        <a href="/lego_shop_php/adminorder?search=&status=all&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem tất cả đơn hôm nay">
+        <a href="/adminorder?search=&status=all&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem tất cả đơn hôm nay">
             <div class="stat-header">
                 <div class="stat-info">
                     <h3>Tổng đơn hôm nay</h3>
@@ -155,7 +155,7 @@
             <div class="stat-note"><i class="fa-solid fa-check-circle" style="color: #94a3b8;"></i> Từ các đơn đã giao thành công</div>
         </div>
 
-        <a href="/lego_shop_php/adminorder?search=&status=cancelled&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem các đơn bị hủy hôm nay">
+        <a href="/adminorder?search=&status=cancelled&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem các đơn bị hủy hôm nay">
             <div class="stat-header">
                 <div class="stat-info">
                     <h3>Đơn hàng bị hủy</h3>
@@ -224,7 +224,7 @@
     <div class="recent-orders-card">
         <div class="card-title" style="margin-bottom: 10px;">
             <span style="display: flex; align-items: center; gap: 10px;"><i class="fa-regular fa-clipboard" style="color: #3b82f6; padding: 8px; background: #eff6ff; border-radius: 8px;"></i> Đơn hàng mới nhất</span>
-            <a href="/lego_shop_php/adminorder" style="font-size: 13px; color: #fff; background: #3b82f6; text-decoration: none; font-weight: 600; padding: 6px 14px; border-radius: 8px; transition: 0.2s;">Xem tất cả <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="/adminorder" style="font-size: 13px; color: #fff; background: #3b82f6; text-decoration: none; font-weight: 600; padding: 6px 14px; border-radius: 8px; transition: 0.2s;">Xem tất cả <i class="fa-solid fa-arrow-right"></i></a>
         </div>
         
         <div style="overflow-x: auto;">
@@ -256,7 +256,7 @@
                             $badge = $badge_map[$st] ?? $badge_map['pending'];
                             $pm = $don['payment_method'] ?? 'cash';
                         ?>
-                        <tr class="clickable-row" onclick="window.location.href='/lego_shop_php/adminorder/detail/<?= $don['id'] ?>'">
+                        <tr class="clickable-row" onclick="window.location.href='/adminorder/detail/<?= $don['id'] ?>'">
                             <td>
                                 <span style="font-family: monospace; font-size: 15px; font-weight: 800; color: #3b82f6;">
                                     #<?= $don['id'] ?>

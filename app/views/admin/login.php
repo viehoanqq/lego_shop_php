@@ -6,13 +6,13 @@
     <title>Admin Login - LEGO World Store</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
-    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin.css">
+    <link rel="stylesheet" href="/public/assets/css/admin.css">
 </head>
 <body class="admin-body">
 
 <div class="login-admin-wrapper">
     <div class="login-admin-header">
-        <img src="/lego_shop_php/public/assets/images/logo.png" class="admin-logo" alt="LEGO Logo">
+        <img src="/public/assets/images/logo.png" class="admin-logo" alt="LEGO Logo">
         <h2>ADMIN PANEL</h2>
         <p>Control panel login</p>
     </div>
@@ -24,7 +24,7 @@
             </p>
         <?php endif; ?>
 
-        <form action="/lego_shop_php/admin/login" method="POST">
+        <form action="/admin/login" method="POST">
             <div class="admin-form-group">
                 <i class="fa-solid fa-user"></i>
                 <input type="text" name="username" placeholder="admin" required autocomplete="off">

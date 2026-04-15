@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/lego_shop_php/public/assets/css/checkout.css?v=<?= time() ?>">
+<link rel="stylesheet" href="/public/assets/css/checkout.css?v=<?= time() ?>">
 
 <style>
     /* CSS dành riêng cho trang thông báo thành công */
@@ -135,10 +135,10 @@
                 </p>
 
                 <div class="action-buttons">
-                    <a href="/lego_shop_php/home" class="btn-outline-red">
+                    <a href="/home" class="btn-outline-red">
                         <i class="fa-solid fa-house"></i> Về trang chủ
                     </a>
-                    <a href="/lego_shop_php/checkout/view_order?order_id=<?= $order_id ?>" class="btn-solid-red">Xem lại đơn hàng </a>
+                    <a href="/checkout/view_order?order_id=<?= $order_id ?>" class="btn-solid-red">Xem lại đơn hàng </a>
                 </div>
             </div>
         </div>

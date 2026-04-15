@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/lego_shop_php/public/assets/css/cart.css?v=<?= time() ?>">
+<link rel="stylesheet" href="/public/assets/css/cart.css?v=<?= time() ?>">
 
 <div class="cart-page-wrapper">
     <div class="cart-container">
@@ -15,10 +15,10 @@
 
         <?php if (empty($cart_items)): ?>
             <div class="empty-cart">
-                <img src="/lego_shop_php/public/assets/images/empty-cart.png" 
+                <img src="/public/assets/images/empty-cart.png" 
                      onerror="this.src='https://cdn-icons-png.flaticon.com/512/11329/11329060.png'" alt="Empty Cart">
                 <p>Giỏ hàng của bạn đang trống</p>
-                <a href="/lego_shop_php/product" class="btn-continue-shopping">Tiếp tục mua sắm</a>
+                <a href="/product" class="btn-continue-shopping">Tiếp tục mua sắm</a>
             </div>
         <?php else: ?>
             <div class="cart-layout">
@@ -41,11 +41,11 @@
                         ?>
                             <div class="cart-item" id="item-<?= $item['cart_item_id'] ?>">
                                 <div class="item-col item-info" style="width: 45%;">
-                                    <a href="/lego_shop_php/product/detail/<?= $item['product_id'] ?>">
-                                        <img src="/lego_shop_php/public/assets/images/<?= htmlspecialchars($img_src) ?>" alt="Product">
+                                    <a href="/product/detail/<?= $item['product_id'] ?>">
+                                        <img src="/public/assets/images/<?= htmlspecialchars($img_src) ?>" alt="Product">
                                     </a>
                                     <div class="item-details">
-                                        <a href="/lego_shop_php/product/detail/<?= $item['product_id'] ?>" class="item-name"><?= htmlspecialchars($item['name']) ?></a>
+                                        <a href="/product/detail/<?= $item['product_id'] ?>" class="item-name"><?= htmlspecialchars($item['name']) ?></a>
                                     </div>
                                 </div>
                                 
@@ -92,7 +92,7 @@
                             <span class="text-red font-weight-bold">Tổng cộng:</span>
                             <span id="summary-total" class="text-red font-weight-bold" style="font-size: 22px;"><?= number_format($total_price, 0, ',', '.') ?>đ</span>
                         </div>
-                        <button class="btn-checkout" onclick="window.location.href='/lego_shop_php/checkout'">Thanh toán ngay</button>
+                        <button class="btn-checkout" onclick="window.location.href='/checkout'">Thanh toán ngay</button>
                     </div>
                 </div>
 
@@ -182,4 +182,4 @@ function checkAndUpdateCartQty(cartItemId, action) {
 
 </script>
 
-<script src="/lego_shop_php/public/assets/js/cart.js?v=<?= time() ?>"></script>
+<script src="/public/assets/js/cart.js?v=<?= time() ?>"></script>

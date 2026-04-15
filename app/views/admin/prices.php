@@ -46,7 +46,7 @@
 
 <div class="admin-header1" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px;">
 <div style="background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
-    <form id="filterForm" action="/lego_shop_php/adminprice" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+    <form id="filterForm" action="/adminprice" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
         
         <div style="flex: 1; min-width: 250px;">
             <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Tìm kiếm sản phẩm</label>
@@ -72,7 +72,7 @@
         </div>
 
         <div>
-            <a href="/lego_shop_php/adminprice" style="display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; text-decoration: none; padding: 0 20px; border-radius: 6px; font-weight: 600; height: 42px; transition: 0.2s;">
+            <a href="/adminprice" style="display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; text-decoration: none; padding: 0 20px; border-radius: 6px; font-weight: 600; height: 42px; transition: 0.2s;">
                 <i class="fa-solid fa-rotate-right" style="margin-right: 5px;"></i> Xóa lọc
             </a>
         </div>
@@ -104,7 +104,7 @@
                 
                 <td>
                     <div class="product-cell">
-                        <img src="/lego_shop_php/public/assets/images/<?= !empty($p['main_image']) ? $p['main_image'] : 'default.jpg' ?>" 
+                        <img src="/public/assets/images/<?= !empty($p['main_image']) ? $p['main_image'] : 'default.jpg' ?>" 
                              class="img-product" 
                              onerror="this.src='https://placehold.co/60x60?text=LEGO'">
                         <div>
@@ -145,7 +145,7 @@
                             <i class="fa-solid fa-floppy-disk"></i> Lưu
                         </button>
                         
-                        <a href="/lego_shop_php/adminprice/history/<?= $p['id'] ?>" 
+                        <a href="/adminprice/history/<?= $p['id'] ?>" 
                            style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 7px 12px; border-radius: 6px; text-decoration: none; transition: 0.2s;" 
                            title="Tra cứu theo lô hàng">
                             <i class="fa-solid fa-clock-rotate-left"></i>
@@ -165,7 +165,7 @@
         if (!empty($filters['category_id'])) $query_params['category_id'] = $filters['category_id'];
         
         $base_query = http_build_query($query_params);
-        $url_prefix = "/lego_shop_php/adminprice?" . (!empty($base_query) ? $base_query . "&" : "");
+        $url_prefix = "/adminprice?" . (!empty($base_query) ? $base_query . "&" : "");
     ?>
     
     <div class="pagination">
@@ -237,7 +237,7 @@ async function savePrice(id) {
     btn.style.background = '#718096';
     
     try {
-        const res = await fetch('/lego_shop_php/adminprice/update', {
+        const res = await fetch('/adminprice/update', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ product_id: id, profit_margin: margin, selling_price: sell })

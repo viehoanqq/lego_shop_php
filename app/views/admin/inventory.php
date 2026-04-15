@@ -106,7 +106,7 @@
             <h2>Tra cứu tồn kho theo ngày</h2>
             <p>Chọn một ngày trong quá khứ để xem sổ sách (Chỉ tính các đơn hàng và phiếu nhập đã hoàn tất).</p>
             
-            <form action="/lego_shop_php/admininventory" method="GET" class="filter-form" style="margin-bottom: 0;">
+            <form action="/admininventory" method="GET" class="filter-form" style="margin-bottom: 0;">
                 <input type="hidden" name="tab" value="overview">
                 
                 <div class="search-wrapper">
@@ -145,7 +145,7 @@
                         <tr class="overview-row" data-id="<?= $ap['id'] ?>" data-min="<?= $ap['min_stock_level'] ?>" data-search="<?= strtolower($ap['name'] . ' ' . $ap['sku']) ?>">
                             <td>
                                 <div class="product-cell">
-                                    <img src="/lego_shop_php/public/assets/images/<?= $ap['image_url'] ?? 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/52x52?text=LEGO'">
+                                    <img src="/public/assets/images/<?= $ap['image_url'] ?? 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/52x52?text=LEGO'">
                                     <div>
                                         <div style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($ap['name']) ?></div>
                                         <div style="font-size: 11px; color: #64748b; margin-top: 2px;">SKU: <?= strtoupper($ap['sku']) ?></div>
@@ -201,7 +201,7 @@
             <h2>Cảnh báo Tồn kho</h2>
             <p>Hiển thị các sản phẩm chạm ngưỡng báo động. Cài đặt ngưỡng chung cho toàn bộ kho.</p>
 
-            <form action="/lego_shop_php/admininventory" method="GET" class="filter-form">
+            <form action="/admininventory" method="GET" class="filter-form">
                 <input type="hidden" name="tab" value="alerts"> 
                 
                 <div class="search-wrapper">
@@ -238,7 +238,7 @@
                     <tr>
                         <td>
                             <div class="product-cell">
-                                <img src="/lego_shop_php/public/assets/images/<?= $p['main_image'] ?? 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/52x52?text=LEGO'">
+                                <img src="/public/assets/images/<?= $p['main_image'] ?? 'default.jpg' ?>" class="img-product" onerror="this.src='https://placehold.co/52x52?text=LEGO'">
                                 <div>
                                     <div style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($p['name']) ?></div>
                                     <div style="font-size: 11px; color: #64748b; margin-top: 2px;">SKU: <?= strtoupper($p['sku']) ?></div>
@@ -378,7 +378,7 @@ if (activeTab === 'alerts' || urlParams.has('threshold') || urlParams.has('keywo
         btn.innerHTML = 'Đang tải <i class="fa-solid fa-spinner fa-spin"></i>';
 
         try {
-            const res = await fetch(`/lego_shop_php/admininventory/getSnapshotAjax?date=${date}`);
+            const res = await fetch(`/admininventory/getSnapshotAjax?date=${date}`);
             const result = await res.json();
             
             if (result.success) {
@@ -430,7 +430,7 @@ if (activeTab === 'alerts' || urlParams.has('threshold') || urlParams.has('keywo
         document.getElementById('historyModal').style.display = 'block';
 
         try {
-            const res = await fetch(`/lego_shop_php/admininventory/getStockCardAjax?product_id=${id}&date=${selectedDate}`);
+            const res = await fetch(`/admininventory/getStockCardAjax?product_id=${id}&date=${selectedDate}`);
             const result = await res.json();
             if (result.success) {
                 document.getElementById('histOpeningStock').innerText = result.data.opening_stock;
@@ -453,8 +453,8 @@ if (activeTab === 'alerts' || urlParams.has('threshold') || urlParams.has('keywo
                             typeBadge = '<span style="background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:4px; font-size: 11px;">Xuất bán</span>';
                         }
 
-                        let safeNote = item.note.replace(/PN-(\d+)/g, '<a href="/lego_shop_php/adminimport/detail/$1" target="_blank" style="color:#3b82f6;">PN-$1</a>')
-                                                .replace(/DH-(\d+)/g, '<a href="/lego_shop_php/adminorder/detail/$1" target="_blank" style="color:#3b82f6;">DH-$1</a>');
+                        let safeNote = item.note.replace(/PN-(\d+)/g, '<a href="/adminimport/detail/$1" target="_blank" style="color:#3b82f6;">PN-$1</a>')
+                                                .replace(/DH-(\d+)/g, '<a href="/adminorder/detail/$1" target="_blank" style="color:#3b82f6;">DH-$1</a>');
 
                         html += `<tr>
                             <td style="color:#64748b; font-size:12px;">${item.created_at}</td>
@@ -487,7 +487,7 @@ if (activeTab === 'alerts' || urlParams.has('threshold') || urlParams.has('keywo
             let safeImg = p.image_url ? p.image_url : 'default.jpg';
             return `
             <li class="combo-item" data-search="${searchStr}" onclick="selectProduct('${rowId}', ${p.id}, '${safeName}', ${p.min_stock_level})">
-                <img src="/lego_shop_php/public/assets/images/${safeImg}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border: 1px solid #e2e8f0;" onerror="this.src='https://placehold.co/40x40?text=LEGO'">
+                <img src="/public/assets/images/${safeImg}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border: 1px solid #e2e8f0;" onerror="this.src='https://placehold.co/40x40?text=LEGO'">
                 <div style="flex: 1;">
                     <div style="font-weight: 700;">${p.name}</div>
                     <span class="combo-item-sku" style="font-size:11px;">SKU: ${p.sku} | Mức hiện tại: <b style="color:#3b82f6">${p.min_stock_level}</b></span>
@@ -574,14 +574,14 @@ if (activeTab === 'alerts' || urlParams.has('threshold') || urlParams.has('keywo
         if (!isValid) return alert("Có sản phẩm chưa được chọn đúng từ danh sách dropdown!");
 
         try {
-            const response = await fetch('/lego_shop_php/admininventory/updateBulkMinStock', {
+            const response = await fetch('/admininventory/updateBulkMinStock', {
                 method: 'POST', headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ items: dataToSend })
             });
             const result = await response.json();
             if(result.success) {
                 alert("Cập nhật thành công!");
-                window.location.href = "/lego_shop_php/admininventory?tab=alerts";
+                window.location.href = "/admininventory?tab=alerts";
             } else { alert("Lỗi: " + result.message); }
         } catch (err) { alert("Lỗi mạng!"); }
     }

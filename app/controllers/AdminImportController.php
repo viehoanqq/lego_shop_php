@@ -5,7 +5,7 @@ class AdminImportController extends Controller {
 
     public function __construct() {
         if (!isset($_SESSION['admin_id'])) { 
-            header("Location: /lego_shop_php/admin/login"); 
+            header("Location: /admin/login"); 
             exit; 
         }
     }
@@ -100,7 +100,7 @@ class AdminImportController extends Controller {
         
         $receipt = $importModel->getImportById($id);
         if (!$receipt) {
-            header("Location: /lego_shop_php/adminimport?error=notfound");
+            header("Location: /adminimport?error=notfound");
             exit;
         }
 
@@ -118,9 +118,9 @@ class AdminImportController extends Controller {
         $importModel = $this->model('ImportModel');
         if ($importModel->completeImport($id)) {
             // Hoàn tất thành công, quay lại trang chi tiết kèm thông báo
-            header("Location: /lego_shop_php/adminimport/detail/$id?msg=completed");
+            header("Location: /adminimport/detail/$id?msg=completed");
         } else {
-            header("Location: /lego_shop_php/adminimport/detail/$id?error=1");
+            header("Location: /adminimport/detail/$id?error=1");
         }
         exit;
     }
@@ -160,7 +160,7 @@ class AdminImportController extends Controller {
         $receipt = $importModel->getImportById($id);
         // Chặn nếu không tìm thấy phiếu, hoặc phiếu KHÔNG PHẢI BẢN NHÁP
         if (!$receipt || $receipt['status'] !== 'draft') {
-            header("Location: /lego_shop_php/adminimport");
+            header("Location: /adminimport");
             exit;
         }
 
