@@ -49,32 +49,13 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        min-width: 110px; /* Kích thước bằng nhau */
+        min-width: 110px;
         letter-spacing: 0.5px;
     }
 
-    /* Đang bán (Outline Green) */
-    .status-active-ui {
-        background: #ffffff;
-        color: #2f855a;
-        border: 1px solid #6ee7b7;
-    }
-
-    /* Tạm khóa (Solid Orange + Shadow) */
-    .status-locked-ui {
-        background: #dd6b20;
-        color: #ffffff;
-        box-shadow: 0 4px 10px rgba(221, 107, 32, 0.3);
-        border: 1px solid transparent;
-    }
-
-    /* Đã bị ẩn (Solid Red + Shadow) */
-    .status-hidden-ui {
-        background: #e53e3e;
-        color: #ffffff;
-        box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
-        border: 1px solid transparent;
-    }
+    .status-active-ui { background: #ffffff; color: #2f855a; border: 1px solid #6ee7b7; }
+    .status-locked-ui { background: #dd6b20; color: #ffffff; box-shadow: 0 4px 10px rgba(221, 107, 32, 0.3); border: 1px solid transparent; }
+    .status-hidden-ui { background: #e53e3e; color: #ffffff; box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3); border: 1px solid transparent; }
 
     /* ===== ALERT ===== */
     #status-alert-container { position: fixed; top: 20px; right: 20px; z-index: 9999; width: 320px; }
@@ -106,7 +87,8 @@
     .section-block { background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
     .section-title-form { margin: 0 0 15px 0; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; font-size: 16px;}
     .input-group-text { display: flex; align-items: center; background: #edf2f7; border: 1px solid #e2e8f0; border-left: none; padding: 0 15px; border-radius: 0 6px 6px 0; font-weight: 600; color: #4a5568;}
-/* ===== GALLERY CSS ===== */
+    
+    /* ===== GALLERY CSS ===== */
     .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; margin-top: 15px; }
     .gallery-item { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; aspect-ratio: 1; background: #fff; }
     .gallery-item img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
@@ -384,6 +366,7 @@ $session_error = get_flash_message('error');
                         </div>
                     </div>
                 </div>
+                
                 <div style="flex: 1; min-width: 300px;">
                     <div class="section-block" style="background: #f0fff4; border-color: #c6f6d5;">
                         <h4 class="section-title-form" style="color: #276749; border-color: #c6f6d5;">3. Lợi nhuận & Cấu hình</h4>
@@ -406,55 +389,13 @@ $session_error = get_flash_message('error');
                             <?php endif; ?>
                         </div>
                     </div>
+                    
                     <div class="section-block">
-    <h4 class="section-title-form">4. Hình ảnh sản phẩm</h4>
-    
-    <div class="form-group">
-        <label>Ảnh đại diện (Main Image) <span style="color:red">*</span></label>
-        <input type="file" id="main_image" name="main_image" accept="image/*" style="display: none;" onchange="previewImage(this)">
-        <div class="image-upload-box" onclick="document.getElementById('main_image').click()" style="height: 180px;">
-            <?php if(!empty($product['main_image'])): ?>
-                <img id="image_preview" src="/lego_shop_php/public/assets/images/<?= $product['main_image'] ?>">
-                <div class="image-upload-placeholder" id="image_placeholder" style="display:none;">
-                    <i class="fa-solid fa-cloud-arrow-up"></i><br>Đổi ảnh khác
-                </div>
-            <?php else: ?>
-                <img id="image_preview" src="" style="display:none;">
-                <div class="image-upload-placeholder" id="image_placeholder">
-                    <i class="fa-solid fa-cloud-arrow-up"></i><br>Nhấn để chọn ảnh chính
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-
-    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-
-    <div class="form-group" style="margin-bottom: 0;">
-        <label>Thư viện ảnh phụ (Gallery)</label>
-        <small style="color: #718096; display: block; margin-bottom: 10px;">Có thể chọn nhiều lần để thêm dồn ảnh.</small>
-        
-        <input type="file" id="real_gallery_input" name="gallery_images[]" accept="image/*" multiple style="display: none;">
-        
-        <input type="file" id="temp_gallery_input" accept="image/*" multiple style="display: none;" onchange="handleNewGalleryImages(this)">
-        
-        <div class="gallery-grid" id="gallery_container">
-            <div class="upload-multiple-btn" onclick="document.getElementById('temp_gallery_input').click()">
-                <i class="fa-solid fa-plus" style="font-size: 24px; margin-bottom: 5px;"></i>
-                Thêm ảnh phụ
-            </div>
-
-            <?php if(isset($gallery) && !empty($gallery)): ?>
-                <?php foreach($gallery as $img): ?>
-                    <div class="gallery-item existing-image" id="img-box-<?= $img['id'] ?>">
-                        <img src="/lego_shop_php/public/assets/images/<?= $img['image_url'] ?>">
-                        <span style="position: absolute; bottom: 0; background: rgba(71, 85, 105, 0.9); color: #fff; font-size: 10px; width: 100%; text-align: center; padding: 2px 0;">Ảnh cũ</span>
-                        <button type="button" class="btn-remove-img" onclick="deleteExistingImage(<?= $img['id'] ?>)" title="Xóa vĩnh viễn ảnh này">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                        <h4 class="section-title-form">4. Hình ảnh đại diện</h4>
-                        <div class="form-group" style="margin-bottom: 0;">
+                        <h4 class="section-title-form">4. Hình ảnh sản phẩm</h4>
+                        <div class="form-group">
+                            <label>Ảnh đại diện (Main Image) <span style="color:red">*</span></label>
                             <input type="file" id="main_image" name="main_image" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                            <div class="image-upload-box" onclick="document.getElementById('main_image').click()">
+                            <div class="image-upload-box" onclick="document.getElementById('main_image').click()" style="height: 180px;">
                                 <?php if(!empty($product['main_image'])): ?>
                                     <img id="image_preview" src="/public/assets/images/<?= $product['main_image'] ?>">
                                     <div class="image-upload-placeholder" id="image_placeholder" style="display:none;">
@@ -463,14 +404,41 @@ $session_error = get_flash_message('error');
                                 <?php else: ?>
                                     <img id="image_preview" src="" style="display:none;">
                                     <div class="image-upload-placeholder" id="image_placeholder">
-                                        <i class="fa-solid fa-cloud-arrow-up"></i><br>Nhấn để chọn ảnh
+                                        <i class="fa-solid fa-cloud-arrow-up"></i><br>Nhấn để chọn ảnh chính
                                     </div>
                                 <?php endif; ?>
                             </div>
                         </div>
-            </div>
-    </div>
-</div>
+
+                        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Thư viện ảnh phụ (Gallery)</label>
+                            <small style="color: #718096; display: block; margin-bottom: 10px;">Có thể chọn nhiều lần để thêm dồn ảnh.</small>
+                            
+                            <input type="file" id="real_gallery_input" name="gallery_images[]" accept="image/*" multiple style="display: none;">
+                            <input type="file" id="temp_gallery_input" accept="image/*" multiple style="display: none;" onchange="handleNewGalleryImages(this)">
+                            
+                            <div class="gallery-grid" id="gallery_container">
+                                <div class="upload-multiple-btn" onclick="document.getElementById('temp_gallery_input').click()">
+                                    <i class="fa-solid fa-plus" style="font-size: 24px; margin-bottom: 5px;"></i>
+                                    Thêm ảnh phụ
+                                </div>
+
+                                <?php if(isset($gallery) && !empty($gallery)): ?>
+                                    <?php foreach($gallery as $img): ?>
+                                        <div class="gallery-item existing-image" id="img-box-<?= $img['id'] ?>">
+                                            <img src="/public/assets/images/<?= $img['image_url'] ?>">
+                                            <span style="position: absolute; bottom: 0; background: rgba(71, 85, 105, 0.9); color: #fff; font-size: 10px; width: 100%; text-align: center; padding: 2px 0;">Ảnh cũ</span>
+                                            <button type="button" class="btn-remove-img" onclick="deleteExistingImage(<?= $img['id'] ?>)" title="Xóa vĩnh viễn ảnh này">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div style="display: flex; gap: 12px; margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
@@ -570,82 +538,24 @@ $session_error = get_flash_message('error');
             }
         });
     }
-    // Hàm preview nhiều ảnh mới vừa được chọn
-    function previewGallery(input) {
-        const container = document.getElementById('gallery_container');
-        
-        // Xóa các preview cũ chưa upload (giữ lại nút thêm ảnh và ảnh cũ từ DB)
-        document.querySelectorAll('.new-preview').forEach(el => el.remove());
 
-        if (input.files && input.files.length > 0) {
-            for (let i = 0; i < input.files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'gallery-item new-preview';
-                    div.innerHTML = `
-                        <img src="${e.target.result}" style="opacity: 0.7; border: 2px dashed #3182ce;">
-                        <span style="position: absolute; bottom: 0; background: rgba(49,130,206,0.9); color: #fff; font-size: 10px; width: 100%; text-align: center; padding: 2px 0;">Mới</span>
-                    `;
-                    container.appendChild(div);
-                }
-                reader.readAsDataURL(input.files[i]);
-            }
-        }
-    }
-
-    // Hàm xóa ảnh phụ (AJAX) - Dành cho lúc Edit sản phẩm
-    function deleteGalleryImage(imageId) {
-        if(confirm('Bạn có chắc muốn xóa ảnh này khỏi hệ thống?')) {
-            // Bạn cần tạo 1 route trong Controller để xử lý việc này
-            fetch(`/lego_shop_php/adminproduct/deleteImageAjax?id=${imageId}`, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    document.getElementById(`img-box-${imageId}`).remove();
-                } else {
-                    alert('Lỗi: ' + (data.message || 'Không thể xóa ảnh!'));
-                }
-            })
-            .catch(err => console.error('Error:', err));
-        }
-    }
-    // ==========================================
-    // QUẢN LÝ ẢNH PHỤ (THÊM DỒN & XÓA TRƯỚC KHI LƯU)
-    // ==========================================
-    
-    // Sử dụng DataTransfer để lưu trữ mảng file một cách linh hoạt
     let selectedFiles = new DataTransfer(); 
 
-    // Hàm xử lý khi người dùng chọn thêm ảnh mới
     function handleNewGalleryImages(input) {
         if (input.files && input.files.length > 0) {
-            // Đẩy các file vừa chọn vào "giỏ" selectedFiles
             for (let i = 0; i < input.files.length; i++) {
                 selectedFiles.items.add(input.files[i]);
             }
-            
-            // Cập nhật lại cái input THỰC TẾ sẽ được submit lên PHP
             document.getElementById('real_gallery_input').files = selectedFiles.files;
-            
-            // Render lại giao diện
             renderNewPreviews();
-            
-            // Reset cái input cò mồi để lần sau chọn tiếp không bị lỗi
             input.value = ""; 
         }
     }
 
-    // Hàm hiển thị ảnh mới ra màn hình
     function renderNewPreviews() {
         const container = document.getElementById('gallery_container');
-        
-        // 1. Xóa các preview 'mới' cũ đi để vẽ lại từ đầu (không chạm vào ảnh Database và nút Add)
         document.querySelectorAll('.new-preview-item').forEach(el => el.remove());
 
-        // 2. Lặp qua danh sách file đang có trong "giỏ" để vẽ
         const files = selectedFiles.files;
         for (let i = 0; i < files.length; i++) {
             const reader = new FileReader();
@@ -665,9 +575,7 @@ $session_error = get_flash_message('error');
         }
     }
 
-    // Hàm XÓA ảnh MỚI (chưa upload lên server)
     function removeNewImage(index) {
-        // Tạo một DataTransfer mới, copy mọi thứ trừ file bị xóa
         const newDt = new DataTransfer();
         const files = selectedFiles.files;
         for (let i = 0; i < files.length; i++) {
@@ -675,27 +583,19 @@ $session_error = get_flash_message('error');
                 newDt.items.add(files[i]);
             }
         }
-        
-        // Cập nhật lại giỏ
         selectedFiles = newDt;
         document.getElementById('real_gallery_input').files = selectedFiles.files;
-        
-        // Vẽ lại giao diện
         renderNewPreviews();
     }
 
-    // ==========================================
-    // HÀM XÓA ẢNH CŨ TRONG DATABASE BẰNG AJAX
-    // ==========================================
     function deleteExistingImage(imageId) {
         if(confirm('Bạn có chắc muốn xóa vĩnh viễn ảnh này khỏi hệ thống? Hành động này không thể hoàn tác!')) {
-            fetch(`/lego_shop_php/adminproduct/deleteImageAjax?id=${imageId}`, {
+            fetch(`/adminproduct/deleteImageAjax?id=${imageId}`, {
                 method: 'POST'
             })
             .then(response => response.json())
             .then(data => {
                 if(data.success) {
-                    // Xóa mượt mà cái box ảnh đó khỏi HTML
                     const box = document.getElementById(`img-box-${imageId}`);
                     box.style.transition = '0.3s';
                     box.style.transform = 'scale(0)';
