@@ -1,4 +1,4 @@
-	<?php
+<?php
 class AdminProductController extends Controller {
     private $productModel;
     private $categoryModel;
@@ -19,8 +19,8 @@ class AdminProductController extends Controller {
         $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
         $offset = ($page - 1) * $this->limit;
 
-        //Gọi hàm Admin thay vì hàm Filter mặc định
-sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"        $products = $this->productModel->getAdminProducts($filters, $offset, $this->limit);
+        // Gọi hàm Admin thay vì hàm Filter mặc định
+        $products = $this->productModel->getAdminProducts($filters, $offset, $this->limit);
         $totalProducts = $this->productModel->countAdminProducts($filters);
         
         $totalPages = ceil($totalProducts / $this->limit);
@@ -41,22 +41,20 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
             'status'   => $_GET['status'] ?? '1,2' // Mặc định hiện cả Đang bán và Tạm ẩn
         ];
 
-        //Lấy dữ liệu
+        // Lấy dữ liệu
         $pageData = $this->getPaginationData($filters);
         $categories = $this->categoryModel->getAllCategories();
-
 
         $this->view('admin/products', array_merge($pageData, [
             'categories' => $categories,
             'is_form'    => false,
             'filters'    => $filters,
-            'title'   => 'Quản lý sản phẩm',
+            'title'      => 'Quản lý sản phẩm',
         ]));
     }
 
     // 2. Form Thêm mới
     public function add() {
-        
         // Vẫn dùng bộ lọc mặc định để hiển thị danh sách bên dưới form
         $filters = ['keyword' => '', 'category' => 'all', 'status' => '1,2'];
         $pageData = $this->getPaginationData($filters);
@@ -69,7 +67,7 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
         ]));
     }
 
-    // Hàm Edit 
+    // Hàm Edit (Đã gộp gọn phần view và truyền mảng ảnh phụ)
     public function edit($id) {
         $product = $this->productModel->getProductById($id);
         if (!$product) {
@@ -77,51 +75,37 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
             exit();
         }
 
+        // Lấy mảng ảnh phụ từ Model
+        $gallery = $this->productModel->getGalleryImages($id); 
+
         $filters = ['keyword' => '', 'category' => 'all', 'status' => '1,2'];
         $pageData = $this->getPaginationData($filters);
         $categories = $this->categoryModel->getAllCategories();
 
+        // Truyền biến 'gallery' vào mảng data để View có thể dùng
         $this->view('admin/products', array_merge($pageData, [
             'product'    => $product,
+            'gallery'    => $gallery, 
             'categories' => $categories,
             'is_form'    => true,
             'filters'    => $filters
         ]));
-
-    // 2. PHẢI CÓ DÒNG NÀY: Lấy mảng ảnh phụ từ Model
-    $gallery = $this->productModel->getGalleryImages($id); 
-
-    $filters = ['keyword' => '', 'category' => 'all', 'status' => '1,2'];
-    $pageData = $this->getPaginationData($filters);
-    $categories = $this->categoryModel->getAllCategories();
-
-    // 3. Truyền biến 'gallery' vào mảng data để View có thể dùng
-    $this->view('admin/products', array_merge($pageData, [
-        'product'    => $product,
-        'gallery'    => $gallery, // <-- Truyền nó qua đây
-        'categories' => $categories,
-        'is_form'    => true,
-        'filters'    => $filters
-    ]));
-}
+    }
 
     // Hàm Khóa sản phẩm (Chuyển từ 1 sang 2)
     public function hide($id) {
         $id = intval($id);
         $product = $this->productModel->getProductById($id);
 
-        // 1. Kiểm tra sản phẩm có tồn tại không
         if (!$product) {
             set_flash_message('error', 'db');
             header('Location: /adminproduct');
             exit();
         }
 
-        // 2. Nếu sản phẩm đã ẩn rồi (status == 0) thì thông báo luôn
         if ($product['status'] == 0) {
             set_flash_message('error', 'already_hidden');
         } 
-        // 3. Nếu chưa ẩn (status là 1 hoặc 2) thì tiến hành đưa về 0
         else {
             if ($this->productModel->updateStatus($id, 0)) {
                 set_flash_message('msg', 'hidden');
@@ -133,57 +117,6 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
         header('Location: /adminproduct');
         exit();
     }
-
-    // Hàm Mở khóa sản phẩm (Chuyển từ 2 sang 1)
-    // public function show($id) {
-    //     $id = intval($id);
-    //     $product = $this->productModel->getProductById($id);
-
-    //     if (!$product) {
-    //         set_flash_message('error', 'db');
-
-    //     // Chỉ cho phép đổi từ 0 -> 2
-    //     } elseif ($product['status'] != 0) {
-    //         set_flash_message('error', 'invalid_status');
-
-    //     // Update status = 2
-    //     } elseif ($this->productModel->updateStatus($id, 2)) {
-    //         set_flash_message('msg', 'updated_to_2');
-
-    //     } else {
-    //         set_flash_message('error', 'db');
-    //     }
-
-    //     header('Location: /adminproduct');
-    //     exit();
-    // }
-
-
-    // public function toggleStatus($id) {
-    //     // Đổi $this->productModel->find($id) thành hàm bạn đã có:
-    //     $product = $this->productModel->getProductFullDetail($id);
-        
-    //     if (!$product) {
-    //         set_flash_message('error', 'notfound');
-    //         header("Location: /adminproduct");
-    //         exit();
-    //     }
-
-    //     // Đảo ngược trạng thái
-    //     $newStatus = ($product['status'] == 1) ? 2 : 1;
-        
-    //     // Gọi hàm updateStatus bạn đã có ở dòng 134 của Model
-    //     $result = $this->productModel->updateStatus($id, $newStatus);
-        
-    //     if ($result) {
-    //         set_flash_message('msg', ($newStatus == 2 ? 'hidden' : 'show'));
-    //     } else {
-    //         set_flash_message('error', 'db');
-    //     }
-        
-    //     header("Location: /adminproduct");
-    //     exit();
-    // }
 
     public function toggleStatus($id) {
         $product = $this->productModel->getProductById($id);
@@ -307,7 +240,6 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
                 empty($_POST['length']) || empty($_POST['width']) || empty($_POST['height'])) {
                 
                 set_flash_message('error', 'empty');
-                // Chỗ này tùy hàm mà nó redirect về add hay edit nhé
                 header('Location: /adminproduct/' . (isset($id) ? 'edit/'.$id : 'add')); 
                 exit();
             }
@@ -341,30 +273,7 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
         }
     }
     
-    // public function delete($id) {
-    //     $productModel = $this->model("ProductModel");
-
-    //     // BƯỚC 1: KIỂM TRA RÀNG BUỘC
-    //     if (!$productModel->canDeleteProduct($id)) {
-    //         // Gửi mã 'has_history' để View hiển thị đúng câu thông báo
-    //         set_flash_message('error', 'has_history'); 
-    //         header("Location: /adminproduct");
-    //         exit();
-    //     }
-
-    //     // BƯỚC 2: TIẾN HÀNH XÓA
-    //     if ($productModel->deleteProduct($id)) {
-    //         // Đồng nhất với View (View của bạn đang dùng 'deleted')
-    //         set_flash_message('msg', 'deleted'); 
-    //     } else {
-    //         set_flash_message('error', 'db');
-    //     }
-
-    //     header("Location: /adminproduct");
-    //     exit();
-    // }
-
-   public function delete($id) {
+    public function delete($id) {
         $productModel = $this->model("ProductModel");
         $id = intval($id);
 
@@ -378,7 +287,6 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
             }
         } else {
             // TRƯỜNG HỢP B: Đã có lịch sử -> Đổi trạng thái sang 3 (Đã bị ẩn/Xóa mềm)
-            // LƯU Ý: Chỗ này gọi 'msg' để nó hiện Box Thành Công màu Xanh (kèm thông báo "Tự động Ẩn do có lịch sử")
             if ($productModel->updateStatus($id, 3)) {
                 set_flash_message('msg', 'hidden_due_to_history');
             } else {
@@ -389,6 +297,7 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
         header("Location: /adminproduct");
         exit();
     }
+
     private function uploadGalleryFiles($files) {
         $uploadedNames = [];
         $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'image/gif'];
@@ -404,7 +313,6 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
                 finfo_close($fileInfo);
 
                 if (in_array($mimeType, $allowed) && $files['size'][$i] <= 2 * 1024 * 1024) {
-                    // Thêm số ngẫu nhiên để tránh trùng tên nếu up nhiều file cùng lúc
                     $fileName = time() . '_' . rand(100,999) . '_' . basename($files["name"][$i]);
                     $targetFile = $targetDir . $fileName;
 
@@ -416,6 +324,7 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
         }
         return $uploadedNames;
     }
+
     public function deleteImageAjax() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $imageId = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -464,7 +373,6 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
         }
         return 'default.jpg';
     }
-    
 
     // Hàm hiển thị trang chi tiết kỹ thuật
     public function detail($id) {
@@ -490,10 +398,8 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
                 'age_range'    => $_POST['age_range'] ?? '',
                 'pieces'       => intval($_POST['pieces'] ?? 0),
                 'theme_story'  => $_POST['theme_story'] ?? '',
-                'release_year'  => $_POST['release_year'] ?? ''
+                'release_year' => $_POST['release_year'] ?? ''
             ];
-
-            $result = $this->productModel->updateProductDetail($id, $data);
 
             if ($this->productModel->updateProductDetail($id, $data)) {
                 set_flash_message('msg', 'updated');
@@ -505,16 +411,13 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
         }
     }
 
-
     public function lowstock() {
-        // 1. Lấy keyword và type từ URL
         $type = $_GET['type'] ?? 'all';
         $keyword = $_GET['keyword'] ?? ''; 
         
         $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
         $offset = ($page - 1) * $this->limit;
 
-        // 2. Truyền thêm keyword vào Model
         $products = $this->productModel->getLowStockProducts($offset, $this->limit, $type, $keyword);
         $totalItems = $this->productModel->countLowStockProducts($type, $keyword);
         
@@ -525,7 +428,7 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
 
         $this->view('admin/low_stock', [
             'products'     => $products,
-            'all_products' => $all_products, // Đưa dữ liệu này xuống view
+            'all_products' => $all_products, 
             'totalItems'   => $totalItems,
             'totalPages'   => $totalPages,
             'currentPage'  => $page,
@@ -533,7 +436,4 @@ sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_F
             'keyword'      => $keyword 
         ]);
     }
-    
-
-    
 }
