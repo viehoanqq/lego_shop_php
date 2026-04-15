@@ -1,4 +1,4 @@
-<?php
+	<?php
 class AdminProductController extends Controller {
     private $productModel;
     private $categoryModel;
@@ -20,7 +20,7 @@ class AdminProductController extends Controller {
         $offset = ($page - 1) * $this->limit;
 
         //Gọi hàm Admin thay vì hàm Filter mặc định
-        $products = $this->productModel->getAdminProducts($filters, $offset, $this->limit);
+sudo mysql -u root -p -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"        $products = $this->productModel->getAdminProducts($filters, $offset, $this->limit);
         $totalProducts = $this->productModel->countAdminProducts($filters);
         
         $totalPages = ceil($totalProducts / $this->limit);
@@ -87,7 +87,6 @@ class AdminProductController extends Controller {
             'is_form'    => true,
             'filters'    => $filters
         ]));
-    }
 
     // 2. PHẢI CÓ DÒNG NÀY: Lấy mảng ảnh phụ từ Model
     $gallery = $this->productModel->getGalleryImages($id); 
