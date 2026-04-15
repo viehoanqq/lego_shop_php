@@ -71,23 +71,29 @@ class AdminProductController extends Controller {
 
     // Hàm Edit 
     public function edit($id) {
-        $product = $this->productModel->getProductById($id);
-        if (!$product) {
-            header('Location: /lego_shop_php/adminproduct');
-            exit();
-        }
-
-        $filters = ['keyword' => '', 'category' => 'all', 'status' => '1,2'];
-        $pageData = $this->getPaginationData($filters);
-        $categories = $this->categoryModel->getAllCategories();
-
-        $this->view('admin/products', array_merge($pageData, [
-            'product'    => $product,
-            'categories' => $categories,
-            'is_form'    => true,
-            'filters'    => $filters
-        ]));
+    // 1. Lấy thông tin sản phẩm chính
+    $product = $this->productModel->getProductById($id);
+    if (!$product) {
+        header('Location: /lego_shop_php/adminproduct');
+        exit();
     }
+
+    // 2. PHẢI CÓ DÒNG NÀY: Lấy mảng ảnh phụ từ Model
+    $gallery = $this->productModel->getGalleryImages($id); 
+
+    $filters = ['keyword' => '', 'category' => 'all', 'status' => '1,2'];
+    $pageData = $this->getPaginationData($filters);
+    $categories = $this->categoryModel->getAllCategories();
+
+    // 3. Truyền biến 'gallery' vào mảng data để View có thể dùng
+    $this->view('admin/products', array_merge($pageData, [
+        'product'    => $product,
+        'gallery'    => $gallery, // <-- Truyền nó qua đây
+        'categories' => $categories,
+        'is_form'    => true,
+        'filters'    => $filters
+    ]));
+}
 
     // Hàm Khóa sản phẩm (Chuyển từ 1 sang 2)
     public function hide($id) {
@@ -195,8 +201,7 @@ class AdminProductController extends Controller {
         exit();
     }
 
-
-    // 3. Logic Lưu sản phẩm mới
+    // [CẬP NHẬT MỚI] - Thêm xử lý Upload nhiều ảnh phụ
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
@@ -210,7 +215,7 @@ class AdminProductController extends Controller {
                 'sku'           => strtoupper(trim($_POST['sku'] ?? '')),
                 'category_id'   => intval($_POST['category_id'] ?? 0),
                 'description'   => trim($_POST['description'] ?? ''),
-                'status'        => intval($_POST['status'] ?? 1), // <-- Chỉ có lúc Tạo mới
+                'status'        => intval($_POST['status'] ?? 1), 
                 'profit_margin' => (floatval($_POST['profit_margin'] ?? 30) / 100), 
                 'main_image'    => $uploaded_image,
                 
@@ -238,7 +243,18 @@ class AdminProductController extends Controller {
                 header('Location: /lego_shop_php/adminproduct/add'); exit();
             }
 
-            if ($this->productModel->insertProduct($data)) {
+            // Hứng ID vừa tạo
+            $newProductId = $this->productModel->insertProduct($data);
+
+            if ($newProductId) {
+                // XỬ LÝ UPLOAD ẢNH PHỤ
+                if (isset($_FILES['gallery_images']) && !empty($_FILES['gallery_images']['name'][0])) {
+                    $galleryFiles = $this->uploadGalleryFiles($_FILES['gallery_images']);
+                    if (!empty($galleryFiles)) {
+                        $this->productModel->insertGalleryImages($newProductId, $galleryFiles);
+                    }
+                }
+
                 set_flash_message('msg', 'success');
                 header('Location: /lego_shop_php/adminproduct');
             } else {
@@ -248,10 +264,9 @@ class AdminProductController extends Controller {
             exit();
         }
     }
-    // ==========================================
-    // CẬP NHẬT SẢN PHẨM (Cập nhật 2 bảng cùng lúc)
-    // ==========================================
-   public function update($id) {
+
+    // [CẬP NHẬT MỚI] - Thêm ảnh phụ mới lúc cập nhật
+    public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             $uploaded_image = null;
@@ -276,26 +291,35 @@ class AdminProductController extends Controller {
                 'release_year'  => !empty($_POST['release_year']) ? intval($_POST['release_year']) : null,
                 'theme_story'   => trim($_POST['theme_story'] ?? '')
             ];
+
             if (empty($data['name']) || empty($data['sku']) || empty($data['category_id']) || 
                 empty($_POST['pieces']) || empty($_POST['age_range']) || 
                 empty($_POST['length']) || empty($_POST['width']) || empty($_POST['height'])) {
                 
                 set_flash_message('error', 'empty');
-                // Chỗ này tùy hàm mà nó redirect về add hay edit nhé
-                header('Location: /lego_shop_php/adminproduct/' . (isset($id) ? 'edit/'.$id : 'add')); 
+                header('Location: /lego_shop_php/adminproduct/edit/'.$id); 
                 exit();
             }
+
             if ($this->productModel->isNameExists($data['name'], $id)) {
                 set_flash_message('error', 'name_exists');
                 header('Location: /lego_shop_php/adminproduct/edit/'.$id); exit();
             }
-
             if ($this->productModel->isSkuExists($data['sku'], $id)) {
                 set_flash_message('error', 'sku_exists');
                 header('Location: /lego_shop_php/adminproduct/edit/'.$id); exit();
             }
 
             if ($this->productModel->updateProduct($id, $data)) {
+                
+                // XỬ LÝ UPLOAD THÊM ẢNH PHỤ
+                if (isset($_FILES['gallery_images']) && !empty($_FILES['gallery_images']['name'][0])) {
+                    $galleryFiles = $this->uploadGalleryFiles($_FILES['gallery_images']);
+                    if (!empty($galleryFiles)) {
+                        $this->productModel->insertGalleryImages($id, $galleryFiles);
+                    }
+                }
+
                 set_flash_message('msg', 'updated');
                 header('Location: /lego_shop_php/adminproduct');
             } else {
@@ -353,6 +377,46 @@ class AdminProductController extends Controller {
 
         header("Location: /lego_shop_php/adminproduct");
         exit();
+    }
+    private function uploadGalleryFiles($files) {
+        $uploadedNames = [];
+        $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'image/gif'];
+        $targetDir = "public/assets/images/";
+        if (!file_exists($targetDir)) mkdir($targetDir, 0777, true);
+
+        $fileCount = count($files['name']);
+        
+        for ($i = 0; $i < $fileCount; $i++) {
+            if ($files['error'][$i] === UPLOAD_ERR_OK) {
+                $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_file($fileInfo, $files['tmp_name'][$i]);
+                finfo_close($fileInfo);
+
+                if (in_array($mimeType, $allowed) && $files['size'][$i] <= 2 * 1024 * 1024) {
+                    // Thêm số ngẫu nhiên để tránh trùng tên nếu up nhiều file cùng lúc
+                    $fileName = time() . '_' . rand(100,999) . '_' . basename($files["name"][$i]);
+                    $targetFile = $targetDir . $fileName;
+
+                    if (move_uploaded_file($files["tmp_name"][$i], $targetFile)) {
+                        $uploadedNames[] = $fileName;
+                    }
+                }
+            }
+        }
+        return $uploadedNames;
+    }
+    public function deleteImageAjax() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $imageId = isset($_GET['id']) ? intval($_GET['id']) : 0;
+            
+            if ($imageId > 0) {
+                $deleted = $this->productModel->deleteGalleryImage($imageId);
+                echo json_encode(['success' => $deleted]);
+                exit;
+            }
+        }
+        echo json_encode(['success' => false, 'message' => 'Lỗi dữ liệu']);
+        exit;
     }
 
     public function restore($id) {

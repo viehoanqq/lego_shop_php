@@ -356,87 +356,122 @@
         }
 
         public function insertProduct($data) {
-            $db = $this->getConnection();
-            $db->begin_transaction(); 
+        $db = $this->getConnection();
+        $db->begin_transaction(); 
+        
+        try {
+            // Bảng 1: products (Ép cứng Giá = 0, Tồn = 0)
+            $sql = "INSERT INTO products (name, sku, category_id, selling_price, stock_quantity, description, status, profit_margin) 
+                    VALUES (?, ?, ?, 0, 0, ?, ?, ?)";
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param("ssisid", $data['name'], $data['sku'], $data['category_id'], $data['description'], $data['status'], $data['profit_margin']);
+            $stmt->execute();
             
-            try {
-                // Ép cứng Giá = 0, Tồn = 0. Có insert status và profit_margin
-                $sql = "INSERT INTO products (name, sku, category_id, selling_price, stock_quantity, description, status, profit_margin) 
-                        VALUES (?, ?, ?, 0, 0, ?, ?, ?)";
-                $stmt = $db->prepare($sql);
-                // ssisid: string, string, int, string, int, double
-                $stmt->bind_param("ssisid", $data['name'], $data['sku'], $data['category_id'], $data['description'], $data['status'], $data['profit_margin']);
-                $stmt->execute();
+            // Lấy ID vừa được tạo ra
+            $product_id = $db->insert_id;
+
+            // Bảng 2: product_details
+            $sqlDetails = "INSERT INTO product_details (product_id, pieces, manufacturer, material, dimensions, age_range, release_year, theme_story) 
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmtDetails = $db->prepare($sqlDetails);
+            $stmtDetails->bind_param("iissssis", 
+                $product_id, $data['pieces'], $data['manufacturer'], $data['material'], 
+                $data['dimensions'], $data['age_range'], $data['release_year'], $data['theme_story']
+            );
+            $stmtDetails->execute();
+
+            // Bảng 3: product_images (Lưu ảnh đại diện is_main = 1)
+            $image_to_save = !empty($data['main_image']) ? $data['main_image'] : 'default.jpg';
+            $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
+            $stmtImg = $db->prepare($sqlImg);
+            $stmtImg->bind_param("is", $product_id, $image_to_save);
+            $stmtImg->execute();
+
+            $db->commit(); 
+            
+            // [QUAN TRỌNG NHẤT]: Phải trả về ID để Controller lấy đi lưu ảnh phụ
+            return $product_id; 
+            
+        } catch (Exception $e) {
+            $db->rollback(); 
+            return false;
+        }
+    }
+
+    // ==========================================
+    // 2. HÀM CẬP NHẬT SẢN PHẨM
+    // ==========================================
+    public function updateProduct($id, $data) {
+        $db = $this->getConnection();
+        $db->begin_transaction();
+        
+        try {
+            $id = intval($id);
+            
+            // Bảng 1: products (Không cho phép đổi giá và trạng thái ở đây)
+            $sql = "UPDATE products SET name=?, sku=?, category_id=?, description=? WHERE id=?";
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param("ssisi", $data['name'], $data['sku'], $data['category_id'], $data['description'], $id);
+            $stmt->execute();
+
+            // Bảng 2: product_details
+            $sqlDetails = "UPDATE product_details SET 
+                           pieces = ?, manufacturer = ?, material = ?, dimensions = ?, 
+                           age_range = ?, release_year = ?, theme_story = ? 
+                           WHERE product_id = ?";
+            $stmtDetails = $db->prepare($sqlDetails);
+            $stmtDetails->bind_param("issssisi", 
+                $data['pieces'], $data['manufacturer'], $data['material'], $data['dimensions'], 
+                $data['age_range'], $data['release_year'], $data['theme_story'], $id
+            );
+            $stmtDetails->execute();
+
+            // Bảng 3: product_images (Chỉ xử lý nếu người dùng có up ảnh đại diện mới)
+            if (!empty($data['main_image'])) {
+                // Tối ưu: Chỉ hạ cấp ảnh chính CŨ (is_main = 1) thành ảnh phụ (is_main = 0)
+                $db->query("UPDATE product_images SET is_main = 0 WHERE product_id = $id AND is_main = 1");
                 
-                $product_id = $db->insert_id;
-
-                $sqlDetails = "INSERT INTO product_details (product_id, pieces, manufacturer, material, dimensions, age_range, release_year, theme_story) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmtDetails = $db->prepare($sqlDetails);
-                $stmtDetails->bind_param("iissssis", 
-                    $product_id, $data['pieces'], $data['manufacturer'], $data['material'], 
-                    $data['dimensions'], $data['age_range'], $data['release_year'], $data['theme_story']
-                );
-                $stmtDetails->execute();
-
-                $image_to_save = !empty($data['main_image']) ? $data['main_image'] : 'default.jpg';
+                // Thêm ảnh chính MỚI vào
                 $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
                 $stmtImg = $db->prepare($sqlImg);
-                $stmtImg->bind_param("is", $product_id, $image_to_save);
+                $stmtImg->bind_param("is", $id, $data['main_image']);
                 $stmtImg->execute();
-
-                $db->commit(); 
-                return true;
-                
-            } catch (Exception $e) {
-                $db->rollback(); 
-                return false;
             }
-        }
 
-        // Cập nhật sản phẩm
-        public function updateProduct($id, $data) {
-            $db = $this->getConnection();
-            $db->begin_transaction();
+            $db->commit();
+            return true;
             
-            try {
-                $id = intval($id);
-                
-                // Loại bỏ selling_price, status, profit_margin khỏi câu UPDATE
-                $sql = "UPDATE products SET name=?, sku=?, category_id=?, description=? WHERE id=?";
-                $stmt = $db->prepare($sql);
-                // ssisi: string, string, int, string, int
-                $stmt->bind_param("ssisi", $data['name'], $data['sku'], $data['category_id'], $data['description'], $id);
-                $stmt->execute();
-
-                $sqlDetails = "UPDATE product_details SET 
-                            pieces = ?, manufacturer = ?, material = ?, dimensions = ?, 
-                            age_range = ?, release_year = ?, theme_story = ? 
-                            WHERE product_id = ?";
-                $stmtDetails = $db->prepare($sqlDetails);
-                $stmtDetails->bind_param("issssisi", 
-                    $data['pieces'], $data['manufacturer'], $data['material'], $data['dimensions'], 
-                    $data['age_range'], $data['release_year'], $data['theme_story'], $id
-                );
-                $stmtDetails->execute();
-
-                if (!empty($data['main_image'])) {
-                    $db->query("UPDATE product_images SET is_main = 0 WHERE product_id = $id");
-                    $sqlImg = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 1)";
-                    $stmtImg = $db->prepare($sqlImg);
-                    $stmtImg->bind_param("is", $id, $data['main_image']);
-                    $stmtImg->execute();
-                }
-
-                $db->commit();
-                return true;
-                
-            } catch (Exception $e) {
-                $db->rollback();
-                return false;
-            }
+        } catch (Exception $e) {
+            $db->rollback();
+            return false;
         }
+    }
+    public function getGalleryImages($productId) {
+        $stmt = $this->conn->prepare("SELECT * FROM product_images WHERE product_id = ? AND is_main = 0");
+        $stmt->bind_param("i", $productId);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
 
+    // 2. Chèn 1 mảng ảnh phụ vào database
+    public function insertGalleryImages($productId, $imageUrls) {
+        // Tránh gọi prepare trong vòng lặp để tối ưu hiệu suất
+        $stmt = $this->conn->prepare("INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, 0)");
+        
+        foreach ($imageUrls as $url) {
+            $stmt->bind_param("is", $productId, $url);
+            $stmt->execute();
+        }
+        return true;
+    }
+
+    // 3. Xóa một ảnh phụ
+    public function deleteGalleryImage($imageId) {
+        $db = $this->getConnection();
+        $stmt = $this->conn->prepare("DELETE FROM product_images WHERE id = ?");
+        $stmt->bind_param("i", $imageId);
+        return $stmt->execute();
+    }
         // Kiểm tra SKU tồn tại
         public function isSkuExists($sku, $exclude_id = null) {
             $db = $this->getConnection();
