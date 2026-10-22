@@ -1,0 +1,7 @@
+# Thư mục public chỉ chứa file tĩnh (ảnh, css, js, font).
+# Không cho chạy file PHP ở đây, kể cả khi ai đó tải lên được file .php đội lốt ảnh.
+<FilesMatch "(?i)\.(php\d?|phtml|phar|pht|phps|cgi|pl|py|sh)$">
+    Require all denied
+</FilesMatch>
+
+Options -Indexes

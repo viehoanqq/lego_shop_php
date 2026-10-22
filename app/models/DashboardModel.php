@@ -22,7 +22,7 @@ class DashboardModel extends Database {
     public function getCancelledOrdersToday() {
         $db = $this->getConnection();
         $sql = "SELECT COUNT(*) as total FROM orders 
-                WHERE status = 'cancelled' 
+                WHERE status IN ('cancelled', 'returned')
                 AND DATE(created_at) = CURDATE()";
         $result = $db->query($sql);
         return $result->fetch_assoc()['total'] ?? 0;

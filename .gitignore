@@ -1,1 +1,36 @@
-/core/database.php
+# =====================================================================
+# Cấu hình môi trường (chứa mật khẩu DB, API key) - KHÔNG commit
+# Mẫu để chia sẻ: .env.example
+# =====================================================================
+.env
+.env.*
+!.env.example
+
+# Ảnh minh chứng hoàn tiền do khách tải lên (dữ liệu người dùng)
+public/assets/images/refunds/
+
+# Thư mục tạm khi chụp màn hình / kiểm thử giao diện
+public/_shot/
+
+# Log, file tạm, file sao lưu
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# Bản sao lưu database xuất ra khi làm việc (giữ lại lego_shop.sql và database/migrations)
+
+# Thư viện cài bằng composer / npm (nếu sau này dùng)
+/vendor/
+node_modules/
+
+# IDE / editor
+.vscode/
+.idea/
+*.code-workspace
+
+# Hệ điều hành
+.DS_Store
+Thumbs.db
+desktop.ini

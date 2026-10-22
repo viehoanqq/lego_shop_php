@@ -10,7 +10,6 @@
 
         <div class="cart-header-title">
             <h2>Giỏ hàng của bạn</h2>
-            <p>Kiểm tra sản phẩm trước khi thanh toán.</p>
         </div>
 
         <?php if (empty($cart_items)): ?>
@@ -162,7 +161,7 @@ function checkAndUpdateCartQty(cartItemId, action) {
             if(typeof showToast === 'function') {
                 showToast(`Sản phẩm này chỉ còn ${max} sản phẩm!`, "warning");
             } else {
-                alert(`Sản phẩm này chỉ còn ${max} sản phẩm!`);
+                uiAlert(`Sản phẩm này chỉ còn ${max} sản phẩm!`);
             }
             return; // Ngưng tại đây, không cho gọi hàm tiếp theo
         }

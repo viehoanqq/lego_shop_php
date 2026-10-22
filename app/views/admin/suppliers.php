@@ -112,7 +112,7 @@ if($session_msg || $session_error): ?>
 <?php if(!isset($is_form) || $is_form === false): ?>
     <div class="header">
         <div>
-            <form action="/lego_shop_php/adminsupplier" method="GET" class="search-form">
+            <form action="/lego_shop_php/admin/supplier" method="GET" class="search-form">
                 <input type="text" name="keyword" class="form-control" placeholder="Tìm tên, SĐT, Email..." value="<?= htmlspecialchars($filters['keyword'] ?? '') ?>" style="width: 250px;">
                 <select name="status" class="form-control" onchange="this.form.submit()" style="width: 180px; cursor: pointer;">
                     <option value="all">Tất cả trạng thái</option>
@@ -123,7 +123,7 @@ if($session_msg || $session_error): ?>
                 <button type="submit" style="display:none;"></button>
             </form>
         </div>
-        <a href="/lego_shop_php/adminsupplier/add" class="btn-add"><i class="fa-solid fa-plus"></i> Thêm đối tác mới</a>
+        <a href="/lego_shop_php/admin/supplier/add" class="btn-add"><i class="fa-solid fa-plus"></i> Thêm đối tác mới</a>
     </div>
 
     <div class="table-container">
@@ -164,17 +164,17 @@ if($session_msg || $session_error): ?>
                             </td>
                             <td style="text-align: center; white-space: nowrap;">
                                 <?php if($is_hidden): ?>
-                                    <a href="/lego_shop_php/adminsupplier/restore/<?= $s['id'] ?>" style="color: #38a169; text-decoration: none; font-weight: 600;" onclick="return confirm('Bạn muốn khôi phục nhà cung cấp này?')">
+                                    <a href="/lego_shop_php/admin/supplier/restore/<?= $s['id'] ?>" style="color: #38a169; text-decoration: none; font-weight: 600;" data-confirm="Bạn muốn khôi phục nhà cung cấp này?">
                                         <i class="fa-solid fa-rotate-left"></i> Khôi phục
                                     </a>
                                 <?php else: ?>
-                                    <a href="/lego_shop_php/adminsupplier/edit/<?= $s['id'] ?>" style="color: #3182ce; margin-right: 12px; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-pen"></i> Sửa</a>
+                                    <a href="/lego_shop_php/admin/supplier/edit/<?= $s['id'] ?>" style="color: #3182ce; margin-right: 12px; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-pen"></i> Sửa</a>
                                     
-                                    <a href="/lego_shop_php/adminsupplier/toggleStatus/<?= $s['id'] ?>" style="color: <?= $s['status'] == 'active' ? '#dd6b20' : '#38a169' ?>; margin-right: 12px; text-decoration: none; font-weight: 600;" onclick="return confirm('Xác nhận <?= $s['status'] == 'active' ? 'KHÓA' : 'MỞ KHÓA' ?> đối tác này?')">
+                                    <a href="/lego_shop_php/admin/supplier/toggleStatus/<?= $s['id'] ?>" style="color: <?= $s['status'] == 'active' ? '#dd6b20' : '#38a169' ?>; margin-right: 12px; text-decoration: none; font-weight: 600;" data-confirm="Xác nhận <?= $s['status'] == 'active' ? 'KHÓA' : 'MỞ KHÓA' ?> đối tác này?">
                                         <i class="fa-solid <?= $s['status'] == 'active' ? 'fa-lock' : 'fa-lock-open' ?>"></i> <?= $s['status'] == 'active' ? 'Khóa' : 'Mở' ?>
                                     </a>
 
-                                    <a href="/lego_shop_php/adminsupplier/delete/<?= $s['id'] ?>" style="color: #e53e3e; text-decoration: none; font-weight: 600;" onclick="return confirm('Bạn có chắc muốn xóa Nhà cung cấp này? Nếu đã có giao dịch, hệ thống sẽ chỉ ẩn đi để bảo lưu dữ liệu.')">
+                                    <a href="/lego_shop_php/admin/supplier/delete/<?= $s['id'] ?>" style="color: #e53e3e; text-decoration: none; font-weight: 600;" data-confirm="Bạn có chắc muốn xóa Nhà cung cấp này? Nếu đã có giao dịch, hệ thống sẽ chỉ ẩn đi để bảo lưu dữ liệu.">
                                         <i class="fa-solid fa-trash"></i> Xóa
                                     </a>
                                 <?php endif; ?>
@@ -208,35 +208,35 @@ if($session_msg || $session_error): ?>
             <?= isset($supplier) ? 'Chỉnh sửa Đối tác: <span style="color: #38a169;">' . htmlspecialchars($supplier['name']) . '</span>' : 'Thêm Nhà cung cấp mới' ?>
         </h3>
         
-        <form id="supplierForm" action="<?= isset($supplier) ? '/lego_shop_php/adminsupplier/update/'.$supplier['id'] : '/lego_shop_php/adminsupplier/store' ?>" method="POST" style="margin-top: 20px;">
+        <form id="supplierForm" action="<?= isset($supplier) ? '/lego_shop_php/admin/supplier/update/'.$supplier['id'] : '/lego_shop_php/admin/supplier/store' ?>" method="POST" style="margin-top: 20px;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label>Tên nhà cung cấp / Công ty <span style="color:red">*</span></label>
-                    <input type="text" id="name" name="name" class="form-control" value="<?= $supplier['name'] ?? '' ?>" placeholder="Nhập tên đối tác...">
+                    <input type="text" id="name" name="name" class="form-control" value="<?= htmlspecialchars((string)($supplier['name'] ?? '')) ?>" placeholder="Nhập tên đối tác...">
                     <small class="error-text"></small>
                 </div>
                 <div class="form-group">
                     <label>Số điện thoại liên hệ <span style="color:red">*</span></label>
-                    <input type="text" id="phone" name="phone" class="form-control" value="<?= $supplier['phone'] ?? '' ?>" placeholder="Ví dụ: 0987654321">
+                    <input type="text" id="phone" name="phone" class="form-control" value="<?= htmlspecialchars((string)($supplier['phone'] ?? '')) ?>" placeholder="Ví dụ: 0987654321">
                     <small class="error-text"></small>
                 </div>
             </div>
             
             <div class="form-group">
                 <label>Email liên hệ</label>
-                <input type="email" id="email" name="email" class="form-control" value="<?= $supplier['email'] ?? '' ?>" placeholder="Ví dụ: contact@congty.com">
+                <input type="email" id="email" name="email" class="form-control" value="<?= htmlspecialchars((string)($supplier['email'] ?? '')) ?>" placeholder="Ví dụ: contact@congty.com">
                 <small class="error-text"></small>
             </div>
 
             <div class="form-group">
                 <label>Địa chỉ công ty / kho hàng</label>
-                <textarea id="address" name="address" class="form-control" rows="3" placeholder="Nhập địa chỉ đầy đủ..."><?= $supplier['address'] ?? '' ?></textarea>
+                <textarea id="address" name="address" class="form-control" rows="3" placeholder="Nhập địa chỉ đầy đủ..."><?= htmlspecialchars((string)($supplier['address'] ?? '')) ?></textarea>
                 <small class="error-text"></small>
             </div>
 
             <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #f1f5f9; display: flex; gap: 10px;">
                 <button type="submit" class="btn-submit"><i class="fa-solid fa-floppy-disk"></i> Lưu thông tin</button>
-                <a href="/lego_shop_php/adminsupplier" style="padding: 10px 20px; color: #475569; text-decoration: none; font-weight: 600; background: #edf2f7; border-radius: 8px;">Hủy bỏ</a>
+                <a href="/lego_shop_php/admin/supplier" style="padding: 10px 20px; color: #475569; text-decoration: none; font-weight: 600; background: #edf2f7; border-radius: 8px;">Hủy bỏ</a>
             </div>
         </form>
     </div>
@@ -305,7 +305,7 @@ if($session_msg || $session_error): ?>
 
             if (!(isNameValid && isPhoneValid && isEmailValid && isAddressValid)) {
                 e.preventDefault(); 
-                alert("⚠️ Vui lòng kiểm tra và sửa lại các trường bị báo đỏ trước khi lưu!");
+                uiAlert("Vui lòng kiểm tra và sửa lại các trường bị báo đỏ trước khi lưu!");
                 const firstError = document.querySelector(".input-error");
                 if(firstError) firstError.focus();
             }

@@ -1,6 +1,6 @@
 <aside class="side-bar">
     <div class="logo">
-        <h2><a href="/lego_shop_php/admindashboard">LEGO ADMIN</a></h2>
+        <h2><a href="/lego_shop_php/admin/dashboard">LEGO ADMIN</a></h2>
     </div>
     <nav class="menu">
     <?php 
@@ -18,7 +18,7 @@
         <ul class="system">
             <li class="menu-label">Hệ thống</li>
             <li>
-                <a href="/lego_shop_php/admindashboard" class="<?= isActive('admindashboard', $current_page) ?>">
+                <a href="/lego_shop_php/admin/dashboard" class="<?= isActive('admin/dashboard', $current_page) ?>">
                     <i class="fa-solid fa-gauge-high"></i>Tổng quan
                 </a>
             </li>
@@ -27,17 +27,39 @@
         <ul class="system">
             <li class="menu-label">Kinh doanh</li>
             <li>
-                <a href="/lego_shop_php/adminorder" class="<?= isActive('adminorder', $current_page) ?>">
+                <a href="/lego_shop_php/admin/order" class="<?= isActive('admin/order', $current_page) ?>">
                     <i class="fa-solid fa-cart-shopping"></i>Quản lý đơn hàng
                 </a>
             </li>
+            <?php
+                // Số yêu cầu hoàn tiền cần xử lý (chờ duyệt + chờ chuyển tiền)
+                require_once __DIR__ . '/../../models/RefundModel.php';
+                $refund_counts = (new RefundModel())->countByStatus();
+                $refund_open = $refund_counts['pending'] + $refund_counts['approved'];
+            ?>
+            <li>
+                <a href="/lego_shop_php/admin/refund" class="<?= isActive('admin/refund', $current_page) ?>">
+                    <i class="fa-solid fa-rotate-left"></i>Hoàn tiền / Trả hàng
+                    <?php if ($refund_open > 0): ?><span class="menu-count"><?= $refund_open ?></span><?php endif; ?>
+                </a>
+            </li>
+            <li>
+                <a href="/lego_shop_php/admin/payment" class="<?= isActive('admin/payment', $current_page) ?>">
+                    <i class="fa-solid fa-money-bill-transfer"></i>Giao dịch VietQR
+                </a>
+            </li>
+            <li>
+                <a href="/lego_shop_php/admin/voucher" class="<?= isActive('admin/voucher', $current_page) ?>">
+                    <i class="fa-solid fa-ticket"></i>Mã giảm giá
+                </a>
+            </li>
              <li>
-                <a href="/lego_shop_php/adminreview" class="<?= isActive('adminreview', $current_page) ?>">
+                <a href="/lego_shop_php/admin/review" class="<?= isActive('admin/review', $current_page) ?>">
                     <i class="fa-solid fa-star"></i>Đánh giá
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/admincustomer" class="<?= isActive('admincustomer', $current_page) ?>">
+                <a href="/lego_shop_php/admin/customer" class="<?= isActive('admin/customer', $current_page) ?>">
                     <i class="fa-solid fa-user-group"></i>Khách hàng
                 </a>
             </li>
@@ -46,18 +68,18 @@
         <ul class="system">
             <li class="menu-label">Sản phẩm</li>
             <li>
-                <a href="/lego_shop_php/admincategory" class="<?= isActive('admincategory', $current_page) ?>">
+                <a href="/lego_shop_php/admin/category" class="<?= isActive('admin/category', $current_page) ?>">
                     <i class="fa-solid fa-layer-group"></i>Danh mục
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/adminproduct" class="<?= isActive('adminproduct', $current_page) ?>">
+                <a href="/lego_shop_php/admin/product" class="<?= isActive('admin/product', $current_page) ?>">
                     <i class="fa-solid fa-cubes"></i>Sản phẩm
                 </a>
             </li>
             
             <li>
-    <a href="/lego_shop_php/adminprice" class="<?= isActive('adminprice', $current_page) ?>">
+    <a href="/lego_shop_php/admin/price" class="<?= isActive('admin/price', $current_page) ?>">
         <i class="fa-solid fa-tags"></i>Quản lý giá bán
     </a>
 </li>
@@ -66,29 +88,29 @@
         <ul class="system">
             <li class="menu-label">Kho hàng</li>
             <li>
-                <a href="/lego_shop_php/adminsupplier" class="<?= isActive('adminsupplier', $current_page) ?>">
+                <a href="/lego_shop_php/admin/supplier" class="<?= isActive('admin/supplier', $current_page) ?>">
                     <i class="fa-solid fa-handshake"></i>Nhà cung cấp
                 </a>
             </li>
             <li>
-    <a href="/lego_shop_php/adminimport" class="<?= isActive('adminimport', $current_page) ?>">
+    <a href="/lego_shop_php/admin/import" class="<?= isActive('admin/import', $current_page) ?>">
         <i class="fa-solid fa-file-invoice-dollar"></i>Quản lý phiếu nhập
     </a>
 </li>
 <li>
-                <a href="/lego_shop_php/admininventory" class="<?= isActive('admininventory', $current_page) ?>">
+                <a href="/lego_shop_php/admin/inventory" class="<?= isActive('admin/inventory', $current_page) ?>">
                     <i class="fa-solid fa-warehouse"></i>Quản lý tồn kho
                 </a>
             </li>
             <li>
-                <a href="/lego_shop_php/adminreport" class="<?= isActive('adminreport', $current_page) ?>">
+                <a href="/lego_shop_php/admin/report" class="<?= isActive('admin/report', $current_page) ?>">
                     <i class="fa-solid fa-chart-line"></i>Thống kê báo cáo
                 </a>
             </li>
         </ul>
 
         <ul class="support">
-            <li><a href="/lego_shop_php/adminsetting" class="<?= isActive('adminsetting', $current_page) ?>">
+            <li><a href="/lego_shop_php/admin/setting" class="<?= isActive('admin/setting', $current_page) ?>">
                 <i class="fa-solid fa-gear"></i>Cài đặt hệ thống
             </a></li>
             <li><a href="/lego_shop_php/admin/logout"><i class="fa-solid fa-power-off"></i>Đăng xuất</a></li>
@@ -108,6 +130,20 @@
     }
     .side-bar .menu ul {
         margin-bottom: 15px;
+    }
+    .menu-count {
+        margin-left: auto;
+        background: #2563eb;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 800;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
     
 </style>

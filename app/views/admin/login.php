@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - LEGO World Store</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <link rel="stylesheet" href="/lego_shop_php/public/assets/vendor/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin.css">
 </head>
 <body class="admin-body">

@@ -24,7 +24,7 @@
             <h2>Tạo mật khẩu mới</h2>
         </div>
         <div class="reset-body">
-            <?php if ($error): ?> <div class="alert-danger">⚠️ <?= $error ?></div> <?php endif; ?>
+            <?php if ($error): ?> <div class="alert-danger"><i class="fa-solid fa-triangle-exclamation"></i> <?= $error ?></div> <?php endif; ?>
 
             <form id="resetForm" action="/lego_shop_php/account/actionReset" method="POST" novalidate>
                 <div style="margin-bottom: 20px;">

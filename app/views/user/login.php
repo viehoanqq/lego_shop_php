@@ -48,7 +48,7 @@ $success = $data['success'] ?? null;
             <form id="loginForm" action="/lego_shop_php/account/actionLogin" method="POST" novalidate>
                 <div class="form-group">
                     <label>Email hoặc Số điện thoại</label>
-                    <input type="text" name="username" id="username" value="<?= $old['username'] ?? '' ?>" placeholder="Nhập Email hoặc SĐT của bạn" required>
+                    <input type="text" name="username" id="username" value="<?= htmlspecialchars((string)($old['username'] ?? '')) ?>" placeholder="Nhập Email hoặc SĐT của bạn" required>
                     <span class="error-msg" id="username-error"></span>
                 </div>
 

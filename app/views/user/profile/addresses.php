@@ -15,7 +15,7 @@
                     <?php if (empty($addresses)): ?>
                         <div style="text-align: center; padding: 40px; color: #888;">
                             <i class="fa-regular fa-map" style="font-size: 40px; margin-bottom: 10px;"></i>
-                            <p>Bạn chưa có địa chỉ nào. Hãy thêm địa chỉ mới nhé!</p>
+                            <p>Bạn chưa có địa chỉ nào.</p>
                         </div>
                     <?php else: ?>
                         <?php foreach($addresses as $addr): ?>
@@ -146,7 +146,7 @@
         </div>
         <h3 style="margin-bottom: 10px; font-size: 22px; color: #333;">Xóa địa chỉ?</h3>
         <p style="color: #666; margin-bottom: 25px; font-size: 15px; line-height: 1.5;">
-            Bạn có chắc chắn muốn xóa địa chỉ này không?<br>Hành động này không thể hoàn tác.
+            Bạn có chắc chắn muốn xóa địa chỉ này không?
         </p>
         <div style="display: flex; justify-content: center; gap: 15px;">
             <button class="btn-cancel" id="cancelDeleteBtn">Hủy bỏ</button>

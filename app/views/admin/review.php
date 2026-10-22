@@ -276,7 +276,7 @@ $session_error = get_flash_message('error');
 <div class="review-management-container">
     <div class="header">
         <div class="header-title">
-            <form action="/lego_shop_php/adminreview" method="GET" 
+            <form action="/lego_shop_php/admin/review" method="GET" 
                   style="display: flex; gap: 12px; margin-top: 20px; width: 100%; align-items: center;">
 
                 <div class="search-group">
@@ -351,13 +351,13 @@ $session_error = get_flash_message('error');
 
                         <td style="text-align:center;">
                             <div style="display: flex; justify-content: center; gap: 4px;">
-                                <a href="/lego_shop_php/adminreview/toggleStatus?id=<?= $r['id'] ?>&status=<?= $r['status'] ?>" 
+                                <a href="/lego_shop_php/admin/review/toggleStatus?id=<?= $r['id'] ?>&status=<?= $r['status'] ?>" 
                                    class="action-btn btn-toggle" title="<?= $r['status']=='approved'?'Ẩn đánh giá':'Hiện đánh giá' ?>">
                                     <i class="fa-solid <?= $r['status']=='approved'?'fa-eye-slash':'fa-eye' ?>"></i>
                                 </a>
-                                <a href="/lego_shop_php/adminreview/delete/<?= $r['id'] ?>" 
+                                <a href="/lego_shop_php/admin/review/delete/<?= $r['id'] ?>" 
                                     class="action-btn btn-delete"
-                                    onclick="return confirm('Bạn có chắc muốn xóa đánh giá này không? Thao tác này không thể hoàn tác!')"
+                                    data-confirm="Bạn có chắc muốn xóa đánh giá này không? Thao tác này không thể hoàn tác!"
                                     title="Xóa vĩnh viễn">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>

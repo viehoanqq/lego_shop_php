@@ -56,7 +56,6 @@
                     <input type="email" placeholder="Nhập email của bạn" required />
                     <button type="submit">Đăng ký</button>
                 </form>
-                <small class="subscribe-note">*Bạn có thể hủy đăng ký bất kỳ lúc nào!</small>
             </div>
         </div>
 

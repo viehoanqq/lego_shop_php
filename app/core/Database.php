@@ -1,25 +1,37 @@
 <?php
+require_once __DIR__ . '/Env.php';
+Env::load(__DIR__ . '/../../.env');
+
 class Database {
-    private $host = "localhost";
-    private $port = 3306;
-    private $db_name = "lego_shop";
-    private $username = "root";
-    private $password = "";
     public $conn;
 
-    public function getConnection() {
-        $this->conn = null;
-        try {
-            $this->conn = new mysqli($this->host, $this->username, $this->password, $this->db_name, $this->port);
-            $this->conn->set_charset("utf8");
+    // Dùng chung 1 kết nối cho toàn bộ request để transaction hoạt động xuyên suốt giữa các Model
+    private static $sharedConn = null;
 
-            // --- CHỈNH Ở ĐÂY ---
-            // Ép MySQL luôn chạy múi giờ Việt Nam (+07:00)
-            $this->conn->query("SET time_zone = '+07:00'");
-            
-        } catch(Exception $e) {
-            echo "Lỗi kết nối: " . $e->getMessage();
+    public function getConnection() {
+        if (self::$sharedConn === null) {
+            // Thông tin kết nối lấy từ file .env (bộ test tự đặt DB_NAME=lego_shop_test)
+            try {
+                self::$sharedConn = new mysqli(
+                    env('DB_HOST', 'localhost'),
+                    env('DB_USER', 'root'),
+                    (string)env('DB_PASS', ''),
+                    env('DB_NAME', 'lego_shop'),
+                    (int)env('DB_PORT', 3306)
+                );
+                self::$sharedConn->set_charset("utf8mb4");
+
+                // Ép MySQL luôn chạy múi giờ Việt Nam (+07:00)
+                self::$sharedConn->query("SET time_zone = '+07:00'");
+
+            } catch (Exception $e) {
+                // Không in chi tiết lỗi (lộ host/user DB) khi chạy thật
+                error_log('DB connection error: ' . $e->getMessage());
+                http_response_code(500);
+                exit(env('APP_DEBUG', false) ? 'Lỗi kết nối CSDL: ' . $e->getMessage() : 'Hệ thống đang bảo trì, vui lòng thử lại sau.');
+            }
         }
+        $this->conn = self::$sharedConn;
         return $this->conn;
     }
 }

@@ -21,12 +21,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($title) ? $title . ' - ' . htmlspecialchars($shop_name) : htmlspecialchars($shop_name) ?></title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <link rel="stylesheet" href="/lego_shop_php/public/assets/vendor/fontawesome/css/all.min.css" />
     
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/global.css">
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/components/header.css">
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/components/footer.css">
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/components/productCard.css">
+    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/responsive.css">
+    <script src="/lego_shop_php/public/assets/js/ui-dialog.js"></script>
+    <?php $flash_dialog = function_exists('get_flash_message') ? get_flash_message('dialog') : null; if ($flash_dialog): ?>
+    <script>document.addEventListener('DOMContentLoaded', () => uiAlert(<?= json_encode($flash_dialog) ?>));</script>
+    <?php endif; ?>
     <script src="/lego_shop_php/public/assets/js/main.js" defer></script>
 </head>
 <body>
@@ -124,7 +129,8 @@
                     <i class="fa-solid fa-user"></i> <span id="name"><?= htmlspecialchars($_SESSION['user_fullname']) ?></span>
                 </a>
                 <ul class="user-dropdown-menu">
-                     <li><a href="/lego_shop_php/profile/edit"><i class="fa-solid fa-user-pen"></i> Xem trang cá nhân</a></li>
+                     <li><a href="/lego_shop_php/profile/index"><i class="fa-solid fa-user-pen"></i> Xem trang cá nhân</a></li>
+                    <li><a href="/lego_shop_php/profile/orders"><i class="fa-solid fa-box"></i> Đơn hàng của tôi</a></li>
                     <li><a href="/lego_shop_php/wishlist"><i class="fa-solid fa-heart"></i> Sản phẩm yêu thích</a></li>
                     <li><a href="/lego_shop_php/account/logout" style="color: #dc3545;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
                 </ul>

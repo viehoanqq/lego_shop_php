@@ -1,0 +1,115 @@
+/* =====================================================================
+   RESPONSIVE - giao diện khách hàng (tablet <= 992px, điện thoại <= 576px)
+   File được nạp sau cùng nên ghi đè được style cũ của từng trang.
+   ===================================================================== */
+img { max-width: 100%; }
+
+/* Nút mở bộ lọc ở trang sản phẩm: chỉ hiện trên mobile */
+.mobile-filter-toggle { display: none; }
+
+@media (max-width: 992px) {
+    /* ---------- HEADER ---------- */
+    header .top-bar { padding: 6px 12px; justify-content: flex-start; gap: 22px; overflow-x: auto; white-space: nowrap; font-size: 12px; scrollbar-width: none; }
+    header .top-bar::-webkit-scrollbar { display: none; }
+    header .top-bar span { flex-shrink: 0; }
+
+    body header .main-header { padding: 10px 12px; flex-wrap: wrap !important; gap: 10px; }
+    header .logo img { width: 170px; }
+    body header .search-bar { order: 3; flex: 1 1 100%; max-width: none; margin: 0; }
+    body header .user-options { gap: 12px; }
+    header .user-options a { font-size: 14px; }
+
+    header .header-menu-ul { gap: 22px !important; padding: 12px 10px !important; }
+    header .header-menu-ul li a { font-size: 14px; }
+
+    /* ---------- DANH SÁCH SẢN PHẨM ---------- */
+    body .product-page-wrapper .container { grid-template-columns: 1fr !important; gap: 20px !important; }
+    body .category-header-bar { flex-wrap: wrap; gap: 12px; }
+    body .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+
+    /* Bộ lọc thu gọn sau nút "Bộ lọc" */
+    .mobile-filter-toggle { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; background: #fff; border: 1px solid #eee; border-radius: 10px; font-size: 15px; font-weight: 600; color: #333; cursor: pointer; }
+    .mobile-filter-toggle i:first-child { color: #a4161a; }
+    .mobile-filter-toggle .toggle-caret { margin-left: auto; font-size: 12px; transition: transform .2s; }
+    .mobile-filter-toggle.open .toggle-caret { transform: rotate(180deg); }
+    body .product-page-wrapper .left-column { display: none; }
+    body .product-page-wrapper .left-column.open { display: block; }
+
+    /* ---------- HỒ SƠ: menu gọn, cuộn ngang ---------- */
+    body .profile-container { padding: 16px 12px; gap: 16px; }
+    body .profile-sidebar { border-width: 1px; }
+    body .profile-avatar { display: grid; grid-template-columns: 48px 1fr; column-gap: 12px; align-items: center; text-align: left; padding: 12px 16px; }
+    body .profile-avatar .avatar-img { grid-row: span 2; }
+    body .profile-avatar .avatar-img { width: 48px; height: 48px; margin: 0; }
+    body .profile-avatar .user-name { font-size: 16px; margin: 0; }
+    body .profile-avatar .user-email { font-size: 12px; margin: 0; }
+    body .profile-menu { display: flex; overflow-x: auto; scrollbar-width: none; }
+    body .profile-menu::-webkit-scrollbar { display: none; }
+    body .profile-menu .menu-item { flex-shrink: 0; white-space: nowrap; padding: 12px 14px; border-left: none; border-bottom: 3px solid transparent; }
+    body .profile-menu .menu-item.active { border-bottom-color: #a4161a; }
+    body .profile-main { width: 100%; min-width: 0; }
+
+    /* ---------- XEM ĐƠN HÀNG ---------- */
+    body .order-detail-box { width: 100%; padding: 20px 16px; }
+}
+
+@media (max-width: 576px) {
+    header .logo img { width: 140px; }
+    header .user-options #name { display: inline-block; max-width: 90px; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
+    header .header-menu-ul { gap: 16px !important; }
+    header .header-menu-ul li a { font-size: 13px; }
+
+    /* ---------- THẺ SẢN PHẨM: lưới 2 cột ---------- */
+    body .product-grid,
+    body .new-products-grid,
+    body .featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+    body .product-card { max-width: none; padding: 12px; border-radius: 14px; }
+    body .product-card:hover { transform: none; }
+    body .product-image { height: 130px; margin-bottom: 10px; }
+    body .product-name { height: 36px; margin-bottom: 10px; }
+    body .product-name a { font-size: 13px; }
+    body .current-price { font-size: 14px; }
+    body .product-price { margin-bottom: 12px; }
+    body .product-actions { gap: 6px; }
+    body .btn-add-cart { font-size: 12px; padding: 8px 0; gap: 5px; }
+    body .btn-wishlist { font-size: 19px; }
+    body .badge-new { top: 6px; right: 6px; }
+
+    /* ---------- GIỎ HÀNG: mỗi sản phẩm là 1 thẻ ---------- */
+    body .cart-header-row { display: none; }
+    body .cart-item { flex-wrap: wrap; gap: 10px; padding: 16px; position: relative; }
+    body .cart-item .item-info { width: 100% !important; padding-right: 30px; }
+    body .cart-item .item-price { width: auto !important; justify-content: flex-start !important; color: #888; font-size: 13px; }
+    body .cart-item .item-qty { width: auto !important; }
+    body .cart-item .item-subtotal { width: auto !important; margin-left: auto; }
+    body .cart-item .item-action { position: absolute; top: 14px; right: 12px; width: auto !important; }
+    body .cart-header-title h2 { font-size: 24px; }
+
+    /* ---------- CHECKOUT / XEM ĐƠN ---------- */
+    body .checkout-header-title h2 { font-size: 24px; }
+    body .checkout-progress .step { width: 64px; }
+    body .checkout-progress .step-text { font-size: 11px; }
+    body .order-header { flex-wrap: wrap; gap: 10px; }
+    body .order-header h2 { font-size: 20px; }
+    body .table-items th:nth-child(2), body .table-items td:nth-child(2) { display: none; } /* ẩn cột đơn giá */
+    body .table-items th, body .table-items td { padding: 10px 6px; font-size: 13px; }
+    body .item-product img { width: 44px; height: 44px; }
+    body .total-section { width: 100%; }
+    body .btn-wrap { display: flex; flex-direction: column; gap: 10px; }
+    body .btn-wrap .btn-continue { margin: 0; }
+
+    /* ---------- HỒ SƠ ---------- */
+    body .profile-form-box { padding: 18px !important; }
+    body .order-card { padding: 14px !important; }
+}
+
+@media (max-width: 576px) {
+    /* ---------- POPUP CHI TIẾT ĐƠN (Đơn hàng của tôi) ---------- */
+    body .modal-overlay .modal-box { width: 94% !important; max-height: 92vh; }
+    body .order-modal-content { padding: 16px !important; }
+    body .md-info-row { flex-direction: column; gap: 10px !important; }
+    body .md-footer-row { flex-direction: column-reverse; align-items: stretch !important; gap: 12px; }
+    body .bank-fields { grid-template-columns: 1fr; }
+    body .bank-fields select { grid-column: auto; }
+    body #md_items_body td { padding: 10px 8px !important; font-size: 13px; }
+}

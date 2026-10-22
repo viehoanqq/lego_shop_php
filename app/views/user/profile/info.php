@@ -25,7 +25,6 @@
                         <label>Số điện thoại <span style="color: red;">*</span></label>
                         <input type="tel" id="phone" name="phone" value="<?= htmlspecialchars($user_info['phone'] ?? '') ?>" required />
                         <small id="phoneError" style="color: red; display: none; margin-top: 5px;"></small>
-                        <small style="display: block; margin-top: 6px; color: #888; font-size: 12px;">Nhập 10 số, bắt đầu bằng 03, 05, 07, 08, 09</small>
                     </div>
 
                     <button type="submit" class="update-btn"><i class="fa-solid fa-floppy-disk"></i> Cập nhật thông tin</button>

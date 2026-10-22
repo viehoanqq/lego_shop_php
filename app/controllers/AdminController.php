@@ -6,13 +6,13 @@ class AdminController extends Controller {
             header("Location: /lego_shop_php/admin/login");
             exit;
         }
-        header("Location: /lego_shop_php/admindashboard");
+        header("Location: /lego_shop_php/admin/dashboard");
         exit;
     }
 
     public function login() {
         if (isset($_SESSION['admin_id'])) {
-            header("Location: /lego_shop_php/admindashboard");
+            header("Location: /lego_shop_php/admin/dashboard");
             exit;
         }
 
@@ -27,11 +27,12 @@ class AdminController extends Controller {
             $adminUser = $accountModel->checkAdminLogin($username, $password);
 
             if ($adminUser) {
+                session_regenerate_id(true); // chống session fixation
                 $_SESSION['admin_id'] = $adminUser['id'];
                 $_SESSION['admin_name'] = $adminUser['fullname'];
                 $_SESSION['admin_role'] = $adminUser['role'];
                 
-                header("Location: /lego_shop_php/admindashboard");
+                header("Location: /lego_shop_php/admin/dashboard");
                 exit;
             } else {
                 $error = "Tài khoản hoặc mật khẩu không chính xác, hoặc bạn không có quyền Admin!";

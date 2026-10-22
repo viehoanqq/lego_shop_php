@@ -100,7 +100,7 @@ class AdminImportController extends Controller {
         
         $receipt = $importModel->getImportById($id);
         if (!$receipt) {
-            header("Location: /lego_shop_php/adminimport?error=notfound");
+            header("Location: /lego_shop_php/admin/import?error=notfound");
             exit;
         }
 
@@ -118,9 +118,9 @@ class AdminImportController extends Controller {
         $importModel = $this->model('ImportModel');
         if ($importModel->completeImport($id)) {
             // Hoàn tất thành công, quay lại trang chi tiết kèm thông báo
-            header("Location: /lego_shop_php/adminimport/detail/$id?msg=completed");
+            header("Location: /lego_shop_php/admin/import/detail/$id?msg=completed");
         } else {
-            header("Location: /lego_shop_php/adminimport/detail/$id?error=1");
+            header("Location: /lego_shop_php/admin/import/detail/$id?error=1");
         }
         exit;
     }
@@ -131,7 +131,8 @@ class AdminImportController extends Controller {
         
         $receipt = $importModel->getImportById($id);
         if (!$receipt || $receipt['status'] !== 'completed') {
-            echo "<script>alert('Lỗi: Chỉ có thể in phiếu nhập đã hoàn tất!'); window.close();</script>";
+            set_flash_message('dialog', 'Chỉ có thể in phiếu nhập đã hoàn tất!');
+            header("Location: /lego_shop_php/admin/import/detail/" . (int)$id);
             exit;
         }
 
@@ -160,7 +161,7 @@ class AdminImportController extends Controller {
         $receipt = $importModel->getImportById($id);
         // Chặn nếu không tìm thấy phiếu, hoặc phiếu KHÔNG PHẢI BẢN NHÁP
         if (!$receipt || $receipt['status'] !== 'draft') {
-            header("Location: /lego_shop_php/adminimport");
+            header("Location: /lego_shop_php/admin/import");
             exit;
         }
 

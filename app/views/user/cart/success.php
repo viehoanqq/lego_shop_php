@@ -129,10 +129,24 @@
                     <strong>#<?= htmlspecialchars($order_id ?? 'N/A') ?></strong>
                 </div>
                 
-                <p class="success-desc">
-                    Cảm ơn bạn đã mua sắm tại <strong>LEGO WORLD STORE</strong>.<br>
-                    Hệ thống đã ghi nhận đơn hàng. Chúng tôi sẽ sớm liên hệ với bạn để xác nhận và giao hàng trong thời gian sớm nhất.
-                </p>
+                <?php if (!empty($order)): ?>
+                    <p class="success-desc" style="margin-bottom: 15px;">
+                        Tổng thanh toán: <strong><?= number_format($order['total_amount'], 0, ',', '.') ?>đ</strong>
+                        <?php if ($order['discount_amount'] > 0): ?>
+                            (đã giảm <?= number_format($order['discount_amount'], 0, ',', '.') ?>đ)
+                        <?php endif; ?>
+                        <br>
+                        <?php if ($order['payment_method'] === 'vietqr' && $order['payment_status'] === 'paid'): ?>
+                            Đã thanh toán qua VietQR
+                        <?php elseif ($order['payment_method'] === 'vietqr'): ?>
+                            Chưa thanh toán - <a href="/lego_shop_php/checkout/payment?order_id=<?= (int)$order['id'] ?>" style="color:#a4161a; font-weight:700;">Thanh toán ngay</a>
+                        <?php else: ?>
+                            Thanh toán khi nhận hàng (COD)
+                        <?php endif; ?>
+                    </p>
+                <?php endif; ?>
+
+                <p class="success-desc">Cảm ơn bạn đã mua sắm tại <strong>LEGO WORLD STORE</strong>.</p>
 
                 <div class="action-buttons">
                     <a href="/lego_shop_php/home" class="btn-outline-red">

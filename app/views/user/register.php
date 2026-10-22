@@ -87,12 +87,12 @@ $error = $data['error'] ?? null;
                 <div class="form-row">
                     <div class="form-group">
                         <label>Số điện thoại *</label>
-                        <input type="text" name="phone" id="phone" value="<?= $old['phone'] ?? '' ?>" placeholder="Nhập số điện thoại">
+                        <input type="text" name="phone" id="phone" value="<?= htmlspecialchars((string)($old['phone'] ?? '')) ?>" placeholder="Nhập số điện thoại">
                         <span class="error-msg" id="phone-error"></span>
                     </div>
                     <div class="form-group">
                         <label>Email *</label>
-                        <input type="email" name="email" id="email" value="<?= $old['email'] ?? '' ?>" placeholder="example@gmail.com">
+                        <input type="email" name="email" id="email" value="<?= htmlspecialchars((string)($old['email'] ?? '')) ?>" placeholder="example@gmail.com">
                         <span class="error-msg" id="email-error"></span>
                     </div>
                 </div>
@@ -112,7 +112,7 @@ $error = $data['error'] ?? null;
                 <div class="form-section">THÔNG TIN & ĐỊA CHỈ</div>
                 <div class="form-group">
                     <label>Họ và tên *</label>
-                    <input type="text" name="fullname" id="fullname" value="<?= $old['fullname'] ?? '' ?>" placeholder="Nhập họ & tên">
+                    <input type="text" name="fullname" id="fullname" value="<?= htmlspecialchars((string)($old['fullname'] ?? '')) ?>" placeholder="Nhập họ & tên">
                     <span class="error-msg" id="fullname-error"></span>
                 </div>
                 <div class="form-row">
@@ -143,7 +143,7 @@ $error = $data['error'] ?? null;
                     </div>
                     <div class="form-group">
                         <label>Số nhà, tên đường *</label>
-                        <input type="text" name="street" id="street" value="<?= $old['street'] ?? '' ?>" placeholder="Nhập địa chỉ cụ thể">
+                        <input type="text" name="street" id="street" value="<?= htmlspecialchars((string)($old['street'] ?? '')) ?>" placeholder="Nhập địa chỉ cụ thể">
                         <span class="error-msg" id="street-error"></span>
                     </div>
                 </div>
@@ -242,7 +242,7 @@ $error = $data['error'] ?? null;
         
         const terms = document.getElementById('terms');
         if (!terms.checked) {
-            alert("Bạn phải đồng ý với Điều khoản dịch vụ để tiếp tục!");
+            uiAlert("Bạn phải đồng ý với Điều khoản dịch vụ để tiếp tục!");
             valid = false;
         }
 

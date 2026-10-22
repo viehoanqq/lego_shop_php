@@ -14,8 +14,8 @@
                 <div class="thumbnail-list">
                     <?php if(!empty($images)): ?>
                         <?php foreach($images as $img): ?>
-                            <div class="thumb-item" onclick="changeMainImage('<?= $img['image_url'] ?>')">
-                                <img src="/lego_shop_php/public/assets/images/<?= $img['image_url'] ?>" alt="Thumbnail">
+                            <div class="thumb-item" onclick="changeMainImage('<?= htmlspecialchars((string)($img['image_url'])) ?>')">
+                                <img src="/lego_shop_php/public/assets/images/<?= htmlspecialchars((string)($img['image_url'])) ?>" alt="Thumbnail">
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -170,7 +170,7 @@
                 <?php else: ?>
                     <div class="no-reviews" style="text-align: center; padding: 40px 0; background: #f9f9f9; border-radius: 8px; border: 1px dashed #ddd;">
                         <i class="fa-regular fa-comment-dots" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i>
-                        <p style="color: #666; margin: 0;">Chưa có đánh giá nào. Hãy mua hàng và là người đầu tiên đánh giá sản phẩm này!</p>
+                        <p style="color: #666; margin: 0;">Chưa có đánh giá nào.</p>
                     </div>
                 <?php endif; ?>
             </div>

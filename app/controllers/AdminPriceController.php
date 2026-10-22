@@ -73,7 +73,7 @@ class AdminpriceController extends Controller {
         
         $product = $productModel->getProductFullDetail($id);
         if (!$product) {
-            header("Location: /lego_shop_php/adminprice?error=notfound");
+            header("Location: /lego_shop_php/admin/price?error=notfound");
             exit;
         }
 
@@ -91,7 +91,7 @@ class AdminpriceController extends Controller {
         $receipt = $importModel->getImportById($id);
         // Chặn nếu không phải bản nháp
         if (!$receipt || $receipt['status'] !== 'draft') {
-            header("Location: /lego_shop_php/adminimport");
+            header("Location: /lego_shop_php/admin/import");
             exit;
         }
 

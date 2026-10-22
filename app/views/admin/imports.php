@@ -116,7 +116,7 @@
         <?php if(isset($_GET['error'])): ?>
             <div class="alert-box error-js" style="padding: 15px; border-radius: 8px; background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; display: flex; align-items: center; gap: 10px;">
                 <i class="fa-solid fa-triangle-exclamation"></i>
-                <span>❌ Lỗi hệ thống: Không thể xử lý dữ liệu.</span>
+                <span>Lỗi hệ thống: Không thể xử lý dữ liệu.</span>
             </div>
         <?php endif; ?>
     </div>
@@ -127,7 +127,7 @@
      
     </div>
     <?php if(!isset($is_form) || $is_form === false): ?>
-        <a href="/lego_shop_php/adminimport/create" style="background: #3182ce; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+        <a href="/lego_shop_php/admin/import/create" style="background: #3182ce; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-plus"></i> Lập phiếu nhập mới
         </a>
     <?php endif; ?>
@@ -136,7 +136,7 @@
 <?php if(!isset($is_form) || $is_form === false): ?>
 <div style="background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
     
-    <form id="filterForm" action="/lego_shop_php/adminimport" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+    <form id="filterForm" action="/lego_shop_php/admin/import" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
         
         <div style="flex: 1; min-width: 180px;">
             <label style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Tìm kiếm</label>
@@ -181,7 +181,7 @@
         </div>
 
         <div>
-            <a href="/lego_shop_php/adminimport" style="display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; text-decoration: none; padding: 0 15px; border-radius: 6px; font-weight: 600; height: 42px; transition: 0.2s;">
+            <a href="/lego_shop_php/admin/import" style="display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; text-decoration: none; padding: 0 15px; border-radius: 6px; font-weight: 600; height: 42px; transition: 0.2s;">
                 <i class="fa-solid fa-rotate-right" style="margin-right: 5px;"></i> Làm mới
             </a>
         </div>
@@ -212,7 +212,7 @@
                 </div>
                 <div class="form-group" style="margin: 0;">
                     <label>Nhân viên tiếp nhận</label>
-                    <input type="text" class="form-control" value="<?= $_SESSION['admin_name'] ?>" readonly style="background: #edf2f7; cursor: not-allowed; color: #4a5568; font-weight: 600;">
+                    <input type="text" class="form-control" value="<?= htmlspecialchars((string)($_SESSION['admin_name'])) ?>" readonly style="background: #edf2f7; cursor: not-allowed; color: #4a5568; font-weight: 600;">
                 </div>
                 
                 <div class="form-group" style="margin: 0;">
@@ -288,9 +288,9 @@
                 </button>
                 
                 <?php if(isset($receipt)): ?>
-                    <a href="/lego_shop_php/adminimport/detail/<?= $receipt['id'] ?>" class="btn-action" style="padding: 10px 20px; color: #718096; background: #edf2f7; display:flex; align-items:center;">Hủy bỏ chỉnh sửa</a>
+                    <a href="/lego_shop_php/admin/import/detail/<?= $receipt['id'] ?>" class="btn-action" style="padding: 10px 20px; color: #718096; background: #edf2f7; display:flex; align-items:center;">Hủy bỏ chỉnh sửa</a>
                 <?php else: ?>
-                    <a href="/lego_shop_php/adminimport" class="btn-action" style="padding: 10px 20px; color: #718096; background: #edf2f7; display:flex; align-items:center;">Hủy bỏ</a>
+                    <a href="/lego_shop_php/admin/import" class="btn-action" style="padding: 10px 20px; color: #718096; background: #edf2f7; display:flex; align-items:center;">Hủy bỏ</a>
                 <?php endif; ?>
             </div>
         </form>
@@ -339,7 +339,7 @@
                         <?= number_format($item['total_amount'], 0, ',', '.') ?>đ
                     </td>
                     <td style="text-align: center;">
-                        <a href="/lego_shop_php/adminimport/detail/<?= $item['id'] ?>" class="btn-action" style="color: #3182ce; border: 1px solid #3182ce;">
+                        <a href="/lego_shop_php/admin/import/detail/<?= $item['id'] ?>" class="btn-action" style="color: #3182ce; border: 1px solid #3182ce;">
                             <i class="fa-solid fa-circle-info"></i> Kiểm tra
                         </a>
                     </td>
@@ -366,7 +366,7 @@
         if (!empty($filters['end_date'])) $query_params['end_date'] = $filters['end_date'];
         
         $base_query = http_build_query($query_params);
-        $url_prefix = "/lego_shop_php/adminimport?" . (!empty($base_query) ? $base_query . "&" : "");
+        $url_prefix = "/lego_shop_php/admin/import?" . (!empty($base_query) ? $base_query . "&" : "");
     ?>
     
     <div class="pagination">
@@ -479,10 +479,10 @@
 
     async function submitImportForm(status) {
         const supplierId = document.getElementById('supplier_id').value;
-        if (!supplierId) return alert("Vui lòng chọn Nhà cung cấp!");
+        if (!supplierId) return uiAlert("Vui lòng chọn Nhà cung cấp!");
 
         const rows = document.querySelectorAll('#importTable tbody tr');
-        if (rows.length === 0) return alert("Vui lòng thêm ít nhất một sản phẩm!");
+        if (rows.length === 0) return uiAlert("Vui lòng thêm ít nhất một sản phẩm!");
 
         const productsDataToSend = [];
         let isValid = true;
@@ -500,9 +500,9 @@
             }
         });
 
-        if (!isValid) return alert("Vui lòng điền đầy đủ và đúng thông tin sản phẩm!");
+        if (!isValid) return uiAlert("Vui lòng điền đầy đủ và đúng thông tin sản phẩm!");
 
-        if(status === 'completed' && !confirm("Xác nhận hoàn tất? Thao tác này sẽ cập nhật kho và không thể sửa sau đó.")) return;
+        if (status === 'completed' && !(await uiConfirm("Xác nhận hoàn tất? Thao tác này sẽ cập nhật kho và không thể sửa sau đó.", { okText: 'Hoàn tất' }))) return;
 
         const formData = {
             supplier_id: supplierId,
@@ -511,7 +511,7 @@
             import_date: document.getElementById('import_date').value || new Date().toISOString()
         };
 
-        const targetUrl = isEdit ? '/lego_shop_php/adminimport/updateDraft/' + receiptId : '/lego_shop_php/adminimport/store';
+        const targetUrl = isEdit ? '/lego_shop_php/admin/import/updateDraft/' + receiptId : '/lego_shop_php/admin/import/store';
 
         try {
             const response = await fetch(targetUrl, {
@@ -521,9 +521,9 @@
             });
             const result = await response.json();
             if(result.success) {
-                window.location.href = isEdit ? `/lego_shop_php/adminimport/detail/${receiptId}?msg=updated` : '/lego_shop_php/adminimport?msg=success';
-            } else { alert("Lỗi: " + result.message); }
-        } catch (err) { alert("Lỗi kết nối server!"); }
+                window.location.href = isEdit ? `/lego_shop_php/admin/import/detail/${receiptId}?msg=updated` : '/lego_shop_php/admin/import?msg=success';
+            } else { uiAlert("Lỗi: " + result.message); }
+        } catch (err) { uiAlert("Lỗi kết nối server!"); }
     }
 
     function handleProductSelect(input) {
@@ -539,7 +539,7 @@
         }
         input.parentElement.querySelector('.real-product-id').value = foundId;
         if (!foundId && val.trim() !== "") {
-            alert("Vui lòng chọn sản phẩm từ danh sách gợi ý!");
+            uiAlert("Vui lòng chọn sản phẩm từ danh sách gợi ý!");
             input.value = "";
         }
     }

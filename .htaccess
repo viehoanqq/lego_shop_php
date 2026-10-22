@@ -1,7 +1,21 @@
 RewriteEngine On
 
+# Giữ lại header Authorization cho webhook thanh toán (SePay gửi "Authorization: Apikey ...")
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # Khai báo thư mục gốc ảo để .htaccess không bị lạc đường
 RewriteBase /lego_shop_php/
+
+# ---------------------------------------------------------------------
+# BẢO MẬT: chặn truy cập trực tiếp file / thư mục không dành cho trình duyệt
+# (mã nguồn, dữ liệu SQL, bộ test, git, .env, tài liệu)
+# ---------------------------------------------------------------------
+RewriteRule ^(app|database|tests)(/|$) - [F,L]
+RewriteRule (^|/)\. - [F,L]
+RewriteRule \.(sql|md|env|example|log|sh|bak|ini|lock)$ - [F,L]
+
+# Không liệt kê nội dung thư mục
+Options -Indexes
 
 # Bỏ qua nếu là file (hình ảnh, css) hoặc thư mục có thật
 RewriteCond %{REQUEST_FILENAME} !-f

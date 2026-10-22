@@ -30,7 +30,7 @@
             <p>Nhập Email hoặc SĐT để tìm lại tài khoản</p>
         </div>
         <div class="forgot-body">
-            <?php if ($error): ?> <div class="alert-danger">⚠️ <?= $error ?></div> <?php endif; ?>
+            <?php if ($error): ?> <div class="alert-danger"><i class="fa-solid fa-triangle-exclamation"></i> <?= $error ?></div> <?php endif; ?>
 
             <form id="forgotForm" action="/lego_shop_php/account/actionForgot" method="POST" novalidate>
                 <div style="margin-bottom: 20px;">

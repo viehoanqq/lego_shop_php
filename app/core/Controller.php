@@ -7,6 +7,25 @@ class Controller {
         return new $model();
     }
 
+    /**
+     * Lưu 1 ảnh tải lên vào public/assets/images một cách an toàn.
+     * - Chỉ nhận JPG/PNG/WEBP/GIF, kiểm tra theo NỘI DUNG file (không tin tên/đuôi do người dùng gửi)
+     * - Tên file do hệ thống tạo, đuôi lấy theo loại ảnh thật -> không thể tải lên file .php
+     * Trả về tên file đã lưu, hoặc null nếu file không hợp lệ.
+     */
+    protected function saveUploadedImage($tmpName, $size, $error = UPLOAD_ERR_OK, $maxBytes = 2097152) {
+        if ($error !== UPLOAD_ERR_OK || !is_uploaded_file($tmpName) || $size > $maxBytes) return null;
+
+        $exts = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif'];
+        $mime = (new finfo(FILEINFO_MIME_TYPE))->file($tmpName);
+        if (!isset($exts[$mime]) || @getimagesize($tmpName) === false) return null;
+
+        $dir = __DIR__ . '/../../public/assets/images/';
+        if (!is_dir($dir)) mkdir($dir, 0775, true);
+        $fileName = time() . '_' . bin2hex(random_bytes(6)) . '.' . $exts[$mime];
+        return move_uploaded_file($tmpName, $dir . $fileName) ? $fileName : null;
+    }
+
     // Nạp View
     public function view($view, $data = []) {
         // Giải nén mảng data thành các biến riêng lẻ

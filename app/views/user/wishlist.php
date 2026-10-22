@@ -20,7 +20,7 @@
             <div class="empty-wishlist" style="text-align: center; padding: 60px 20px; background: #fff; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
                 <i class="fa-regular fa-heart" style="font-size: 80px; color: #ddd; margin-bottom: 20px; display: block;"></i>
                 <h2 style="color: #333; margin-bottom: 15px;">Danh sách đang trống!</h2>
-                <p style="color: #888; margin-bottom: 30px;">Bạn chưa yêu thích sản phẩm nào. Hãy khám phá các bộ LEGO mới nhất nhé!</p>
+                <p style="color: #888; margin-bottom: 30px;">Bạn chưa yêu thích sản phẩm nào.</p>
                 <a href="/lego_shop_php/product" class="btn-view-all" style="background: #a4161a; color: #fff; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: 700; transition: 0.3s;">
                     KHÁM PHÁ NGAY
                 </a>

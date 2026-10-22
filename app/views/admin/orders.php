@@ -66,6 +66,12 @@
         color: #059669;
         border: 1px solid #6ee7b7;
     }
+    .badge-outline-purple {
+        background: #ffffff;
+        color: #6d28d9;
+        border: 1px solid #c4b5fd;
+    }
+    .pay-mini { margin-top: 3px; font-size: 12px; color: #64748b; }
     .badge-outline-blue {
         background: #ffffff;
         color: #3182ce;
@@ -89,7 +95,7 @@
     
 </div>
 
-<form method="GET" action="/lego_shop_php/adminorder" class="filter-bar" id="filterForm">
+<form method="GET" action="/lego_shop_php/admin/order" class="filter-bar" id="filterForm">
     <div class="filter-group" style="flex: 2;">
         <label><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm nhanh</label>
         <div class="search-wrapper">
@@ -107,6 +113,7 @@
             <option value="shipping" <?= (isset($filters['status']) && $filters['status'] == 'shipping') ? 'selected' : '' ?>>Đang giao hàng</option>
             <option value="delivered" <?= (isset($filters['status']) && $filters['status'] == 'delivered') ? 'selected' : '' ?>>Giao thành công</option>
             <option value="cancelled" <?= (isset($filters['status']) && $filters['status'] == 'cancelled') ? 'selected' : '' ?>>Đã hủy</option>
+            <option value="returned" <?= (isset($filters['status']) && $filters['status'] == 'returned') ? 'selected' : '' ?>>Đã trả hàng</option>
         </select>
     </div>
 
@@ -134,7 +141,7 @@
 
     <div class="filter-group" style="flex: 0; min-width: auto; flex-direction: row; gap: 8px;">
         <button type="submit" class="btn-submit-filter" title="Lọc theo ngày"><i class="fa-solid fa-filter"></i> Lọc</button>
-        <a href="/lego_shop_php/adminorder" class="btn-reset" title="Xóa tất cả bộ lọc"><i class="fa-solid fa-rotate-right"></i></a>
+        <a href="/lego_shop_php/admin/order" class="btn-reset" title="Xóa tất cả bộ lọc"><i class="fa-solid fa-rotate-right"></i></a>
     </div>
 </form>
 
@@ -167,12 +174,14 @@ $status_map = [
     // Đang tiến hành hoặc đã xong -> Viền mảnh
     'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'badge-outline-teal', 'icon' => 'fa-box'],
     'shipping'  => ['label' => 'Đang giao', 'class' => 'badge-outline-blue', 'icon' => 'fa-truck-fast'],
-    'delivered' => ['label' => 'Thành công', 'class' => 'badge-outline-green', 'icon' => 'fa-check-double']
+    'delivered' => ['label' => 'Thành công', 'class' => 'badge-outline-green', 'icon' => 'fa-check-double'],
+    'returned'  => ['label' => 'Đã trả hàng', 'class' => 'badge-outline-purple', 'icon' => 'fa-rotate-left']
 ];
 $payment_map = [
     'cash'     => 'COD',
     'transfer' => 'Chuyển khoản',
-    'online'   => 'Thanh toán Online'
+    'online'   => 'Thanh toán Online',
+    'vietqr'   => 'VietQR'
 ];
 ?>
 
@@ -205,12 +214,11 @@ $payment_map = [
                     <?php foreach ($ward_orders as $item): 
                         $st = $item['status'] ?? 'pending';
                         $st_lbl = $status_map[$st]['label'] ?? 'Không xác định';
-                        $st_class = $status_map[$st]['class'] ?? 'badge-outline-orange'; // Mặc định class
-                        $st_icon = $status_map[$st]['icon'] ?? 'fa-circle-question';
+                        $st_class = in_array($st, ['cancelled', 'returned']) ? 'muted' : ($st === 'pending' ? 'attn' : '');
                     ?>
                     <tr>
                         <td style="text-align: center;">
-                            <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" style="background: #f1f5f9; color: #3182ce; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-family: monospace; border: 1px solid #e2e8f0; text-decoration: none; display: inline-block; transition: 0.2s;">
+                            <a href="/lego_shop_php/admin/order/detail/<?= $item['id'] ?>" style="background: #f1f5f9; color: #3182ce; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-family: monospace; border: 1px solid #e2e8f0; text-decoration: none; display: inline-block; transition: 0.2s;">
                                 #<?= $item['id'] ?>
                             </a>
                         </td>
@@ -228,20 +236,24 @@ $payment_map = [
                         </td>
                         <td>
                             <span style="font-size: 13px; font-weight: 600; color: #475569;">
-                                <i class="fa-solid fa-credit-card" style="font-size: 11px; opacity: 0.5;"></i> <?= $payment_map[$item['payment_method']] ?? $item['payment_method'] ?>
+                                <?= $payment_map[$item['payment_method']] ?? $item['payment_method'] ?>
                             </span>
+                            <?php if ($item['payment_method'] !== 'cash' || $item['payment_status'] !== 'unpaid'):
+                                $p_lbl = OrderModel::PAYMENT_STATUS[$item['payment_status']][0] ?? ''; ?>
+                                <div class="pay-mini"><?= $p_lbl ?></div>
+                            <?php endif; ?>
                         </td>
                         <td style="text-align: center;">
-                            <span class="status-badge <?= $st_class ?>">
-                                <i class="fa-solid <?= $st_icon ?>"></i> <?= $st_lbl ?>
+                            <span class="ui-badge <?= $st_class ?>">
+                                <?= $st_lbl ?>
                             </span>
                         </td>
-                        <td style="text-align: right; font-weight: 800; color: #e53e3e; font-size: 15px;">
+                        <td style="text-align: right; font-weight: 700; color: #1e293b;">
                             <?= number_format($item['total_amount'], 0, ',', '.') ?>đ
                         </td>
                         
                         <td style="text-align: center;">
-                            <a href="/lego_shop_php/adminorder/detail/<?= $item['id'] ?>" class="btn-action" title="Xem chi tiết đơn hàng này">
+                            <a href="/lego_shop_php/admin/order/detail/<?= $item['id'] ?>" class="btn-action" title="Xem chi tiết đơn hàng này">
                                 <i class="fa-solid fa-eye"></i> Chi tiết
                             </a>
                         </td>
@@ -274,7 +286,7 @@ $payment_map = [
         if (!empty($filters['sort'])) $query_params['sort'] = $filters['sort'];
         
         $base_query = http_build_query($query_params);
-        $url_prefix = "/lego_shop_php/adminorder?" . (!empty($base_query) ? $base_query . "&" : "");
+        $url_prefix = "/lego_shop_php/admin/order?" . (!empty($base_query) ? $base_query . "&" : "");
     ?>
     
     <div class="pagination">

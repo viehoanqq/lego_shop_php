@@ -1,4 +1,8 @@
 <?php
+require_once __DIR__ . '/../models/PaymentModel.php';
+require_once __DIR__ . '/../models/RefundModel.php';
+require_once __DIR__ . '/../models/VoucherModel.php';
+
 class AdminOrderController extends Controller {
     
     private $limit = 5; // SỐ DÒNG HIỂN THỊ TRÊN MỖI TRANG
@@ -46,20 +50,26 @@ class AdminOrderController extends Controller {
         $order = $orderModel->getOrderById($id);
         
         if (!$order) {
-            header("Location: /lego_shop_php/adminorder?error=notfound");
+            header("Location: /lego_shop_php/admin/order?error=notfound");
             exit;
         }
 
         $items = $orderModel->getOrderItems($id);
         $reviews = $orderModel->getOrderReviews($id, $order['user_id']);
         $history = $orderModel->getOrderHistory($id); // LẤY LỊCH SỬ TỪ DB
-        
+        $paymentModel = $this->model('PaymentModel');
+        $refundModel = $this->model('RefundModel');
+
         $this->view('admin/order_detail', [
             'title' => 'Chi tiết đơn hàng #DH-' . $id,
             'order' => $order,
             'items' => $items,
             'reviews' => $reviews,
-            'history' => $history // TRUYỀN LỊCH SỬ RA VIEW
+            'history' => $history, // TRUYỀN LỊCH SỬ RA VIEW
+            'transactions' => $paymentModel->getTransactionsByOrder($id),
+            'refund' => $refundModel->getLatestByOrder($id),
+            'banks' => RefundModel::BANKS,
+            'flash_error' => get_flash_message('order_error')
         ]);
     }
     
@@ -78,7 +88,7 @@ class AdminOrderController extends Controller {
             $order = $orderModel->getOrderById($id);
             
             if (!$order) {
-                header("Location: /lego_shop_php/adminorder?error=notfound");
+                header("Location: /lego_shop_php/admin/order?error=notfound");
                 exit;
             }
 
@@ -99,7 +109,20 @@ class AdminOrderController extends Controller {
             
             // Nếu đơn đã hoàn tất/hủy hoặc chọn trạng thái linh tinh -> Đuổi về
             if (!$is_valid || $current_status === 'delivered' || $current_status === 'cancelled') {
-                echo "<script>alert('Lỗi: Cập nhật trạng thái không hợp lệ theo quy trình!'); history.back();</script>";
+                set_flash_message('order_error', 'Cập nhật trạng thái không hợp lệ theo quy trình!');
+                header("Location: /lego_shop_php/admin/order/detail/$id");
+                exit;
+            }
+
+            // Đơn chuyển khoản / VietQR phải nhận được tiền rồi mới được giao thành công
+            if ($new_status === 'delivered' && in_array($order['payment_method'], ['transfer', 'vietqr']) && $order['payment_status'] !== 'paid') {
+                set_flash_message('order_error', 'Đơn chưa được thanh toán.');
+                header("Location: /lego_shop_php/admin/order/detail/$id"); exit;
+            }
+
+            // --- HỦY ĐƠN: hoàn lượt voucher + tạo yêu cầu hoàn tiền nếu khách đã thanh toán ---
+            if ($new_status === 'cancelled') {
+                $this->cancelByAdmin($order, $note);
                 exit;
             }
             // --- BẮT ĐẦU LOGIC TRỪ KHO KHI THÀNH CÔNG ---
@@ -125,35 +148,101 @@ class AdminOrderController extends Controller {
                     $orderModel->updateOrderStatusAdmin($id, $new_status, $note);
                     
                     $db->commit();
-                    header("Location: /lego_shop_php/adminorder/detail/$id?msg=status_success");
+                    header("Location: /lego_shop_php/admin/order/detail/$id?msg=status_success");
                 } catch (Exception $e) {
                     $db->rollback();
-                    header("Location: /lego_shop_php/adminorder/detail/$id?error=stock_error");
+                    header("Location: /lego_shop_php/admin/order/detail/$id?error=stock_error");
                 }
                 exit;
             }   
             // --- KẾT THÚC LOGIC TRỪ KHO ---
 
             if ($orderModel->updateOrderStatusAdmin($id, $new_status, $note)) {
-                header("Location: /lego_shop_php/adminorder/detail/$id?msg=status_success");
+                header("Location: /lego_shop_php/admin/order/detail/$id?msg=status_success");
             } else {
-                header("Location: /lego_shop_php/adminorder/detail/$id?error=1");
+                header("Location: /lego_shop_php/admin/order/detail/$id?error=1");
             }
             exit;
         }
     }
 
-    // Xử lý Cập nhật trạng thái Thanh toán
+    private function cancelByAdmin($order, $note) {
+        $id = (int)$order['id'];
+        $orderModel = $this->model('OrderModel');
+        $voucherModel = $this->model('VoucherModel');
+        $refundModel = $this->model('RefundModel');
+        $is_paid = ($order['payment_status'] === 'paid');
+
+        // Tài khoản nhận tiền hoàn (không bắt buộc - khách có thể tự bổ sung ở trang đơn hàng)
+        $bank_name = trim($_POST['bank_name'] ?? '');
+        $bank_no = preg_replace('/\s+/', '', $_POST['bank_account_number'] ?? '');
+        $bank_holder = mb_strtoupper(trim($_POST['bank_account_name'] ?? ''));
+        if ($is_paid && ($bank_name !== '' || $bank_no !== '' || $bank_holder !== '')) {
+            $error = RefundModel::validateBankInfo($bank_name, $bank_no, $bank_holder);
+            if ($error) {
+                set_flash_message('order_error', $error);
+                header("Location: /lego_shop_php/admin/order/detail/$id"); exit;
+            }
+        }
+
+        $db = $orderModel->getConnection();
+        $db->begin_transaction();
+        try {
+            $stmt = $db->prepare("UPDATE orders SET status = 'cancelled' WHERE id = ? AND status = ?");
+            $stmt->bind_param("is", $id, $order['status']);
+            $stmt->execute();
+            if ($stmt->affected_rows === 0) throw new RuntimeException('Đơn hàng vừa được cập nhật bởi người khác!');
+
+            $orderModel->addHistory($id, 'cancelled', $note ?: 'Cửa hàng hủy đơn');
+            $voucherModel->releaseUsage($id);
+
+            if ($is_paid) {
+                $refundModel->create([
+                    'order_id' => $id,
+                    'user_id' => $order['user_id'],
+                    'type' => 'cancel',
+                    'amount' => (int)$order['total_amount'],
+                    'reason' => 'Cửa hàng hủy đơn' . ($note ? ": $note" : ''),
+                    'evidence_image' => null,
+                    'bank_name' => $bank_name,
+                    'bank_account_number' => $bank_no,
+                    'bank_account_name' => $bank_holder,
+                ]);
+                $db->query("UPDATE orders SET payment_status = 'refund_pending' WHERE id = $id");
+                $orderModel->addHistory($id, 'refund_requested', 'Tạo yêu cầu hoàn ' . number_format($order['total_amount'], 0, ',', '.') . 'đ do cửa hàng hủy đơn');
+            }
+            $db->commit();
+        } catch (Exception $e) {
+            $db->rollback();
+            set_flash_message('order_error', $e instanceof RuntimeException ? $e->getMessage() : 'Lỗi hệ thống khi hủy đơn!');
+            header("Location: /lego_shop_php/admin/order/detail/$id"); exit;
+        }
+        header("Location: /lego_shop_php/admin/order/detail/$id?msg=status_success");
+    }
+
+    // Xử lý Cập nhật trạng thái Thanh toán (admin xác nhận đã nhận tiền chuyển khoản / VietQR)
     public function update_payment($id) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $payment_status = $_POST['payment_status'] ?? 'unpaid';
-            
             $orderModel = $this->model('OrderModel');
-            
-            if ($orderModel->updatePaymentStatusAdmin($id, $payment_status)) {
-                header("Location: /lego_shop_php/adminorder/detail/$id?msg=payment_success");
+            $order = $orderModel->getOrderById($id);
+
+            if ($payment_status !== 'paid' || !$order) {
+                header("Location: /lego_shop_php/admin/order/detail/$id"); exit;
+            }
+
+            // Ghi qua PaymentModel để có log giao dịch + lịch sử đơn
+            $paymentModel = $this->model('PaymentModel');
+            $ref = 'MANUAL-' . $id . '-' . time();
+            $note = trim($_POST['payment_note'] ?? '');
+            $result = $paymentModel->confirmPayment((int)$id, (int)$order['total_amount'], 'manual', $ref, $note, '');
+
+            if ($result === 'paid') {
+                header("Location: /lego_shop_php/admin/order/detail/$id?msg=payment_success");
             } else {
-                header("Location: /lego_shop_php/adminorder/detail/$id?error=1");
+                $msgs = ['already_paid' => 'Đơn đã được xác nhận thanh toán trước đó!', 'order_cancelled' => 'Đơn đã hủy, không thể xác nhận thanh toán!'];
+                set_flash_message('order_error', $msgs[$result] ?? 'Không thể xác nhận thanh toán!');
+                header("Location: /lego_shop_php/admin/order/detail/$id");
             }
             exit;
         }

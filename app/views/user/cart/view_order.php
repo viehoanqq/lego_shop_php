@@ -47,8 +47,10 @@
                     <?php 
                                 if($order['status'] == 'pending') echo 'Đang chờ xử lý';
                                 elseif($order['status'] == 'confirmed') echo 'Đã xác nhận';
+                                elseif($order['status'] == 'shipping') echo 'Đang giao hàng';
                                 elseif($order['status'] == 'delivered') echo 'Đã giao hàng';
                                 elseif($order['status'] == 'cancelled') echo 'Đã hủy';
+                                elseif($order['status'] == 'returned') echo 'Đã trả hàng';
                                 else echo 'Không xác định';
                             ?>
                 </div>
@@ -70,10 +72,29 @@
                             <?php 
                                 if($order['payment_method'] == 'cash') echo 'Thanh toán khi nhận hàng (COD)';
                                 elseif($order['payment_method'] == 'transfer') echo 'Chuyển khoản ngân hàng';
+                                elseif($order['payment_method'] == 'vietqr') echo 'Thanh toán online VietQR';
                                 else echo 'Thanh toán trực tuyến';
                             ?>
                         </strong>
                     </p>
+                    <p>Trạng thái thanh toán:
+                        <?php
+                            $pay_labels = [
+                                'unpaid' => 'Chưa thanh toán',
+                                'paid' => 'Đã thanh toán',
+                                'refund_pending' => 'Đang hoàn tiền',
+                                'refunded' => 'Đã hoàn tiền',
+                            ];
+                            $pl = $pay_labels[$order['payment_status']] ?? $order['payment_status'];
+                        ?>
+                        <strong><?= $pl ?></strong>
+                        <?php if ($order['payment_method'] === 'vietqr' && $order['payment_status'] === 'unpaid' && $order['status'] === 'pending'): ?>
+                            - <a href="/lego_shop_php/checkout/payment?order_id=<?= (int)$order['id'] ?>" style="color:#a4161a; font-weight:700;">Thanh toán ngay</a>
+                        <?php endif; ?>
+                    </p>
+                    <?php if (!empty($order['paid_at'])): ?>
+                        <p>Thanh toán lúc: <?= date('d/m/Y H:i', strtotime($order['paid_at'])) ?></p>
+                    <?php endif; ?>
                     <p>Ngày đặt: <?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></p>
                 </div>
             </div>
@@ -110,8 +131,14 @@
             <div class="total-section">
                 <div class="total-row">
                     <span>Tạm tính</span>
-                    <span><?= number_format($order['total_amount'], 0, ',', '.') ?>đ</span>
+                    <span><?= number_format($order['subtotal_amount'] ?: $order['total_amount'], 0, ',', '.') ?>đ</span>
                 </div>
+                <?php if ($order['discount_amount'] > 0): ?>
+                    <div class="total-row">
+                        <span>Giảm giá (<?= htmlspecialchars($order['voucher_code']) ?>)</span>
+                        <span>-<?= number_format($order['discount_amount'], 0, ',', '.') ?>đ</span>
+                    </div>
+                <?php endif; ?>
                 <div class="total-row">
                     <span>Phí vận chuyển</span>
                     <span style="color: #2f9e44; font-weight: 600;">Miễn phí</span>
@@ -122,9 +149,22 @@
                 </div>
             </div>
             
+            <?php if (!empty($refund)):
+                $rf_labels = ['pending' => 'Chờ xử lý', 'approved' => 'Đã duyệt - chờ chuyển tiền', 'rejected' => 'Bị từ chối', 'completed' => 'Đã hoàn tiền'];
+            ?>
+                <div class="info-card" style="margin-top: 25px;">
+                    <h3><i class="fa-solid fa-rotate-left" style="color:#e03131;"></i> Yêu cầu hoàn tiền</h3>
+                    <p>Trạng thái: <strong><?= $rf_labels[$refund['status']] ?? $refund['status'] ?></strong></p>
+                    <p>Số tiền hoàn: <strong><?= number_format($refund['amount'], 0, ',', '.') ?>đ</strong> về <?= htmlspecialchars($refund['bank_name']) ?> - <?= htmlspecialchars($refund['bank_account_number']) ?></p>
+                    <?php if (!empty($refund['admin_note'])): ?>
+                        <p>Phản hồi của cửa hàng: <em><?= htmlspecialchars($refund['admin_note']) ?></em></p>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
             <div class="btn-wrap">
-                                <a href="/lego_shop_php/home" class="btn-continue"><i class="fa-solid fa-shopping-bag"></i>   Tiếp tục mua sắm</a>
-                <a href="/lego_shop_php/profile/orders" class="btn-continue"><i class="fa-solid fa-shopping-cart"></i>   Danh sách đơn hàng</a>
+                                <a href="/lego_shop_php/home" class="btn-continue"><i class="fa-solid fa-shopping-bag"></i> Tiếp tục mua sắm</a>
+                <a href="/lego_shop_php/profile/orders" class="btn-continue"><i class="fa-solid fa-shopping-cart"></i> Danh sách đơn hàng</a>
             </div>
         </div>
     </div>

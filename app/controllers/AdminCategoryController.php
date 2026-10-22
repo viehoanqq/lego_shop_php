@@ -65,14 +65,14 @@ class AdminCategoryController extends Controller {
             
             if (empty($name)) {
                 set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/admincategory/add');
+                header('Location: /lego_shop_php/admin/category/add');
                 exit();
             }
 
             // Kiểm tra trùng tên
             if ($this->categoryModel->isNameExists($name)) {
                 set_flash_message('error', 'name_exists');
-                header('Location: /lego_shop_php/admincategory/add');
+                header('Location: /lego_shop_php/admin/category/add');
                 exit();
             }
 
@@ -88,7 +88,7 @@ class AdminCategoryController extends Controller {
             } else {
                 set_flash_message('error', 'db');
             }
-            header('Location: /lego_shop_php/admincategory');
+            header('Location: /lego_shop_php/admin/category');
             exit();
         }
     }
@@ -96,7 +96,7 @@ class AdminCategoryController extends Controller {
     public function edit($id) {
         $category = $this->categoryModel->getCategoryById($id);
         if (!$category) {
-            header('Location: /lego_shop_php/admincategory');
+            header('Location: /lego_shop_php/admin/category');
             exit();
         }
 
@@ -117,14 +117,14 @@ class AdminCategoryController extends Controller {
 
             if (empty($name)) {
                 set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/admincategory/edit/'.$id);
+                header('Location: /lego_shop_php/admin/category/edit/'.$id);
                 exit();
             }
 
             // Kiểm tra trùng tên (loại trừ chính nó)
             if ($this->categoryModel->isNameExists($name, $id)) {
                 set_flash_message('error', 'name_exists');
-                header('Location: /lego_shop_php/admincategory/edit/'.$id);
+                header('Location: /lego_shop_php/admin/category/edit/'.$id);
                 exit();
             }
 
@@ -142,7 +142,7 @@ class AdminCategoryController extends Controller {
             } else {
                 set_flash_message('error', 'db');
             }
-            header('Location: /lego_shop_php/admincategory');
+            header('Location: /lego_shop_php/admin/category');
             exit();
         }
     }
@@ -157,7 +157,7 @@ class AdminCategoryController extends Controller {
         } else {
             set_flash_message('error', 'db');
         }
-        header('Location: /lego_shop_php/admincategory');
+        header('Location: /lego_shop_php/admin/category');
         exit();
     }
 
@@ -169,7 +169,7 @@ class AdminCategoryController extends Controller {
         } else {
             set_flash_message('error', 'db');
         }
-        header('Location: /lego_shop_php/admincategory');
+        header('Location: /lego_shop_php/admin/category');
         exit();
     }
 
@@ -194,7 +194,7 @@ class AdminCategoryController extends Controller {
             }
         }
         
-        header('Location: /lego_shop_php/admincategory');
+        header('Location: /lego_shop_php/admin/category');
         exit();
     }
     public function restore($id) {
@@ -205,17 +205,12 @@ class AdminCategoryController extends Controller {
         } else {
             set_flash_message('error', 'db');
         }
-        header('Location: /lego_shop_php/admincategory');
+        header('Location: /lego_shop_php/admin/category');
         exit();
     }
     private function handleUpload($file) {
-        if (isset($file) && $file['error'] == 0) {
-            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $filename = time() . '.' . $ext;
-            move_uploaded_file($file['tmp_name'], 'public/assets/images/' . $filename);
-            return $filename;
-        }
-        return null;
+        if (empty($file) || $file['error'] === UPLOAD_ERR_NO_FILE) return null;
+        return $this->saveUploadedImage($file['tmp_name'], $file['size'], $file['error']);
     }
     
     

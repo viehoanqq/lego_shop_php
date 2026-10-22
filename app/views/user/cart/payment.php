@@ -1,206 +1,152 @@
 <?php
-// Hàm định dạng tiền tệ VND
-if (!function_exists('format_vnd')) {
-    function format_vnd($amount) {
-        return number_format($amount, 0, ',', '.') . ' đ';
-    }
-}
-
-// Đảm bảo có dữ liệu từ Controller truyền sang
-$current_order_id = $order_id ?? 0;
-$current_total_price = $total_price ?? 0;
-
-// Link tạo mã VietQR tự động (Thay MB bằng ngân hàng của bạn, 0961589023 là STK)
-$qr_code_url = "/lego_shop_php/public/assets/images/qrcode.png"; // Thay bằng link tạo mã QR động nếu có
+$fmt = function ($n) { return number_format($n, 0, ',', '.') . 'đ'; };
+$remaining = max(0, $expire_at - time());
 ?>
+<link rel="stylesheet" href="/lego_shop_php/public/assets/css/cart.css?v=<?= time() ?>">
+<style>
+    .qr-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 900px; margin: 0 auto; }
+    .qr-card { background: #fff; border-radius: 10px; padding: 26px; border: 1px solid #eee; }
+    .qr-card h3 { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 14px; }
+    .qr-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid #f3f3f3; font-size: 15px; }
+    .qr-row:last-child { border-bottom: none; }
+    .qr-row .lbl { color: #777; }
+    .qr-row .val { font-weight: 700; color: #333; display: flex; align-items: center; gap: 8px; }
+    .btn-copy { background: none; border: 1px solid #ddd; border-radius: 4px; padding: 3px 7px; cursor: pointer; color: #666; }
+    .btn-copy:hover { border-color: #a4161a; color: #a4161a; }
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thanh toán chuyển khoản - LEGO World Store</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        /* --- CSS STYLES --- */
-        :root {
-            --primary-red: #c92a2a;
-            --primary-red-hover: #a4161a;
-            --gray-bg: #f9f9f9;
-            --white-bg: #ffffff;
-            --text-dark: #333333;
-            --text-gray: #666666;
-            --border-color: #eeeeee;
-        }
+    .qr-center { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .qr-img-wrap { position: relative; width: 280px; max-width: 100%; border: 1px solid #eee; border-radius: 10px; padding: 8px; }
+    .qr-img-wrap img { width: 100%; display: block; }
+    .qr-overlay { position: absolute; inset: 0; background: rgba(255,255,255,.94); border-radius: 10px; display: none; align-items: center; justify-content: center; font-weight: 700; color: #333; }
+    .qr-img-wrap.done .qr-overlay { display: flex; }
+    .qr-status { margin-top: 14px; font-size: 14px; color: #666; }
+    .qr-status strong { color: #333; font-variant-numeric: tabular-nums; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--gray-bg);
-            color: var(--text-dark);
-        }
+    .qr-actions { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 280px; margin-top: 18px; }
+    .qr-actions a, .qr-actions button { padding: 12px; border-radius: 8px; font-weight: 600; font-size: 14px; text-align: center; cursor: pointer; text-decoration: none; border: 1px solid #ddd; background: #fff; color: #333; }
+    .qr-actions .primary { background: #a4161a; border-color: #a4161a; color: #fff; }
+    @media (max-width: 800px) { .qr-layout { grid-template-columns: 1fr; } }
+</style>
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+<div class="checkout-page-wrapper">
+    <div class="checkout-container">
+        <?php $current_step = 3; require __DIR__ . '/../../components/checkout_progress.php'; ?>
 
-        /* --- Thanh tiến trình --- */
-        .progress-bar-container { display: flex; justify-content: center; margin-bottom: 50px; }
-        .progress-bar { display: flex; align-items: center; }
-        .progress-step { display: flex; flex-direction: column; align-items: center; position: relative; text-align: center; width: 160px; }
-        .step-number { width: 32px; height: 32px; border-radius: 50%; background-color: #e6e6e6; color: #999; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 15px; margin-bottom: 10px; z-index: 1; }
-        .step-label { font-size: 14px; color: #999; font-weight: 500; }
-        
-        .progress-step.completed .step-number, .progress-step.active .step-number { background-color: var(--primary-red); color: white; }
-        .progress-step.completed .step-label, .progress-step.active .step-label { color: var(--text-dark); font-weight: 600; }
-        
-        .progress-line { height: 2px; background-color: #e6e6e6; width: 128px; margin: 0 -16px; position: absolute; top: 16px; left: 50%; }
-        .progress-step.completed .progress-line { background-color: var(--primary-red); }
-        .progress-step:last-child .progress-line { display: none; }
-
-        /* --- Header --- */
-        .page-header { text-align: center; margin-bottom: 50px; }
-        .page-title { font-size: 36px; color: var(--primary-red); font-weight: 800; margin-bottom: 10px; margin-top: 0; }
-        .page-description { color: var(--text-gray); font-size: 16px; margin: 0; }
-
-        /* --- Bố cục 2 cột --- */
-        .checkout-layout { display: flex; gap: 40px; justify-content: center; }
-        .column { flex: 1; background-color: var(--white-bg); padding: 40px; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.03); display: flex; flex-direction: column; }
-        .section-title { font-size: 18px; color: var(--primary-red); font-weight: 700; margin-top: 0; margin-bottom: 25px; }
-
-        /* --- Chọn ngân hàng --- */
-        .bank-selection { display: flex; gap: 15px; margin-bottom: 35px; }
-        .bank-option { border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; min-width: 100px; min-height: 45px; transition: all 0.2s ease; }
-        .bank-option:hover { border-color: #ccc; }
-        .bank-option.active { border-color: var(--primary-red); box-shadow: 0 0 0 1px var(--primary-red); }
-        .bank-option span { font-weight: 700; font-size: 16px; }
-
-        /* --- Tóm tắt chuyển khoản --- */
-        .summary-info { font-size: 15px; line-height: 1.8; margin-bottom: 20px; }
-        .summary-row { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f1f1; padding: 15px 0; }
-        .summary-row:last-child { border-bottom: none; }
-        .summary-label { color: var(--text-gray); font-weight: 500; }
-        .summary-value { color: var(--text-dark); font-weight: 600; text-align: right; }
-
-        /* --- QR Code Section --- */
-        .qr-code-section { text-align: center; margin-top: 20px; margin-bottom: 30px; }
-        .qr-code-img { max-width: 280px; height: auto; border-radius: 12px; border: 1px solid #eee; padding: 10px; }
-
-        /* --- Nút Đã thanh toán --- */
-        .paid-button-container { margin-top: auto; text-align: center; }
-        .paid-button { background-color: var(--primary-red); color: white; border: none; border-radius: 8px; padding: 18px 0; font-size: 17px; font-weight: 700; cursor: pointer; width: 100%; transition: background-color 0.2s; }
-        .paid-button:hover { background-color: var(--primary-red-hover); }
-
-        /* --- Responsive --- */
-        @media (max-width: 1024px) { .container { max-width: 95%; } }
-        @media (max-width: 992px) {
-            .checkout-layout { flex-direction: column; align-items: center; gap: 20px; }
-            .column { width: 100%; max-width: 600px; box-sizing: border-box; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="progress-bar-container">
-            <div class="progress-bar">
-                <div class="progress-step completed">
-                    <div class="step-number">1</div>
-                    <div class="step-label">Giỏ hàng</div>
-                    <div class="progress-line"></div>
-                </div>
-                <div class="progress-step completed">
-                    <div class="step-number">2</div>
-                    <div class="step-label">Thanh toán</div>
-                    <div class="progress-line"></div>
-                </div>
-                <div class="progress-step active">
-                    <div class="step-number">3</div>
-                    <div class="step-label">Chuyển khoản</div>
-                    <div class="progress-line"></div>
-                </div>
-                <div class="progress-step">
-                    <div class="step-number">4</div>
-                    <div class="step-label">Thành công</div>
-                    <div class="progress-line"></div>
-                </div>
-                <div class="progress-step">
-                    <div class="step-number">5</div>
-                    <div class="step-label">Xem lại</div>
-                </div>
-            </div>
+        <div class="checkout-header-title">
+            <h2>Thanh toán đơn hàng #<?= (int)$order['id'] ?></h2>
         </div>
 
-        <div class="page-header">
-            <h1 class="page-title">Thanh toán chuyển khoản</h1>
-            <p class="page-description">Vui lòng dùng App Ngân hàng quét mã QR để thanh toán đơn hàng.</p>
-        </div>
-
-        <div class="checkout-layout">
-            <div class="column">
-                <h2 class="section-title">1. Chọn ngân hàng</h2>
-                <div class="bank-selection">
-                    <div class="bank-option active" onclick="selectBank(this)">
-                        <span style="color: #0056a0">MB Bank</span>
-                    </div>
+        <div class="qr-layout">
+            <div class="qr-card">
+                <h3><i class="fa-solid fa-building-columns" style="color: #a4161a;"></i> Thông tin chuyển khoản</h3>
+                <div class="qr-row"><span class="lbl">Ngân hàng</span><span class="val"><?= htmlspecialchars($settings['bank_code']) ?></span></div>
+                <div class="qr-row"><span class="lbl">Chủ tài khoản</span><span class="val"><?= htmlspecialchars($settings['bank_account_name']) ?></span></div>
+                <div class="qr-row">
+                    <span class="lbl">Số tài khoản</span>
+                    <span class="val"><?= htmlspecialchars($settings['bank_account_no']) ?>
+                        <button type="button" class="btn-copy" title="Sao chép" onclick="copyText('<?= htmlspecialchars($settings['bank_account_no']) ?>')"><i class="fa-regular fa-copy"></i></button>
+                    </span>
                 </div>
-
-                <h2 class="section-title" style="margin-top: 10px;">2. Tóm tắt chuyển khoản</h2>
-                <div class="summary-info">
-                    <div class="summary-row">
-                        <span class="summary-label">Người nhận</span>
-                        <span class="summary-value">NGUYEN HOANG</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Số tài khoản</span>
-                        <span class="summary-value">0961589023 (MB Bank)</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Nội dung chuyển khoản</span>
-                        <span class="summary-value" style="color: var(--primary-red);">LEGO<?= htmlspecialchars($current_order_id) ?></span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Số tiền cần chuyển</span>
-                        <span class="summary-value" style="font-size: 18px; color: var(--primary-red);"><?= format_vnd($current_total_price) ?></span>
-                    </div>
+                <div class="qr-row">
+                    <span class="lbl">Số tiền</span>
+                    <span class="val"><?= $fmt($order['total_amount']) ?>
+                        <button type="button" class="btn-copy" title="Sao chép" onclick="copyText('<?= (int)$order['total_amount'] ?>')"><i class="fa-regular fa-copy"></i></button>
+                    </span>
                 </div>
-                
-                <p style="font-size: 14px; color: #888; text-align: center; margin-top: auto;">
-                    <i>Lưu ý: Vui lòng nhập đúng số tiền và nội dung chuyển khoản để hệ thống tự động xác nhận.</i>
-                </p>
+                <div class="qr-row">
+                    <span class="lbl">Nội dung</span>
+                    <span class="val"><?= htmlspecialchars($order['payment_code']) ?>
+                        <button type="button" class="btn-copy" title="Sao chép" onclick="copyText('<?= htmlspecialchars($order['payment_code']) ?>')"><i class="fa-regular fa-copy"></i></button>
+                    </span>
+                </div>
             </div>
 
-            <div class="column" style="justify-content: center;">
-                <h2 class="section-title" style="text-align: center; margin-bottom: 10px;">3. Quét mã QR để thanh toán</h2>
-                <div class="qr-code-section">
-                    <img src="<?= $qr_code_url ?>" alt="Mã QR Chuyển Khoản" class="qr-code-img">
+            <div class="qr-card qr-center">
+                <div class="qr-img-wrap" id="qrWrap">
+                    <img src="<?= htmlspecialchars($qr_url) ?>" alt="Mã VietQR">
+                    <div class="qr-overlay" id="qrOverlay"></div>
                 </div>
 
-                <div class="paid-button-container">
-                    <button type="button" class="paid-button" onclick="confirmPayment(<?= htmlspecialchars($current_order_id) ?>)">TÔI ĐÃ CHUYỂN KHOẢN XONG</button>
+                <div class="qr-status" id="qrStatus">Hết hạn sau <strong id="countdown">--:--</strong></div>
+
+                <div class="qr-actions">
+                    <?php if ($sandbox): ?>
+                        <button type="button" id="btnSandbox" onclick="simulatePayment()">Giả lập thanh toán</button>
+                    <?php endif; ?>
+                    <a href="/lego_shop_php/checkout/view_order?order_id=<?= (int)$order['id'] ?>">Xem đơn hàng</a>
+                    <a href="/lego_shop_php/profile/orders" class="primary">Thanh toán sau</a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        function selectBank(element) {
-            const options = document.querySelectorAll('.bank-option');
-            options.forEach(opt => opt.classList.remove('active'));
-            element.classList.add('active');
-        }
+<script>
+(function () {
+    const orderId = <?= (int)$order['id'] ?>;
+    let remaining = <?= (int)$remaining ?>;
+    let finished = false;
+    const wrap = document.getElementById('qrWrap');
+    const overlay = document.getElementById('qrOverlay');
+    const status = document.getElementById('qrStatus');
 
-        // Fix lỗi truyền thiếu order_id
-        function confirmPayment(orderId) {
-            if (!orderId || orderId === 0) {
-                alert("Lỗi: Không tìm thấy mã đơn hàng!");
-                return;
-            }
-            // Chuyển hướng chuẩn xác mang theo mã đơn hàng
-            window.location.href = '/lego_shop_php/checkout/success?order_id=' + orderId;
-        }
-    </script>
-</body>
-</html>
+    function finish(text) {
+        finished = true;
+        wrap.classList.add('done');
+        overlay.innerText = text;
+        status.style.display = 'none';
+        const sb = document.getElementById('btnSandbox');
+        if (sb) sb.style.display = 'none';
+    }
+
+    function showPaid() {
+        finish('Thanh toán thành công');
+        setTimeout(() => location.href = '/lego_shop_php/checkout/success?order_id=' + orderId, 1200);
+    }
+
+    function tick() {
+        if (finished) return;
+        if (remaining <= 0) { checkStatus(); return; }
+        const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const s = String(remaining % 60).padStart(2, '0');
+        document.getElementById('countdown').innerText = m + ':' + s;
+        remaining--;
+    }
+    tick();
+    const timer = setInterval(() => { tick(); if (finished) clearInterval(timer); }, 1000);
+
+    // Hỏi trạng thái thanh toán mỗi 4 giây (webhook ngân hàng cập nhật DB)
+    function checkStatus() {
+        if (finished) return;
+        fetch('/lego_shop_php/payment/status?order_id=' + orderId)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+                if (data.payment_status === 'paid') showPaid();
+                else if (data.status === 'cancelled') finish('Mã QR đã hết hạn');
+            })
+            .catch(() => {});
+    }
+    const poll = setInterval(() => { if (finished) clearInterval(poll); else checkStatus(); }, 4000);
+
+    window.simulatePayment = function () {
+        const btn = document.getElementById('btnSandbox');
+        btn.disabled = true;
+        fetch('/lego_shop_php/payment/simulate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_id: orderId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) showPaid();
+            else { btn.disabled = false; showToast(data.message, 'error'); }
+        })
+        .catch(() => { btn.disabled = false; showToast('Lỗi kết nối máy chủ!', 'error'); });
+    };
+
+    window.copyText = function (text) {
+        navigator.clipboard.writeText(text).then(() => showToast('Đã sao chép', 'success'));
+    };
+})();
+</script>

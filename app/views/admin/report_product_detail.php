@@ -39,13 +39,13 @@
 
 <div class="report-container">
     <div style="margin-bottom: 25px;">
-        <a href="/lego_shop_php/adminreport" style="text-decoration: none; color: #3182ce; font-size: 14px; font-weight: 700;">
+        <a href="/lego_shop_php/admin/report" style="text-decoration: none; color: #3182ce; font-size: 14px; font-weight: 700;">
             <i class="fa-solid fa-arrow-left"></i> QUAY LẠI DANH SÁCH BÁO CÁO
         </a>
-        <h2><?= $product['name'] ?></h2>
+        <h2><?= htmlspecialchars((string)($product['name'])) ?></h2>
         <div style="display: flex; gap: 10px; align-items: center;">
             <span style="background: #1e293b; color: #fff; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 700;">ID: #<?= $product['id'] ?></span>
-            <span style="background: #f1f5f9; color: #475569; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 800; border: 1px solid #e2e8f0;">SKU: <?= $product['sku'] ?></span>
+            <span style="background: #f1f5f9; color: #475569; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 800; border: 1px solid #e2e8f0;">SKU: <?= htmlspecialchars((string)($product['sku'])) ?></span>
         </div>
     </div>
 
@@ -122,7 +122,7 @@
             if(!empty($history_asc)): ?>
                 <?php foreach($history_asc as $h): 
                     $is_in = ($h['qty'] > 0);
-                    $link = "/lego_shop_php/admin" . ($is_in ? 'import' : 'order') . "/detail/" . $h['ref'];
+                    $link = "/lego_shop_php/admin/" . ($is_in ? 'import' : 'order') . "/detail/" . $h['ref'];
                 ?>
                 <a href="<?= $link ?>" class="timeline-row">
                     <div class="tm-date">

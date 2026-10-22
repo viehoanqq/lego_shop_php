@@ -1,5 +1,21 @@
 <?php
 class CartModel extends Database {
+
+    // Tồn kho khả dụng = tồn thực tế - số lượng đang nằm trong các đơn chưa giao xong
+    public function getAvailableStock($product_id) {
+        $db = $this->getConnection();
+        $product_id = intval($product_id);
+        $sql = "SELECT (p.stock_quantity - COALESCE((
+                    SELECT SUM(od.quantity) FROM order_details od JOIN orders o ON od.order_id = o.id
+                    WHERE od.product_id = p.id AND o.status IN ('pending', 'confirmed', 'shipping')
+                ), 0)) as available_stock
+                FROM products p WHERE p.id = $product_id AND p.status = 1";
+        $result = $db->query($sql);
+        if ($result && $result->num_rows > 0) {
+            return max(0, (int)$result->fetch_assoc()['available_stock']);
+        }
+        return 0;
+    }
     
     // Hàm Thêm sản phẩm vào giỏ hàng (Có dùng Transaction để bảo vệ dữ liệu)
     public function addProductToCart($user_id, $product_id, $quantity = 1) {
@@ -12,6 +28,8 @@ class CartModel extends Database {
         $user_id = intval($user_id);
         $product_id = intval($product_id);
         $quantity = intval($quantity);
+        // Chặn số lượng âm / bằng 0 (có thể làm giảm tổng tiền đơn hàng)
+        if ($quantity < 1 || $quantity > 99) return 'invalid_quantity';
 
         $db->begin_transaction();
 
@@ -34,9 +52,17 @@ class CartModel extends Database {
         if ($itemResult && $itemResult->num_rows > 0) {
             $item = $itemResult->fetch_assoc();
             $new_quantity = $item['quantity'] + $quantity;
+            if ($new_quantity > $this->getAvailableStock($product_id)) {
+                $db->rollback();
+                return 'out_of_stock';
+            }
             $item_id = $item['id'];
             $db->query("UPDATE cart_items SET quantity = $new_quantity WHERE id = $item_id");
         } else {
+            if ($quantity > $this->getAvailableStock($product_id)) {
+                $db->rollback();
+                return 'out_of_stock';
+            }
             $db->query("INSERT INTO cart_items (cart_id, product_id, quantity) VALUES ($cart_id, $product_id, $quantity)");
         }
 
@@ -96,7 +122,7 @@ class CartModel extends Database {
         $user_id = intval($user_id);
         
         // 1. JOIN thêm bảng products để lấy stock_quantity
-        $checkSql = "SELECT ci.quantity, p.stock_quantity 
+        $checkSql = "SELECT ci.quantity, ci.product_id 
                      FROM cart_items ci 
                      JOIN carts c ON ci.cart_id = c.id 
                      JOIN products p ON ci.product_id = p.id
@@ -107,7 +133,7 @@ class CartModel extends Database {
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $current_qty = $row['quantity'];
-            $max_stock = $row['stock_quantity']; // Lấy số lượng tối đa trong kho
+            $max_stock = $this->getAvailableStock($row['product_id']); // Tồn kho khả dụng
             
             $new_qty = ($action === 'increase') ? $current_qty + 1 : $current_qty - 1;
             

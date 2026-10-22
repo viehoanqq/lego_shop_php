@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $title ?? 'Quản lý LEGO Store' ?></title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <link rel="stylesheet" href="/lego_shop_php/public/assets/vendor/fontawesome/css/all.min.css" />
         <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
@@ -12,6 +12,11 @@
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin.css">
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin_dashboard.css">
     <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin_profile.css">
+    <link rel="stylesheet" href="/lego_shop_php/public/assets/css/admin_ui.css">
+    <script src="/lego_shop_php/public/assets/js/ui-dialog.js"></script>
+    <?php $flash_dialog = function_exists('get_flash_message') ? get_flash_message('dialog') : null; if ($flash_dialog): ?>
+    <script>document.addEventListener('DOMContentLoaded', () => uiAlert(<?= json_encode($flash_dialog) ?>));</script>
+    <?php endif; ?>
     <script src="/lego_shop_php/public/assets/js/admin.js" defer></script>
 </head>
 <body>
@@ -29,6 +34,15 @@
         </section>
     </div>
 <script>
+// Mobile: chạm ra ngoài sidebar hoặc chọn 1 mục menu thì đóng sidebar
+document.addEventListener('click', function (e) {
+    if (!document.body.classList.contains('sidebar-open')) return;
+    if (e.target.closest('.admin-menu-toggle')) return;
+    if (!e.target.closest('.side-bar') || e.target.closest('.side-bar .menu a')) {
+        document.body.classList.remove('sidebar-open');
+    }
+});
+
 document.addEventListener("DOMContentLoaded", function() {
     const contentArea = document.querySelector('#admin-main-content');
     const sidebarLinks = document.querySelectorAll('.side-bar .menu a');

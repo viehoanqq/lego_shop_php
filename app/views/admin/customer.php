@@ -153,7 +153,7 @@ $session_error = get_flash_message('error');
     <div class="header-sync">
         <div class="header-left-group">
             
-            <form action="/lego_shop_php/admincustomer/index" method="GET" class="filter-form-sync">
+            <form action="/lego_shop_php/admin/customer/index" method="GET" class="filter-form-sync">
                 <div class="search-wrapper-sync">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" name="search" class="form-control-sync search-input-sync" 
@@ -170,7 +170,7 @@ $session_error = get_flash_message('error');
                 </select>
             </form>
         </div>
-        <a href="/lego_shop_php/admincustomer/add" class="btn-add">
+        <a href="/lego_shop_php/admin/customer/add" class="btn-add">
             <i class="fa-solid fa-plus"></i> Thêm người dùng
         </a>
     </div>
@@ -204,8 +204,8 @@ $session_error = get_flash_message('error');
                             <div style="font-weight: 700; color: #1a202c;"><?= htmlspecialchars($user['fullname'] ?: 'Chưa cập nhật') ?></div>
                         </td>
                         <td>
-                            <div style="color: #4a5568; margin-bottom: 4px;"><i class="fa-solid fa-envelope" style="color: #cbd5e1; width: 18px;"></i> <?= $user['email'] ?></div>
-                            <div style="color: #718096; font-size: 13px;"><i class="fa-solid fa-phone" style="color: #cbd5e1; width: 18px;"></i> <?= $user['phone'] ?></div>
+                            <div style="color: #4a5568; margin-bottom: 4px;"><i class="fa-solid fa-envelope" style="color: #cbd5e1; width: 18px;"></i> <?= htmlspecialchars((string)($user['email'])) ?></div>
+                            <div style="color: #718096; font-size: 13px;"><i class="fa-solid fa-phone" style="color: #cbd5e1; width: 18px;"></i> <?= htmlspecialchars((string)($user['phone'])) ?></div>
                         </td>
                         <td>
                             <?php if (($user['role'] ?? '') === 'admin'): ?>
@@ -229,11 +229,11 @@ $session_error = get_flash_message('error');
                         <td style="text-align: center; white-space: nowrap;">
                             <div style="display: flex; justify-content: center; gap: 5px;">
                                 <?php if($is_deleted): ?>
-                                    <a href="/lego_shop_php/admincustomer/restore/<?= $user['id'] ?>" class="btn-action btn-edit" style="color: #38a169; background: #f0fff4;" title="Khôi phục" onclick="return confirm('Bạn muốn khôi phục tài khoản này?')">
+                                    <a href="/lego_shop_php/admin/customer/restore/<?= $user['id'] ?>" class="btn-action btn-edit" style="color: #38a169; background: #f0fff4;" title="Khôi phục" data-confirm="Bạn muốn khôi phục tài khoản này?">
                                         <i class="fa-solid fa-rotate-left"></i> Khôi phục
                                     </a>
                                 <?php else: ?>
-                                    <a href="/lego_shop_php/admincustomer/edit/<?= $user['id'] ?>?search=<?= urlencode($search ?? '') ?>&status=<?= $status ?? '' ?>&page=<?= $currentPage ?? 1 ?>" class="btn-action btn-edit" title="Chỉnh sửa">
+                                    <a href="/lego_shop_php/admin/customer/edit/<?= $user['id'] ?>?search=<?= urlencode($search ?? '') ?>&status=<?= $status ?? '' ?>&page=<?= $currentPage ?? 1 ?>" class="btn-action btn-edit" title="Chỉnh sửa">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
 
@@ -241,11 +241,11 @@ $session_error = get_flash_message('error');
                                         $isLocked = ($user['status'] !== 'active');
                                         $statusClass = $isLocked ? 'is-unlocking' : 'is-locking';
                                     ?>
-                                    <a href="/lego_shop_php/admincustomer/toggleStatus/<?= $user['id'] ?>" class="btn-action btn-status-toggle <?= $statusClass ?>" onclick="return confirm('Xác nhận <?= $isLocked ? 'MỞ KHÓA' : 'KHÓA' ?> tài khoản này?')">
+                                    <a href="/lego_shop_php/admin/customer/toggleStatus/<?= $user['id'] ?>" class="btn-action btn-status-toggle <?= $statusClass ?>" data-confirm="Xác nhận <?= $isLocked ? 'MỞ KHÓA' : 'KHÓA' ?> tài khoản này?">
                                         <i class="fa-solid <?= $isLocked ? 'fa-unlock' : 'fa-lock' ?>"></i>
                                     </a>
 
-                                    <a href="/lego_shop_php/admincustomer/delete/<?= $user['id'] ?>" class="btn-action btn-delete" title="Xóa" onclick="return confirm('CẢNH BÁO: Xóa tài khoản này?\n\nNếu người dùng đã có đơn hàng, hệ thống sẽ chỉ TẠM ẨN để bảo lưu dữ liệu kế toán.')">
+                                    <a href="/lego_shop_php/admin/customer/delete/<?= $user['id'] ?>" class="btn-action btn-delete" title="Xóa" data-confirm="CẢNH BÁO: Xóa tài khoản này?\n\nNếu người dùng đã có đơn hàng, hệ thống sẽ chỉ TẠM ẨN để bảo lưu dữ liệu kế toán.">
                                         <i class="fa-solid fa-trash"></i>
                                     </a>
                                 <?php endif; ?>
@@ -259,7 +259,7 @@ $session_error = get_flash_message('error');
     </div>
 
     <?php 
-        $baseUrl = "/lego_shop_php/admincustomer/index";
+        $baseUrl = "/lego_shop_php/admin/customer/index";
         $queryString = "?search=" . urlencode($search ?? '') . "&status=" . ($status ?? '');
     ?>
 
@@ -294,25 +294,25 @@ $session_error = get_flash_message('error');
             </h3>
         </div>
         
-        <form action="/lego_shop_php/admincustomer/<?= (!empty($customer) && isset($customer['id'])) ? 'update/'.$customer['id'] : 'store' ?>" method="POST">    
+        <form action="/lego_shop_php/admin/customer/<?= (!empty($customer) && isset($customer['id'])) ? 'update/'.$customer['id'] : 'store' ?>" method="POST">    
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
                 <div>
                     <div class="form-group">
                         <label>Họ và tên <span style="color:red">*</span></label>
-                        <input type="text" id="fullname" name="fullname" class="form-input" placeholder="VD: Nguyễn Văn A..." value="<?= $customer['fullname'] ?? '' ?>">
+                        <input type="text" id="fullname" name="fullname" class="form-input" placeholder="VD: Nguyễn Văn A..." value="<?= htmlspecialchars((string)($customer['fullname'] ?? '')) ?>">
                         <small class="error-text"></small>
                     </div>
 
                     <div class="form-group">
                         <label>Số điện thoại <span style="color:red">*</span></label>
-                        <input type="text" id="phone" name="phone" class="form-input" placeholder="VD: 0987654321" value="<?= $customer['phone'] ?? '' ?>">
+                        <input type="text" id="phone" name="phone" class="form-input" placeholder="VD: 0987654321" value="<?= htmlspecialchars((string)($customer['phone'] ?? '')) ?>">
                         <small class="error-text"></small>
                     </div>
 
                     <div class="form-group">
                         <label>Địa chỉ Email <span style="color:red">*</span></label>
-                        <input type="text" id="email" name="email" class="form-input" placeholder="name@example.com" value="<?= $customer['email'] ?? '' ?>">
+                        <input type="text" id="email" name="email" class="form-input" placeholder="name@example.com" value="<?= htmlspecialchars((string)($customer['email'] ?? '')) ?>">
                         <small class="error-text"></small>
                     </div>
                 </div>
@@ -364,7 +364,7 @@ $session_error = get_flash_message('error');
                     <i class="fa-solid fa-floppy-disk"></i> 
                     <?= (!empty($customer)) ? 'CẬP NHẬT TÀI KHOẢN' : 'TẠO MỚI NGƯỜI DÙNG' ?>
                 </button>
-                <a href="/lego_shop_php/admincustomer" class="btn-cancel-link">Hủy bỏ / Quay lại</a>
+                <a href="/lego_shop_php/admin/customer" class="btn-cancel-link">Hủy bỏ / Quay lại</a>
             </div>
         </form>
     </div>
@@ -445,7 +445,7 @@ $session_error = get_flash_message('error');
 
             if (!(vName && vPhone && vEmail && vPass && vConf)) {
                 e.preventDefault();
-                alert("⚠️ Vui lòng kiểm tra lại các trường bị báo đỏ trước khi lưu!");
+                uiAlert("Vui lòng kiểm tra lại các trường bị báo đỏ trước khi lưu!");
                 const firstError = document.querySelector(".input-error");
                 if(firstError) firstError.focus();
             }

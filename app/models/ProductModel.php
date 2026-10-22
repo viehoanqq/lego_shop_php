@@ -237,7 +237,7 @@
         // Nếu lọc là một danh sách (ví dụ '1,2')
         elseif (!empty($filters['status']) && $filters['status'] !== 'all' && strpos($filters['status'], ',') !== false) {
             // Làm sạch chuỗi để tránh SQL Injection (ví dụ: "1,2")
-            $safe_status = $db->real_escape_string($filters['status']);
+            $safe_status = implode(',', array_map('intval', explode(',', $filters['status']))); // chỉ cho phép số nguyên (chống SQL injection)
             $where = "WHERE p.status IN ($safe_status)";
         }
 
@@ -278,7 +278,7 @@
             if (isset($filters['status']) && is_numeric($filters['status'])) {
                 $where = "WHERE p.status = " . intval($filters['status']);
             } elseif (!empty($filters['status']) && $filters['status'] !== 'all' && strpos($filters['status'], ',') !== false) {
-                $safe_status = $db->real_escape_string($filters['status']);
+                $safe_status = implode(',', array_map('intval', explode(',', $filters['status']))); // chỉ cho phép số nguyên (chống SQL injection)
                 $where = "WHERE p.status IN ($safe_status)";
             }
 

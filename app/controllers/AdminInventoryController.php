@@ -20,7 +20,7 @@ class AdminInventoryController extends Controller {
     if (isset($_GET['threshold']) && is_numeric($_GET['threshold'])) {
         $new_threshold = intval($_GET['threshold']);
         $this->InventoryModel->updateAllMinStock($new_threshold);
-        header("Location: /lego_shop_php/admininventory?tab=alerts&keyword=" . urlencode($keyword));
+        header("Location: /lego_shop_php/admin/inventory?tab=alerts&keyword=" . urlencode($keyword));
         exit;
     }
 

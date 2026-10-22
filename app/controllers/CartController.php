@@ -23,8 +23,12 @@ class CartController extends Controller {
             if ($product_id > 0) {
                 $cartModel = $this->model('CartModel');
                 $result = $cartModel->addProductToCart($_SESSION['user_id'], $product_id, $quantity);
-                
-                if ($result) {
+
+                if ($result === 'invalid_quantity') {
+                    echo json_encode(['status' => 'error', 'msg' => 'Số lượng không hợp lệ!']);
+                } elseif ($result === 'out_of_stock') {
+                    echo json_encode(['status' => 'error', 'msg' => 'Số lượng vượt quá tồn kho hiện có!']);
+                } elseif ($result) {
                     echo json_encode(['status' => 'success', 'msg' => 'Đã thêm sản phẩm vào giỏ hàng!']);
                 } else {
                     echo json_encode(['status' => 'error', 'msg' => 'Lỗi hệ thống, không thể thêm!']);
@@ -115,8 +119,12 @@ class CartController extends Controller {
             // CHÚ Ý: Kiểm tra tên hàm trong CartModel của bạn là gì (addToCart hay addProductToCart)
             // Tôi giả định dùng addProductToCart theo hàm add() cũ của bạn
             $result = $cartModel->addProductToCart($user_id, $product_id, $quantity);
-            
-            if ($result) {
+
+            if ($result === 'invalid_quantity') {
+                echo json_encode(['success' => false, 'message' => 'Số lượng không hợp lệ!']);
+            } elseif ($result === 'out_of_stock') {
+                echo json_encode(['success' => false, 'message' => 'Số lượng vượt quá tồn kho hiện có!']);
+            } elseif ($result) {
                 // Đếm tổng số lượng sản phẩm trong giỏ để cập nhật icon giỏ hàng
                 $count = $cartModel->countCartItems($user_id); 
                 echo json_encode(['success' => true, 'cart_count' => $count]);

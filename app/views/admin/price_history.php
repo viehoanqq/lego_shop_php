@@ -11,7 +11,7 @@
         <h2 style="margin: 0; color: #1e293b; font-weight: 800;">
             <i class="fa-solid fa-clock-rotate-left" style="color: #3b82f6; margin-right: 10px;"></i> TRA CỨU GIÁ THEO LÔ HÀNG
         </h2>
-        <a href="/lego_shop_php/adminprice" style="color: #64748b; text-decoration: none; font-weight: 600; background: #f1f5f9; padding: 8px 15px; border-radius: 6px; border: 1px solid #e2e8f0;">
+        <a href="/lego_shop_php/admin/price" style="color: #64748b; text-decoration: none; font-weight: 600; background: #f1f5f9; padding: 8px 15px; border-radius: 6px; border: 1px solid #e2e8f0;">
             <i class="fa-solid fa-arrow-left"></i> Quay lại
         </a>
     </div>
@@ -49,7 +49,7 @@
                 ?>
                 <tr class="table-row-hover">
                     <td style="text-align: center;">
-                        <a href="/lego_shop_php/adminimport/detail/<?= $h['receipt_id'] ?>" style="background: #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-family: monospace; text-decoration: none;">
+                        <a href="/lego_shop_php/admin/import/detail/<?= $h['receipt_id'] ?>" style="background: #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-family: monospace; text-decoration: none;">
                             #PN-<?= $h['receipt_id'] ?>
                         </a>
                     </td>

@@ -3,6 +3,9 @@
 <div class="product-page-wrapper" style="background-color: #f8f9fa; padding-bottom: 50px;">
     <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 15px; display: grid; grid-template-columns: 260px 1fr; gap: 30px;">
         
+        <button type="button" class="mobile-filter-toggle" onclick="this.nextElementSibling.classList.toggle('open'); this.classList.toggle('open');">
+            <i class="fa-solid fa-sliders"></i> Bộ lọc <i class="fa-solid fa-chevron-down toggle-caret"></i>
+        </button>
         <div class="left-column">
             <?php require __DIR__ . '/../components/sidebar_filter.php'; ?>
         </div>

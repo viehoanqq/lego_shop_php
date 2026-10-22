@@ -42,6 +42,21 @@ class SettingModel extends Database {
         if ($logo_name) {
             $sql .= ", logo_url = '$logo_name'";
         }
+
+        // Cấu hình thanh toán VietQR & hoàn tiền
+        if (isset($data['bank_code'])) {
+            $bank_code = $db->real_escape_string(strtoupper(trim($data['bank_code'])));
+            $bank_no = $db->real_escape_string(preg_replace('/\s+/', '', $data['bank_account_no'] ?? ''));
+            $bank_name = $db->real_escape_string(mb_strtoupper(trim($data['bank_account_name'] ?? '')));
+            $sandbox = isset($data['payment_sandbox']) ? 1 : 0;
+            $timeout = max(5, min(1440, (int)($data['payment_timeout_minutes'] ?? 30)));
+            $refund_days = max(0, min(60, (int)($data['refund_days'] ?? 7)));
+            $sql .= ", bank_code = '$bank_code', bank_account_no = '$bank_no', bank_account_name = '$bank_name',
+                      payment_sandbox = $sandbox, payment_timeout_minutes = $timeout, refund_days = $refund_days";
+        }
+        if (!empty($data['regenerate_webhook_key'])) {
+            $sql .= ", payment_webhook_key = '" . bin2hex(random_bytes(16)) . "'";
+        }
         
         $sql .= " WHERE id = 1";
         

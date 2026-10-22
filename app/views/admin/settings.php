@@ -34,12 +34,12 @@
         </div>
     <?php endif; ?>
 
-    <form action="/lego_shop_php/adminsetting/update" method="POST" enctype="multipart/form-data">
+    <form action="/lego_shop_php/admin/setting/update" method="POST" enctype="multipart/form-data">
         <div class="settings-grid">
             
             <div class="dashboard-left">
                 <div class="admin-card">
-                    <h3 class="card-title"><i class="fa-solid fa-building text-primary"></i> Thông tin Doanh Nghiệp (Footer)</h3>
+                    <h3 class="card-title">Thông tin Doanh Nghiệp (Footer)</h3>
                     
                     <div class="form-group">
                         <label class="form-label">Tên Cửa Hàng (Hiển thị chung)</label>
@@ -56,7 +56,7 @@
                 </div>
 
                 <div class="admin-card">
-                    <h3 class="card-title"><i class="fa-solid fa-address-book text-primary"></i> Liên hệ & Giờ mở cửa</h3>
+                    <h3 class="card-title">Liên hệ & Giờ mở cửa</h3>
                     <div class="form-group">
                         <label class="form-label">Số Điện Thoại Hotline</label>
                         <div class="input-group">
@@ -91,7 +91,7 @@
                 </div>
 
                 <div class="admin-card">
-                    <h3 class="card-title"><i class="fa-solid fa-bullhorn text-primary"></i> Các chính sách & Cam kết (Banner trên cùng)</h3>
+                    <h3 class="card-title">Các chính sách & Cam kết (Banner trên cùng)</h3>
                     <div class="form-group">
                         <label class="form-label">Chính sách 1 (VD: Miễn phí giao hàng đơn từ 500k)</label>
                         <input type="text" name="policy_1" class="form-control" value="<?= htmlspecialchars($settings['policy_1']) ?>">
@@ -118,16 +118,15 @@
             <div class="dashboard-right">
                 
                 <div class="admin-card">
-                    <h3 class="card-title"><i class="fa-solid fa-image"></i> Logo Cửa Hàng</h3>
+                    <h3 class="card-title">Logo Cửa Hàng</h3>
                     <div class="form-group">
                         <img src="/lego_shop_php/public/assets/images/<?= $settings['logo_url'] ?>" alt="Logo" class="logo-preview">
                         <input type="file" name="logo_upload" class="form-control" accept="image/*">
-                        <small style="color: #64748b; font-size: 12px; margin-top: 5px; display: block;">Chỉ tải lên khi muốn thay đổi logo mới (Khuyên dùng đuôi .png trong suốt).</small>
                     </div>
                 </div>
 
                 <div class="admin-card">
-                    <h3 class="card-title"><i class="fa-solid fa-share-nodes"></i> Liên Kết Mạng Xã Hội</h3>
+                    <h3 class="card-title">Liên Kết Mạng Xã Hội</h3>
                     
                     <div class="form-group">
                         <label class="form-label">Facebook</label>
@@ -166,8 +165,88 @@
                     </div>
                 </div>
 
+                <div class="admin-card">
+                    <h3 class="card-title">Thanh toán VietQR & Hoàn tiền</h3>
+                    <?php
+                        $qr_banks = ['MB' => 'MB Bank', 'VCB' => 'Vietcombank', 'ICB' => 'VietinBank', 'BIDV' => 'BIDV', 'VBA' => 'Agribank',
+                                     'TCB' => 'Techcombank', 'ACB' => 'ACB', 'VPB' => 'VPBank', 'TPB' => 'TPBank', 'STB' => 'Sacombank',
+                                     'VIB' => 'VIB', 'SHB' => 'SHB', 'HDB' => 'HDBank', 'OCB' => 'OCB', 'MSB' => 'MSB', 'EIB' => 'Eximbank',
+                                     'LPB' => 'LPBank', 'SEAB' => 'SeABank', 'CAKE' => 'Cake', 'TIMO' => 'Timo'];
+                        $webhook_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/lego_shop_php/payment/webhook';
+                    ?>
+                    <div class="form-group">
+                        <label class="form-label">Ngân hàng nhận tiền</label>
+                        <select name="bank_code" id="set_bank_code" class="form-control">
+                            <?php foreach ($qr_banks as $code => $name): ?>
+                                <option value="<?= $code ?>" <?= ($settings['bank_code'] ?? '') === $code ? 'selected' : '' ?>><?= $name ?> (<?= $code ?>)</option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Số tài khoản</label>
+                        <input type="text" name="bank_account_no" id="set_bank_no" class="form-control" value="<?= htmlspecialchars($settings['bank_account_no'] ?? '') ?>" pattern="[0-9 ]{6,25}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tên chủ tài khoản (không dấu)</label>
+                        <input type="text" name="bank_account_name" id="set_bank_name" class="form-control" value="<?= htmlspecialchars($settings['bank_account_name'] ?? '') ?>" style="text-transform: uppercase;" required>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <img id="set_qr_preview" alt="QR mẫu" style="width: 160px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px;">
+                    </div>
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label class="form-label">Hết hạn thanh toán (phút)</label>
+                            <input type="number" name="payment_timeout_minutes" class="form-control" min="5" max="1440" value="<?= (int)($settings['payment_timeout_minutes'] ?? 30) ?>">
+                        </div>
+                        <div>
+                            <label class="form-label">Hạn trả hàng (ngày)</label>
+                            <input type="number" name="refund_days" class="form-control" min="0" max="60" value="<?= (int)($settings['refund_days'] ?? 7) ?>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer;">
+                            <input type="checkbox" name="payment_sandbox" value="1" <?= (int)($settings['payment_sandbox'] ?? 0) === 1 ? 'checked' : '' ?>>
+                            Chế độ giả lập thanh toán
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Webhook URL (SePay / Casso)</label>
+                        <input type="text" class="form-control" value="<?= htmlspecialchars($webhook_url) ?>" readonly onclick="this.select()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">API Key webhook</label>
+                        <?php $env_key = (string)env('PAYMENT_WEBHOOK_KEY', ''); if ($env_key !== ''): ?>
+                            <input type="text" class="form-control" value="<?= htmlspecialchars(substr($env_key, 0, 6) . str_repeat('•', 12) . substr($env_key, -4)) ?>" readonly style="font-family: monospace;">
+                            <small style="display: block; margin-top: 6px; font-size: 12px; color: #64748b;">Lưu trong file <code>.env</code> (PAYMENT_WEBHOOK_KEY). Đổi key: sửa file .env.</small>
+                        <?php else: ?>
+                            <input type="text" class="form-control" value="<?= htmlspecialchars($settings['payment_webhook_key'] ?? '') ?>" readonly onclick="this.select()" style="font-family: monospace;">
+                            <label style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: #475569; margin-top: 6px; cursor: pointer;">
+                                <input type="checkbox" name="regenerate_webhook_key" value="1"> Tạo key mới
+                            </label>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn-save" style="position: sticky; top: 20px; box-shadow: 0 4px 12px rgba(59,130,246,0.3);"><i class="fa-solid fa-floppy-disk"></i> LƯU TOÀN BỘ CÀI ĐẶT</button>
             </div>
         </div>
     </form>
 </div>
+
+<script>
+(function () {
+    const code = document.getElementById('set_bank_code');
+    const no = document.getElementById('set_bank_no');
+    const name = document.getElementById('set_bank_name');
+    const img = document.getElementById('set_qr_preview');
+    function refresh() {
+        const acc = no.value.replace(/\s+/g, '');
+        if (!acc) { img.removeAttribute('src'); return; }
+        img.src = `https://img.vietqr.io/image/${code.value}-${encodeURIComponent(acc)}-compact.png?amount=10000&addInfo=TEST&accountName=${encodeURIComponent(name.value.toUpperCase())}`;
+    }
+    code.addEventListener('change', refresh);
+    no.addEventListener('change', refresh);
+    name.addEventListener('change', refresh);
+    refresh();
+})();
+</script>

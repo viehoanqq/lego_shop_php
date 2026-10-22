@@ -25,17 +25,14 @@ class AdminSettingController extends Controller {
             
             $logo_name = null;
             // Chú ý: Đường dẫn upload này phải khớp với cấu trúc thư mục của bạn
-            if (isset($_FILES['logo_upload']) && $_FILES['logo_upload']['error'] == 0) {
-                $target_dir = "public/assets/images/"; 
-                $logo_name = time() . "_" . basename($_FILES["logo_upload"]["name"]);
-                $target_file = $target_dir . $logo_name;
-                move_uploaded_file($_FILES["logo_upload"]["tmp_name"], $target_file);
+            if (isset($_FILES['logo_upload']) && $_FILES['logo_upload']['error'] === UPLOAD_ERR_OK) {
+                $logo_name = $this->saveUploadedImage($_FILES['logo_upload']['tmp_name'], $_FILES['logo_upload']['size']);
             }
 
             if ($settingModel->updateSettings($_POST, $logo_name)) {
-                header("Location: /lego_shop_php/adminsetting?msg=success");
+                header("Location: /lego_shop_php/admin/setting?msg=success");
             } else {
-                header("Location: /lego_shop_php/adminsetting?error=1");
+                header("Location: /lego_shop_php/admin/setting?error=1");
             }
             exit;
         }

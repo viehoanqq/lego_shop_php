@@ -104,12 +104,6 @@ class AccountModel extends Database {
             
             // KIỂM TRA MẬT KHẨU (Đã mã hóa)
             if (password_verify($password, $admin['password'])) {
-                unset($admin['password']); 
-                return $admin;
-            }
-            
-            // KIỂM TRA MẬT KHẨU (Chưa mã hóa - dự phòng)
-            if ($password === $admin['password'] && !empty($admin['password'])) {
                 unset($admin['password']);
                 return $admin;
             }

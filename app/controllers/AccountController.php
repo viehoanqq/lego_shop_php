@@ -32,6 +32,24 @@ class AccountController extends Controller {
                 exit();
             }
 
+            // 1b. Kiểm tra định dạng phía server (không tin dữ liệu từ trình duyệt)
+            $format_error = null;
+            if (!filter_var(trim($data['email']), FILTER_VALIDATE_EMAIL)) {
+                $format_error = "Email không hợp lệ!";
+            } elseif (!preg_match('/^0[35789][0-9]{8}$/', trim($data['phone']))) {
+                $format_error = "Số điện thoại không hợp lệ!";
+            } elseif (mb_strlen(trim($data['fullname'])) < 2 || mb_strlen(trim($data['fullname'])) > 50 || preg_match('/[<>"]/', $data['fullname'])) {
+                $format_error = "Họ tên phải từ 2 đến 50 ký tự và không chứa ký tự đặc biệt!";
+            } elseif (strlen($data['password']) < 6) {
+                $format_error = "Mật khẩu phải từ 6 ký tự trở lên!";
+            }
+            if ($format_error) {
+                $_SESSION['register_error'] = $format_error;
+                $_SESSION['old_data'] = $data;
+                header("Location: /lego_shop_php/account/register");
+                exit();
+            }
+
             // 2. Kiểm tra check Điều khoản
             if (!isset($data['terms'])) {
                 $_SESSION['register_error'] = "Bạn phải đồng ý với Điều khoản dịch vụ!";
@@ -96,9 +114,11 @@ class AccountController extends Controller {
             $user = $model->login($username, $password);
 
             if ($user) {
+                session_regenerate_id(true); // chống session fixation
                 $_SESSION['user_account_id'] = $user['id'];
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['user_fullname'] = $user['fullname'];
+                $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_role'] = $user['role'];
                 
                 header("Location: /lego_shop_php/home");

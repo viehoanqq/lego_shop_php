@@ -1,11 +1,32 @@
 <link rel="stylesheet" href="/lego_shop_php/public/assets/css/cart.css?v=<?= time() ?>">
+<style>
+
+    .voucher-box { border-top: 2px solid #f1f1f1; padding-top: 18px; margin-top: 10px; margin-bottom: 15px; }
+    .voucher-label { display: block; font-weight: 700; font-size: 14px; color: #333; margin-bottom: 10px; }
+    .voucher-input-row { display: flex; gap: 8px; }
+    .voucher-input-row input { flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; text-transform: uppercase; min-width: 0; }
+    .voucher-input-row input:focus { outline: none; border-color: #a4161a; }
+    .voucher-input-row button { background: #a4161a; color: #fff; border: none; border-radius: 6px; padding: 0 16px; font-weight: 700; cursor: pointer; }
+    .voucher-input-row button:disabled { opacity: .6; cursor: wait; }
+    .voucher-applied { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 10px 12px; font-size: 13px; color: #333; }
+    .voucher-applied strong { margin-right: 6px; }
+    .voucher-applied button { background: none; border: none; color: #888; cursor: pointer; font-size: 16px; }
+    .voucher-applied button:hover { color: #e03131; }
+
+    .voucher-suggest { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; max-height: 210px; overflow-y: auto; }
+    .voucher-chip { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; text-align: left; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 8px 10px; cursor: pointer; transition: .2s; }
+    .voucher-chip:hover { border-color: #a4161a; }
+    .voucher-chip .chip-code { grid-row: span 2; align-self: center; font-weight: 700; color: #333; font-size: 13px; }
+    .voucher-chip .chip-desc { font-size: 13px; color: #333; font-weight: 600; }
+    .voucher-chip .chip-cond { font-size: 11px; color: #888; }
+    .voucher-chip.disabled { cursor: not-allowed; opacity: .5; }
+</style>
 <div class="checkout-page-wrapper">
     <div class="checkout-container">
         <?php $current_step = 2; require __DIR__ . '/../../components/checkout_progress.php'; ?>
 
         <div class="checkout-header-title">
             <h2>Thanh toán đơn hàng</h2>
-            <p style="color: #666;">Vui lòng kiểm tra lại thông tin trước khi xác nhận.</p>
         </div>
 
         <form action="/lego_shop_php/checkout/process" method="POST" id="checkoutForm">
@@ -89,17 +110,9 @@
                                 <span>Thanh toán khi nhận hàng (COD)</span>
                             </label>
                             <label class="payment-item">
-                                <input type="radio" name="payment_method" value="transfer">
-                                <span>Chuyển khoản ngân hàng</span>
-                            </label>
-                            <div id="bankingInfo" class="banking-details" style="display: none;">
-                                <p><strong>Ngân hàng:</strong> MB Bank (Quân Đội)</p>
-                                <p><strong>Số tài khoản:</strong> 0961589023</p>
-                                <p><strong>Chủ tài khoản:</strong> HOANG NGUYEN</p>
-                            </div>
-                            <label class="payment-item">
-                                <input type="radio" name="payment_method" value="online">
-                                <span>Thanh toán trực tuyến (Momo, VNPay...)</span>
+                                <input type="radio" name="payment_method" value="vietqr">
+                                <span>Chuyển khoản qua mã VietQR</span>
+                                <i class="fa-solid fa-qrcode" style="margin-left: auto; color: #555;"></i>
                             </label>
                         </div>
                         <div class="back-to-cart-wrapper">
@@ -127,14 +140,58 @@
                             <?php endforeach; ?>
                         </div>
 
+                        <!-- MÃ GIẢM GIÁ -->
+                        <div class="voucher-box">
+                            <label class="voucher-label"><i class="fa-solid fa-ticket"></i> Mã giảm giá</label>
+                            <div class="voucher-input-row" id="voucherInputRow" style="<?= $applied_voucher ? 'display:none;' : '' ?>">
+                                <input type="text" id="voucherCode" placeholder="Nhập mã giảm giá" autocomplete="off">
+                                <button type="button" id="btnApplyVoucher" onclick="applyVoucher()">Áp dụng</button>
+                            </div>
+                            <div class="voucher-applied" id="voucherApplied" style="<?= $applied_voucher ? '' : 'display:none;' ?>">
+                                <div>
+                                    <strong id="voucherAppliedCode"><?= htmlspecialchars($applied_voucher['code'] ?? '') ?></strong>
+                                    <span id="voucherAppliedDesc"><?= $applied_voucher ? htmlspecialchars(VoucherModel::describe($applied_voucher)) : '' ?></span>
+                                </div>
+                                <button type="button" onclick="removeVoucher()" title="Bỏ mã"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+
+                            <?php if (!empty($vouchers)): ?>
+                                <div class="voucher-suggest">
+                                    <?php foreach ($vouchers as $v):
+                                        $usable = $v['remaining_for_user'] > 0 && $total_price >= $v['min_order_value'];
+                                    ?>
+                                        <button type="button" class="voucher-chip <?= $usable ? '' : 'disabled' ?>"
+                                                <?= $usable ? 'onclick="pickVoucher(\'' . htmlspecialchars($v['code']) . '\')"' : '' ?>
+                                                title="<?= htmlspecialchars($v['description'] ?? '') ?>">
+                                            <span class="chip-code"><?= htmlspecialchars($v['code']) ?></span>
+                                            <span class="chip-desc"><?= htmlspecialchars(VoucherModel::describe($v)) ?></span>
+                                            <span class="chip-cond">
+                                                <?php if ($v['remaining_for_user'] <= 0): ?>Bạn đã dùng hết lượt
+                                                <?php elseif ($total_price < $v['min_order_value']): ?>Đơn tối thiểu <?= number_format($v['min_order_value'], 0, ',', '.') ?>đ
+                                                <?php else: ?>Dùng ngay<?php endif; ?>
+                                            </span>
+                                        </button>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
                         <div class="price-breakdown">
+                            <div class="price-row">
+                                <span>Tạm tính</span>
+                                <span id="sumSubtotal"><?= number_format($total_price, 0, ',', '.') ?>đ</span>
+                            </div>
+                            <div class="price-row" id="rowDiscount" style="<?= $discount > 0 ? '' : 'display:none;' ?>">
+                                <span>Giảm giá</span>
+                                <span id="sumDiscount">-<?= number_format($discount, 0, ',', '.') ?>đ</span>
+                            </div>
                             <div class="price-row">
                                 <span>Phí giao hàng</span>
                                 <span class="text-success" style="font-weight: 700;">Miễn phí</span>
                             </div>
                             <div class="price-row total-final">
                                 <span class="text-red">Tổng cộng:</span>
-                                <span class="text-red font-weight-bold"><?= number_format($total_price, 0, ',', '.') ?>đ</span>
+                                <span class="text-red font-weight-bold" id="sumTotal"><?= number_format($total_price - $discount, 0, ',', '.') ?>đ</span>
                             </div>
                         </div>
                         <button type="submit" class="btn-confirm-order">XÁC NHẬN ĐƠN HÀNG</button>
@@ -177,13 +234,63 @@
             });
         });
 
-        // Hiện info banking
-        document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                document.getElementById('bankingInfo').style.display = (this.value === 'banking') ? 'block' : 'none';
-            });
+        // Nhấn Enter trong ô mã giảm giá -> áp dụng mã thay vì submit form đặt hàng
+        document.getElementById('voucherCode').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); applyVoucher(); }
         });
     });
+
+    // ================= MÃ GIẢM GIÁ =================
+    const fmtVND = (n) => Number(n).toLocaleString('vi-VN') + 'đ';
+
+    function renderTotals(data) {
+        document.getElementById('sumSubtotal').innerText = fmtVND(data.subtotal);
+        document.getElementById('sumDiscount').innerText = '-' + fmtVND(data.discount);
+        document.getElementById('rowDiscount').style.display = data.discount > 0 ? '' : 'none';
+        document.getElementById('sumTotal').innerText = fmtVND(data.total);
+    }
+
+    function pickVoucher(code) {
+        document.getElementById('voucherCode').value = code;
+        applyVoucher();
+    }
+
+    function applyVoucher() {
+        const input = document.getElementById('voucherCode');
+        const code = input.value.trim();
+        if (!code) { showToast('Vui lòng nhập mã giảm giá!', 'error'); return; }
+
+        const btn = document.getElementById('btnApplyVoucher');
+        btn.disabled = true;
+        fetch('/lego_shop_php/checkout/applyVoucher', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            if (!data.success) { showToast(data.message, 'error'); return; }
+            showToast(data.message, 'success');
+            document.getElementById('voucherAppliedCode').innerText = data.code;
+            document.getElementById('voucherAppliedDesc').innerText = data.description;
+            document.getElementById('voucherInputRow').style.display = 'none';
+            document.getElementById('voucherApplied').style.display = 'flex';
+            renderTotals(data);
+        })
+        .catch(() => { btn.disabled = false; showToast('Lỗi kết nối máy chủ!', 'error'); });
+    }
+
+    function removeVoucher() {
+        fetch('/lego_shop_php/checkout/removeVoucher', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('voucherCode').value = '';
+            document.getElementById('voucherInputRow').style.display = 'flex';
+            document.getElementById('voucherApplied').style.display = 'none';
+            renderTotals(data);
+        });
+    }
 
  function saveNewAddress() {
     // 1. Lấy dữ liệu

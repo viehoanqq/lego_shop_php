@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/lego_shop_php/public/assets/vendor/fontawesome/css/all.min.css">
 
 <?php 
     // Lấy ngày hôm nay định dạng YYYY-MM-DD để truyền vào Link
@@ -134,7 +134,7 @@
 
 <div class="dashboard-wrapper">
     <div class="stat-top">
-        <a href="/lego_shop_php/adminorder?search=&status=all&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem tất cả đơn hôm nay">
+        <a href="/lego_shop_php/admin/order?search=&status=all&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem tất cả đơn hôm nay">
             <div class="stat-header">
                 <div class="stat-info">
                     <h3>Tổng đơn hôm nay</h3>
@@ -155,7 +155,7 @@
             <div class="stat-note"><i class="fa-solid fa-check-circle" style="color: #94a3b8;"></i> Từ các đơn đã giao thành công</div>
         </div>
 
-        <a href="/lego_shop_php/adminorder?search=&status=cancelled&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem các đơn bị hủy hôm nay">
+        <a href="/lego_shop_php/admin/order?search=&status=cancelled&date_from=<?= $today ?>&date_to=<?= $today ?>&sort=date_desc" class="stat-card" title="Xem các đơn bị hủy hôm nay">
             <div class="stat-header">
                 <div class="stat-info">
                     <h3>Đơn hàng bị hủy</h3>
@@ -224,7 +224,7 @@
     <div class="recent-orders-card">
         <div class="card-title" style="margin-bottom: 10px;">
             <span style="display: flex; align-items: center; gap: 10px;"><i class="fa-regular fa-clipboard" style="color: #3b82f6; padding: 8px; background: #eff6ff; border-radius: 8px;"></i> Đơn hàng mới nhất</span>
-            <a href="/lego_shop_php/adminorder" style="font-size: 13px; color: #fff; background: #3b82f6; text-decoration: none; font-weight: 600; padding: 6px 14px; border-radius: 8px; transition: 0.2s;">Xem tất cả <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="/lego_shop_php/admin/order" style="font-size: 13px; color: #fff; background: #3b82f6; text-decoration: none; font-weight: 600; padding: 6px 14px; border-radius: 8px; transition: 0.2s;">Xem tất cả <i class="fa-solid fa-arrow-right"></i></a>
         </div>
         
         <div style="overflow-x: auto;">
@@ -246,8 +246,10 @@
                             'confirmed' => ['lbl' => 'Đã xác nhận', 'class' => 'badge-outline-teal', 'icon' => 'fa-box-open'],
                             'shipping'  => ['lbl' => 'Đang giao',   'class' => 'badge-outline-blue', 'icon' => 'fa-truck-fast'],
                             'delivered' => ['lbl' => 'Thành công',  'class' => 'badge-outline-green', 'icon' => 'fa-check-double'],
-                            'cancelled' => ['lbl' => 'Đã hủy',      'class' => 'badge-solid-red', 'icon' => 'fa-ban']
+                            'cancelled' => ['lbl' => 'Đã hủy',      'class' => 'badge-solid-red', 'icon' => 'fa-ban'],
+                            'returned'  => ['lbl' => 'Đã trả hàng', 'class' => 'badge-outline-teal', 'icon' => 'fa-rotate-left']
                         ];
+                        $pm_map = ['cash' => 'Tiền mặt', 'transfer' => 'Chuyển khoản', 'online' => 'Online', 'vietqr' => 'VietQR'];
                     ?>
                     
                     <?php if(!empty($don_moi_nhat)): ?>
@@ -256,7 +258,7 @@
                             $badge = $badge_map[$st] ?? $badge_map['pending'];
                             $pm = $don['payment_method'] ?? 'cash';
                         ?>
-                        <tr class="clickable-row" onclick="window.location.href='/lego_shop_php/adminorder/detail/<?= $don['id'] ?>'">
+                        <tr class="clickable-row" onclick="window.location.href='/lego_shop_php/admin/order/detail/<?= $don['id'] ?>'">
                             <td>
                                 <span style="font-family: monospace; font-size: 15px; font-weight: 800; color: #3b82f6;">
                                     #<?= $don['id'] ?>
@@ -264,7 +266,7 @@
                             </td>
                             <td><?= htmlspecialchars($don['khach_hang']) ?></td>
                             <td style="color: #475569; font-weight: 600;">
-                                <?= ($pm == 'cash' ? 'Tiền mặt' : 'Chuyển khoản') ?>
+                                <?= $pm_map[$pm] ?? $pm ?>
                             </td>
                             <td style="font-weight: 800; font-size: 15px; color: #1e293b;"><?= number_format($don['tong_tien'], 0, ',', '.') ?>đ</td>
                             <td style="text-align: center;">

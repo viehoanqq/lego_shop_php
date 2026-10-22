@@ -74,7 +74,7 @@ class AdminProductController extends Controller {
     // 1. Lấy thông tin sản phẩm chính
     $product = $this->productModel->getProductById($id);
     if (!$product) {
-        header('Location: /lego_shop_php/adminproduct');
+        header('Location: /lego_shop_php/admin/product');
         exit();
     }
 
@@ -103,7 +103,7 @@ class AdminProductController extends Controller {
         // 1. Kiểm tra sản phẩm có tồn tại không
         if (!$product) {
             set_flash_message('error', 'db');
-            header('Location: /lego_shop_php/adminproduct');
+            header('Location: /lego_shop_php/admin/product');
             exit();
         }
 
@@ -120,7 +120,7 @@ class AdminProductController extends Controller {
             }
         }
 
-        header('Location: /lego_shop_php/adminproduct');
+        header('Location: /lego_shop_php/admin/product');
         exit();
     }
 
@@ -144,7 +144,7 @@ class AdminProductController extends Controller {
     //         set_flash_message('error', 'db');
     //     }
 
-    //     header('Location: /lego_shop_php/adminproduct');
+    //     header('Location: /lego_shop_php/admin/product');
     //     exit();
     // }
 
@@ -155,7 +155,7 @@ class AdminProductController extends Controller {
         
     //     if (!$product) {
     //         set_flash_message('error', 'notfound');
-    //         header("Location: /lego_shop_php/adminproduct");
+    //         header("Location: /lego_shop_php/admin/product");
     //         exit();
     //     }
 
@@ -171,7 +171,7 @@ class AdminProductController extends Controller {
     //         set_flash_message('error', 'db');
     //     }
         
-    //     header("Location: /lego_shop_php/adminproduct");
+    //     header("Location: /lego_shop_php/admin/product");
     //     exit();
     // }
 
@@ -179,7 +179,7 @@ class AdminProductController extends Controller {
         $product = $this->productModel->getProductById($id);
         if (!$product) {
             set_flash_message('error', 'notfound');
-            header("Location: /lego_shop_php/adminproduct");
+            header("Location: /lego_shop_php/admin/product");
             exit();
         }
 
@@ -197,7 +197,7 @@ class AdminProductController extends Controller {
             set_flash_message('error', 'db');
         }
 
-        header("Location: /lego_shop_php/adminproduct");
+        header("Location: /lego_shop_php/admin/product");
         exit();
     }
 
@@ -232,15 +232,15 @@ class AdminProductController extends Controller {
 
             if ($data['name'] === '' || $data['sku'] === '') {
                 set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/adminproduct/add'); exit();
+                header('Location: /lego_shop_php/admin/product/add'); exit();
             }
             if ($this->productModel->isNameExists($data['name'])) {
                 set_flash_message('error', 'name_exists');
-                header('Location: /lego_shop_php/adminproduct/add'); exit();
+                header('Location: /lego_shop_php/admin/product/add'); exit();
             }
             if ($this->productModel->isSkuExists($data['sku'])) {
                 set_flash_message('error', 'sku_exists');
-                header('Location: /lego_shop_php/adminproduct/add'); exit();
+                header('Location: /lego_shop_php/admin/product/add'); exit();
             }
 
             // Hứng ID vừa tạo
@@ -256,10 +256,10 @@ class AdminProductController extends Controller {
                 }
 
                 set_flash_message('msg', 'success');
-                header('Location: /lego_shop_php/adminproduct');
+                header('Location: /lego_shop_php/admin/product');
             } else {
                 set_flash_message('error', 'db');
-                header('Location: /lego_shop_php/adminproduct/add');
+                header('Location: /lego_shop_php/admin/product/add');
             }
             exit();
         }
@@ -297,17 +297,17 @@ class AdminProductController extends Controller {
                 empty($_POST['length']) || empty($_POST['width']) || empty($_POST['height'])) {
                 
                 set_flash_message('error', 'empty');
-                header('Location: /lego_shop_php/adminproduct/edit/'.$id); 
+                header('Location: /lego_shop_php/admin/product/edit/'.$id); 
                 exit();
             }
 
             if ($this->productModel->isNameExists($data['name'], $id)) {
                 set_flash_message('error', 'name_exists');
-                header('Location: /lego_shop_php/adminproduct/edit/'.$id); exit();
+                header('Location: /lego_shop_php/admin/product/edit/'.$id); exit();
             }
             if ($this->productModel->isSkuExists($data['sku'], $id)) {
                 set_flash_message('error', 'sku_exists');
-                header('Location: /lego_shop_php/adminproduct/edit/'.$id); exit();
+                header('Location: /lego_shop_php/admin/product/edit/'.$id); exit();
             }
 
             if ($this->productModel->updateProduct($id, $data)) {
@@ -321,10 +321,10 @@ class AdminProductController extends Controller {
                 }
 
                 set_flash_message('msg', 'updated');
-                header('Location: /lego_shop_php/adminproduct');
+                header('Location: /lego_shop_php/admin/product');
             } else {
                 set_flash_message('error', 'db');
-                header('Location: /lego_shop_php/adminproduct/edit/'.$id);
+                header('Location: /lego_shop_php/admin/product/edit/'.$id);
             }
             exit();
         }
@@ -337,7 +337,7 @@ class AdminProductController extends Controller {
     //     if (!$productModel->canDeleteProduct($id)) {
     //         // Gửi mã 'has_history' để View hiển thị đúng câu thông báo
     //         set_flash_message('error', 'has_history'); 
-    //         header("Location: /lego_shop_php/adminproduct");
+    //         header("Location: /lego_shop_php/admin/product");
     //         exit();
     //     }
 
@@ -349,7 +349,7 @@ class AdminProductController extends Controller {
     //         set_flash_message('error', 'db');
     //     }
 
-    //     header("Location: /lego_shop_php/adminproduct");
+    //     header("Location: /lego_shop_php/admin/product");
     //     exit();
     // }
 
@@ -375,33 +375,14 @@ class AdminProductController extends Controller {
             }
         }
 
-        header("Location: /lego_shop_php/adminproduct");
+        header("Location: /lego_shop_php/admin/product");
         exit();
     }
     private function uploadGalleryFiles($files) {
         $uploadedNames = [];
-        $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'image/gif'];
-        $targetDir = "public/assets/images/";
-        if (!file_exists($targetDir)) mkdir($targetDir, 0777, true);
-
-        $fileCount = count($files['name']);
-        
-        for ($i = 0; $i < $fileCount; $i++) {
-            if ($files['error'][$i] === UPLOAD_ERR_OK) {
-                $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mimeType = finfo_file($fileInfo, $files['tmp_name'][$i]);
-                finfo_close($fileInfo);
-
-                if (in_array($mimeType, $allowed) && $files['size'][$i] <= 2 * 1024 * 1024) {
-                    // Thêm số ngẫu nhiên để tránh trùng tên nếu up nhiều file cùng lúc
-                    $fileName = time() . '_' . rand(100,999) . '_' . basename($files["name"][$i]);
-                    $targetFile = $targetDir . $fileName;
-
-                    if (move_uploaded_file($files["tmp_name"][$i], $targetFile)) {
-                        $uploadedNames[] = $fileName;
-                    }
-                }
-            }
+        foreach ($files['tmp_name'] as $i => $tmp) {
+            $name = $this->saveUploadedImage($tmp, $files['size'][$i], $files['error'][$i]);
+            if ($name) $uploadedNames[] = $name;
         }
         return $uploadedNames;
     }
@@ -427,31 +408,12 @@ class AdminProductController extends Controller {
         } else {
             set_flash_message('error', 'db');
         }
-        header("Location: /lego_shop_php/adminproduct");
+        header("Location: /lego_shop_php/admin/product");
         exit();
     }
 
     private function uploadFile($file) {
-        $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'image/gif'];
-        
-        // Kiểm tra định dạng thực tế
-        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($fileInfo, $file['tmp_name']);
-        finfo_close($fileInfo);
-
-        if (!in_array($mimeType, $allowed)) return 'default.jpg';
-        if ($file['size'] > 2 * 1024 * 1024) return 'default.jpg';
-
-        $targetDir = "public/assets/images/";
-        if (!file_exists($targetDir)) mkdir($targetDir, 0777, true);
-
-        $fileName = time() . '_' . basename($file["name"]);
-        $targetFile = $targetDir . $fileName;
-
-        if (move_uploaded_file($file["tmp_name"], $targetFile)) {
-            return $fileName;
-        }
-        return 'default.jpg';
+        return $this->saveUploadedImage($file['tmp_name'], $file['size'], $file['error']) ?? 'default.jpg';
     }
     
 
@@ -460,7 +422,7 @@ class AdminProductController extends Controller {
         $product = $this->productModel->getProductFullDetail($id);
         if (!$product) {
             set_flash_message('error', 'notfound');
-            header('Location: /lego_shop_php/adminproduct');
+            header('Location: /lego_shop_php/admin/product');
             exit();
         }
         
@@ -489,7 +451,7 @@ class AdminProductController extends Controller {
             } else {
                 set_flash_message('error', 'db');
             }
-            header("Location: /lego_shop_php/adminproduct/detail/" . $id);
+            header("Location: /lego_shop_php/admin/product/detail/" . $id);
             exit();
         }
     }

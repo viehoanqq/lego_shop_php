@@ -4,12 +4,12 @@
             <div class="avatar-wrapper">
                 <img src="/lego_shop_php/public/assets/images/avt.png" 
                      class="profile-avatar-large" 
-                     onerror="this.src='https://ui-avatars.com/api/?name=<?= $_SESSION['admin_name'] ?? 'A' ?>&background=6366f1&color=fff&size=150&bold=true'" 
+                     onerror="this.src='https://ui-avatars.com/api/?name=<?= htmlspecialchars((string)($_SESSION['admin_name'] ?? 'A')) ?>&background=6366f1&color=fff&size=150&bold=true'" 
                      alt="Avatar">
                
             </div>
             
-            <h2 class="profile-name"><?= $_SESSION['admin_name'] ?? 'Administrator' ?></h2>
+            <h2 class="profile-name"><?= htmlspecialchars((string)($_SESSION['admin_name'] ?? 'Administrator')) ?></h2>
             <p class="profile-role-tag"><?= strtoupper($_SESSION['admin_role'] ?? 'QUẢN TRỊ VIÊN') ?></p>
             
             <div class="profile-stats">

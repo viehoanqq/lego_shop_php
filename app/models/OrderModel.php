@@ -1,6 +1,32 @@
 <?php
 class OrderModel extends Database {
-    
+
+    // Nhãn + màu cho các mốc trong order_history (trạng thái đơn và sự kiện thanh toán / hoàn tiền)
+    const HISTORY_LABELS = [
+        'pending'          => ['Chờ xử lý', '#94a3b8'],
+        'confirmed'        => ['Đã xác nhận', '#3b82f6'],
+        'shipping'         => ['Đang giao', '#3b82f6'],
+        'delivered'        => ['Thành công', '#22c55e'],
+        'cancelled'        => ['Đã hủy', '#ef4444'],
+        'returned'         => ['Đã trả hàng', '#7c3aed'],
+        'paid'             => ['Đã thanh toán', '#16a34a'],
+        'refund_requested' => ['Yêu cầu hoàn tiền', '#f59e0b'],
+        'refund_approved'  => ['Duyệt hoàn tiền', '#0ea5e9'],
+        'refund_rejected'  => ['Từ chối hoàn tiền', '#ef4444'],
+        'refunded'         => ['Đã hoàn tiền', '#7c3aed'],
+    ];
+
+    const PAYMENT_METHODS = [
+        'cash' => 'COD (Tiền mặt)', 'transfer' => 'Chuyển khoản', 'online' => 'Online', 'vietqr' => 'VietQR (online)',
+    ];
+
+    const PAYMENT_STATUS = [
+        'unpaid'         => ['Chưa thanh toán', '#b45309', '#fffbeb'],
+        'paid'           => ['Đã thanh toán', '#15803d', '#f0fdf4'],
+        'refund_pending' => ['Đang hoàn tiền', '#1d4ed8', '#eff6ff'],
+        'refunded'       => ['Đã hoàn tiền', '#6d28d9', '#f5f3ff'],
+    ];
+
     // Lưu thông tin chung của đơn hàng
     private function buildAdminOrdersWhere($filters) {
         $db = $this->getConnection();
@@ -326,31 +352,35 @@ class OrderModel extends Database {
         return $reviews;
     }
 
-    // Lưu thông tin chung của đơn hàng
-    public function createOrder($user_id, $status, $payment_method, $total_amount, $fullname, $phone, $street, $ward, $district, $city) {
+    // Lưu thông tin chung của đơn hàng (kèm tạm tính, giảm giá, voucher)
+    public function createOrder($data) {
         $db = $this->getConnection();
-        
-        $user_id = (int)$user_id;
-        $total_amount = (float)$total_amount; 
-        $status = $db->real_escape_string($status);
-        $payment_method = $db->real_escape_string($payment_method);
-        $fullname = $db->real_escape_string($fullname);
-        $phone = $db->real_escape_string($phone);
-        $street = $db->real_escape_string($street);
-        $ward = $db->real_escape_string($ward);
-        $district = $db->real_escape_string($district);
-        $city = $db->real_escape_string($city);
-        
 
-        // THÊM CỘT created_at VÀO SQL
-        $sql = "INSERT INTO orders (user_id, status, payment_method, total_amount, shipping_fullname, shipping_phone, shipping_street, shipping_ward, shipping_district, shipping_city) 
-                VALUES ($user_id, '$status', '$payment_method', $total_amount, '$fullname', '$phone', '$street', '$ward', '$district', '$city')";
-                
-        if ($db->query($sql) === TRUE) {
-            return $db->insert_id; 
-        }
-        
-        echo "Lỗi SQL: " . $db->error . "<br>Câu lệnh: " . $sql;
-        exit;
+        $sql = "INSERT INTO orders (user_id, status, payment_method, subtotal_amount, discount_amount, voucher_id, voucher_code,
+                    total_amount, shipping_fullname, shipping_phone, shipping_street, shipping_ward, shipping_district, shipping_city)
+                VALUES (?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("isiiisissssss",
+            $data['user_id'], $data['payment_method'], $data['subtotal_amount'], $data['discount_amount'],
+            $data['voucher_id'], $data['voucher_code'], $data['total_amount'],
+            $data['shipping_fullname'], $data['shipping_phone'], $data['shipping_street'],
+            $data['shipping_ward'], $data['shipping_district'], $data['shipping_city']
+        );
+        $stmt->execute();
+        return $db->insert_id;
+    }
+
+    public function setPaymentCode($order_id, $payment_code) {
+        $db = $this->getConnection();
+        $stmt = $db->prepare("UPDATE orders SET payment_code = ? WHERE id = ?");
+        $stmt->bind_param("si", $payment_code, $order_id);
+        return $stmt->execute();
+    }
+
+    public function addHistory($order_id, $status, $note = '') {
+        $db = $this->getConnection();
+        $stmt = $db->prepare("INSERT INTO order_history (order_id, status, note) VALUES (?, ?, ?)");
+        $stmt->bind_param("iss", $order_id, $status, $note);
+        return $stmt->execute();
     }
 }
